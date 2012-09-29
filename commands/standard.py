@@ -1,34 +1,11 @@
 """
-Example command set template module.
-
-To create new commands to populate the cmdset, see
-examples/command.py.
-
-To extend the default command set:
-  - copy this file up one level to gamesrc/commands and name it
-    something fitting.
-  - change settings.CMDSET_DEFAULT to point to the new module's
-    DefaultCmdSet
-  - import/add commands at the end of DefaultCmdSet's add() method.
-
-To extend OOC cmdset:
-  - like default set, but point settings.CMDSET_OOC on your new cmdset.
-
-To extend Unloggedin cmdset:
-  - like default set, but point settings.CMDSET_UNLOGGEDIN on your new cmdset.
-
-To add a wholly new command set:
-  - copy this file up one level to gamesrc/commands and name it
-    something fitting.
-  - add a new cmdset class
-  - add it to objects e.g. with obj.cmdset.add(path.to.the.module.and.class)
-
+Winter's Oasis standard command sets.
 """
 
 from ev import CmdSet, Command
 from ev import default_cmds
 from game.gamesrc.commands import quote
-from game.gamesrc.commands import whospec
+from game.gamesrc.commands import character_commands
 
 from contrib import menusystem, lineeditor
 #from contrib import misc_commands
@@ -70,7 +47,8 @@ class DefaultCmdSet(default_cmds.DefaultCmdSet):
         # calling setup in src.commands.default.cmdset_default
         super(DefaultCmdSet, self).at_cmdset_creation()
         self.add(quote.Quote())
-	self.add(whospec.WhoSpec())
+	self.add(character_commands.WhoSpec())
+	self.add(character_commands.Sheet())
         #
         # any commands you add below will overload the default ones.
         #
