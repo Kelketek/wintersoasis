@@ -203,13 +203,14 @@ say/saycolor bold blue
 	# Add a leading space to make this regex work right.
 	speech = " " + speech
         count = len(re.findall(r'[^\\](' + re.escape(delim) + ')', speech))
+	# self.caller.msg(str(count + offset))
 
         # Remove that leading space and remove backslash escapes.
 	speech = speech[1:].replace("\\" + delim, delim)
 
-        if (count + offset) % 2:
+        if not (count + offset) % 2:
 	    speech = speech + delim
-        
+
 	# How many items we've iterated over.
 	raw_count = 0
 	# How many times we've started a new colored section
@@ -221,9 +222,6 @@ say/saycolor bold blue
 
 	for part in speech_parts:
 	    raw_count += 1
-	    self.caller.msg(part)
-	    self.caller.msg(str(count))
-	    self.caller.msg(str(marker))
 	    if marker:
 		if part[-1] == '\\':
 		    speech += part[:-1]
@@ -297,13 +295,11 @@ say/saycolor bold blue
         if self.cmdstring.lower() in [ "say", '"', "'", "sing", "ponder", "think" ]:
 	    say = True
 	    self.args = prefs("quotecolor", "{n") + prefs("quote", '"') + prefs("saycolor", "{n") + self.args
-	    offset = 1
 	else:
 	    self.args = prefs("posecolor", "{n") + self.args
 	    say = False
-	    offset = 0
 
-	speech = self.process_quotes(self.args, offset)
+	speech = self.process_quotes(self.args)
 
         # calling the speech hook on the location
         speech = caller.location.at_say(caller, speech)
