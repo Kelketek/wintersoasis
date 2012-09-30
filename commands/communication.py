@@ -48,8 +48,55 @@ Will make your statements like:
 
 Tom rumbles, ~This or that.~
 
+You can set colors for your quote marks, your text in quote marks, and your text outside of quote marks with:
+
+say/quotecolor color
+say/saycolor color
+say/posecolor color
+
+The following colors are supported:
+{RRed{n, {GGreen{n, {YYellow{n, {BBlue{n, {MMagenta{n,
+{CCyan{n, {WWhite{n, and {nNormal, which uses 'uncolored' text.
+
+You can also specify that the color is to be bold. So,
+say/saycolor blue
+...will make the color {Bblue{n, but
+say/saycolor bold blue
+...will make the color a {bstrong blue{n.
+
 {c======================={n
 """)
+
+    # To get these lists, lowercase a string, split it, and arrange
+    # alphabetically.
+    COLOR_MAP = {
+        ("bold", "red") : "{r",
+	("red",) : "{R",
+	("bold", "green") : "{g",
+	("green",) : "{G",
+	("bold", "yellow") : "{y",
+	("yellow",) : "{Y",
+	("blue", "bold") : "{b",
+	("blue",) : "{B",
+	("bold", "magenta") : "{m",
+	("magenta",) : "{M",
+	("bold", "cyan") : "{c",
+	("cyan",) : "{C",
+	("bold", "white") : "{w",
+	("white",) : "{W",
+	("normal",) : "{n",
+	}
+
+
+    def determine_color(self, color_string):
+        """
+	    Get a user's input and check to see if it's in a color map. Return the value
+        if so.
+	"""
+	color  = tuple(sorted(color_string.lower().split()))
+	if color in Say.COLOR_MAP:
+	    return Say.COLOR_MAP[color]
+	return False
 
     def pref_setter(self):
         """
@@ -64,7 +111,10 @@ Tom rumbles, ~This or that.~
             self.do_extended_help()
             return True
 
-	if choice in ["say", "ask", "exclaim", "quote"]:
+	if choice in [
+	    "say", "ask", "exclaim", "quote",
+	    "posecolor", "quotecolor", "saycolor", "namecolor"
+	    ]:
 	    if not self.args.strip():
 	        try:
 		    del self.say_sets[choice]
@@ -72,8 +122,17 @@ Tom rumbles, ~This or that.~
 		    pass
 		self.caller.msg("Setting '" + choice + "' cleared!")
 	    else:
-	        self.say_sets[choice] = self.args
-		self.caller.msg("Set '" + choice + "' to '" + self.args + "'.")
+	        if choice in ["posecolor", "quotecolor", "saycolor", "namecolor"]:
+		    color = self.determine_color(self.args)
+		    if color:
+		        self.say_sets[choice] = color
+			self.caller.msg("Color set for " + color + choice + "{n.")
+		    else:
+		        self.caller.msg("Couldn't recognize color: " + self.args)
+			return True
+		else:
+	            self.say_sets[choice] = self.args
+		    self.caller.msg("Set '" + choice + "' to '" + self.args + "'.")
 	    self.caller.say = self.say_sets
 	    return True
 
@@ -101,18 +160,15 @@ Tom rumbles, ~This or that.~
     def say_format(self, speech):
         """
 	Formats a statement that is autoprepended by a delimiter, such as a quote mark.
-
-	Right now, the delimiter is only ". Others will be provided and more will be done.
 	"""
 	prefs = self.say_sets.get
 	verb_map = { "." : prefs("say","says"), "?" : prefs("ask","asks"), "!" : prefs("exclaim","exclaims") }
 
-        delim = prefs("quote", '"')
+        delim = prefs("quotecolor","{n") + prefs("quote", '"') + "{n"
 
 	# Check for punctuation.
 	d = re.escape(delim)
 	match = re.match(r'^.*?(' + d + ').*?(!|[.]|[?])(' + d + ')', delim + speech )
-	#match = re.match(r'^' + re.escape(delim) + r'(?!' + re.escape(delim) + r')*?(!|[.]|[?])' + re.escape(delim),  delim + speech)
         if not match:
 	    verb = verb_map["."]
 	else:
@@ -120,7 +176,7 @@ Tom rumbles, ~This or that.~
 	    # This won't be perfect but it will work for most cases.
 	    # Second group should contain the punctuation we want.
 	    verb = verb_map[match.groups()[1]]
-        self.msg_prefix += '{c%s{n ' + verb + ', ' + delim + '%s{n'
+        self.msg_prefix += '{c%s{n ' + prefs("posecolor", "{n") + verb + ', ' + '%s{n'
 	return self.msg_prefix % ( self.caller.name, speech)
 
     def pose_format(self, speech):
@@ -138,8 +194,12 @@ Tom rumbles, ~This or that.~
 	    Auto-add a " if the number of "s is not even. If offset is
 	specified, it will add that number to the count before determining if another
 	quote should be added.
+
+	Also, break the text into sections to colorize.
 	"""
-	delim = self.say_sets.get("quote", '"')
+	prefs = self.say_sets.get
+	delim_raw = prefs("quote", '"')
+	delim = prefs("quotecolor","{n") + delim_raw + "{n"
 	# Add a leading space to make this regex work right.
 	speech = " " + speech
         count = len(re.findall(r'[^\\](' + re.escape(delim) + ')', speech))
@@ -148,7 +208,58 @@ Tom rumbles, ~This or that.~
 	speech = speech[1:].replace("\\" + delim, delim)
 
         if (count + offset) % 2:
-	    return speech + delim
+	    speech = speech + delim
+        
+	# How many items we've iterated over.
+	raw_count = 0
+	# How many times we've started a new colored section
+        count = 0
+	speech_parts = speech.split(prefs("quote", '"'))
+	speech = ""
+	# If the previous section ended with a backslash-- that is, is escaped.
+	marker = False
+
+	for part in speech_parts:
+	    raw_count += 1
+	    self.caller.msg(part)
+	    self.caller.msg(str(count))
+	    self.caller.msg(str(marker))
+	    if marker:
+		if part[-1] == '\\':
+		    speech += part[:-1]
+		    marker = True
+		else:
+		    speech += part
+		    marker = False
+		if not raw_count == len(speech_parts):
+		    if marker:
+		        speech += delim_raw
+		    else:
+		        speech += delim
+		continue
+	    if not count % 2:
+	        part = prefs("posecolor", "{n") + part
+		if part[-1] == '\\':
+		    marker = True
+		    part = part[:-1]
+		else:
+		    count += 1
+		    marker = False
+		    part = part
+	    else:
+	        part = prefs("saycolor", "{n") + part
+		if part[-1] == '\\':
+		    marker = True
+		    part = part[:-1]
+		else:
+		    marker = False
+		    count += 1
+	    if not raw_count == len(speech_parts):
+	        if marker:
+		    part += delim_raw
+		else:
+		    part += delim
+	    speech += part
 	return speech
 
     def func(self):
@@ -163,6 +274,8 @@ Tom rumbles, ~This or that.~
             self.say_sets = self.caller.say
         except:
             self.say_sets = {}
+
+        prefs = self.say_sets.get
 
         if self.switches:
 	    if self.pref_setter():
@@ -183,8 +296,10 @@ Tom rumbles, ~This or that.~
 
         if self.cmdstring.lower() in [ "say", '"', "'", "sing", "ponder", "think" ]:
 	    say = True
+	    self.args = prefs("quotecolor", "{n") + prefs("quote", '"') + prefs("saycolor", "{n") + self.args
 	    offset = 1
 	else:
+	    self.args = prefs("posecolor", "{n") + self.args
 	    say = False
 	    offset = 0
 
