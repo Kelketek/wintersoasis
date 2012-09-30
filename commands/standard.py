@@ -51,6 +51,7 @@ class DefaultCmdSet(default_cmds.DefaultCmdSet):
 
 	self.add(communication.Say())
 	self.add(communication.Pose())
+	self.add(communication.Ooc())
         #
         # any commands you add below will overload the default ones.
         #
