@@ -183,13 +183,14 @@ say/saycolor bold blue
         """
 	    Formats one or two strings as a 'say' type statement.
 	"""
-        verb = self.statement_type_check(speech)
 	prefs = self.say_sets.get
         if speech2:
-            self.msg_prefix += speech + prefs("posecolor", "{n") + verb + " " + self.caller.name + ", " + speech2
+	    verb = self.statement_type_check(speech2)
+            message = self.msg_prefix + speech + prefs("posecolor", "{n") + " " + verb + " " + self.caller.name + ", " + speech2 + '{n'
         else:
-            self.msg_prefix += '{c%s{n ' + prefs("posecolor", "{n") + verb + ', ' + '%s{n'
-	return self.msg_prefix % ( self.caller.name, speech)
+	    verb = self.statement_type_check(speech)
+            message = self.msg_prefix + self.caller.name + " " + prefs("posecolor", "{n") + verb + ', {n' + speech + '{n' 
+	return message
 
     def pose_format(self, speech):
         """
@@ -305,10 +306,8 @@ say/saycolor bold blue
 
         if self.cmdstring.lower() in [ "say", '"', "'", "sing", "ponder", "think" ]:
 	    say = True
-	    offset = 0
 	    self.args = prefs("quote", '"') + self.args
 	else:
-	    offset = 0
 	    say = False
 
         # ,, can be used to split a statement. For instance:
@@ -319,15 +318,16 @@ say/saycolor bold blue
 	    match = re.match(r'(.*?)(?!\\),,(.*)', self.args)
             if match:
                 speech, speech2 = match.groups()
-                speech = prefs("quote", '"') + speech + ','
-		speech = self.process_quotes(speech, offset)
+                speech = speech + ','
+		speech = self.process_quotes(speech)
+		speech2 = prefs("quote", '"') + speech2
 		speech2 = self.process_quotes(speech2)
                 message = self.say_format(speech, speech2)
         
 	try:
             message
         except UnboundLocalError:
-	    speech = self.process_quotes(self.args, offset)
+	    speech = self.process_quotes(self.args)
             if say:
                 message = self.say_format(speech)
             else:
