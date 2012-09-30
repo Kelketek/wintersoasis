@@ -67,8 +67,8 @@ say/saycolor bold blue
 {c======================={n
 """)
 
-    # To get these lists, lowercase a string, split it, and arrange
-    # alphabetically.
+    # To get these typles, lowercase a string, split it, and arrange
+    # alphabetically before converting.
     COLOR_MAP = {
         ("bold", "red") : "{r",
 	("red",) : "{R",
@@ -157,26 +157,38 @@ say/saycolor bold blue
         else:
             self.cmdstring = "say"
 
-    def say_format(self, speech):
+    def statement_type_check(self, speech):
         """
-	Formats a statement that is autoprepended by a delimiter, such as a quote mark.
-	"""
-	prefs = self.say_sets.get
-	verb_map = { "." : prefs("say","says"), "?" : prefs("ask","asks"), "!" : prefs("exclaim","exclaims") }
+            Determines whether the argument is a declaration, an interrogative,
+        or an exclaimatory one.
+        """
+        prefs = self.say_sets.get
+        verb_map = { "." : prefs("say","says"), "?" : prefs("ask","asks"), "!" : prefs("exclaim","exclaims") }
 
         delim = prefs("quotecolor","{n") + prefs("quote", '"') + "{n"
 
-	# Check for punctuation.
-	d = re.escape(delim)
-	match = re.match(r'^.*?(' + d + ').*?(!|[.]|[?])(' + d + ')', delim + speech )
+        # Check for punctuation.
+        d = re.escape(delim)
+        match = re.match(r'^.*?(' + d + ').*?(!|[.]|[?])(' + d + ')', delim + speech )
         if not match:
-	    verb = verb_map["."]
-	else:
-	    # The first match is the one that will be right after the verb, so it's the most relevant.
-	    # This won't be perfect but it will work for most cases.
-	    # Second group should contain the punctuation we want.
-	    verb = verb_map[match.groups()[1]]
-        self.msg_prefix += '{c%s{n ' + prefs("posecolor", "{n") + verb + ', ' + '%s{n'
+            verb = verb_map["."]
+        else:
+            # The first match is the one that will be right after the verb, so it's the most relevant.
+            # This won't be perfect but it will work for most cases.
+            # Second group should contain the punctuation we want.
+            verb = verb_map[match.groups()[1]]
+        return verb
+
+    def say_format(self, speech, speech2=False):
+        """
+	    Formats one or two strings as a 'say' type statement.
+	"""
+        verb = self.statement_type_check(speech)
+	prefs = self.say_sets.get
+        if speech2:
+            self.msg_prefix += speech + prefs("posecolor", "{n") + verb + " " + self.caller.name + ", " + speech2
+        else:
+            self.msg_prefix += '{c%s{n ' + prefs("posecolor", "{n") + verb + ', ' + '%s{n'
 	return self.msg_prefix % ( self.caller.name, speech)
 
     def pose_format(self, speech):
@@ -202,14 +214,13 @@ say/saycolor bold blue
 	delim = prefs("quotecolor","{n") + delim_raw + "{n"
 	# Add a leading space to make this regex work right.
 	speech = " " + speech
-        count = len(re.findall(r'[^\\](' + re.escape(delim) + ')', speech))
-	# self.caller.msg(str(count + offset))
+        count = len(re.findall(r'[^\\](' + re.escape(delim_raw) + ')', speech))
 
         # Remove that leading space and remove backslash escapes.
-	speech = speech[1:].replace("\\" + delim, delim)
+	speech = speech[1:].replace("\\" + delim_raw, delim_raw)
 
-        if not (count + offset) % 2:
-	    speech = speech + delim
+        if (count + offset) % 2:
+	    speech = speech + delim_raw
 
 	# How many items we've iterated over.
 	raw_count = 0
@@ -294,21 +305,37 @@ say/saycolor bold blue
 
         if self.cmdstring.lower() in [ "say", '"', "'", "sing", "ponder", "think" ]:
 	    say = True
-	    self.args = prefs("quotecolor", "{n") + prefs("quote", '"') + prefs("saycolor", "{n") + self.args
+	    offset = 0
+	    self.args = prefs("quote", '"') + self.args
 	else:
-	    self.args = prefs("posecolor", "{n") + self.args
+	    offset = 0
 	    say = False
 
-	speech = self.process_quotes(self.args)
+        # ,, can be used to split a statement. For instance:
+        # say This is a tough job,,but someone has to do it.
+        # will yield:
+        # "This is a tough job," says Tom, "but someone has to do it."
+        if say and prefs("split", True):
+	    match = re.match(r'(.*?)(?!\\),,(.*)', self.args)
+            if match:
+                speech, speech2 = match.groups()
+                speech = prefs("quote", '"') + speech + ','
+		speech = self.process_quotes(speech, offset)
+		speech2 = self.process_quotes(speech2)
+                message = self.say_format(speech, speech2)
+        
+	try:
+            message
+        except UnboundLocalError:
+	    speech = self.process_quotes(self.args, offset)
+            if say:
+                message = self.say_format(speech)
+            else:
+                message = self.pose_format(speech)
 
         # calling the speech hook on the location
-        speech = caller.location.at_say(caller, speech)
+        caller.location.at_say(caller, message)
 
-        if say:
-	    message = self.say_format(speech)
-	else:
-	    message = self.pose_format(speech)
-                           
         # Send the final message to the room.
         caller.location.msg_contents(message)
 
