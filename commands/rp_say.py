@@ -141,8 +141,9 @@ In a freeform post, your name is always appended to the end.
                 self.say_sets[choice] = False
             else:
                 self.say_sets[choice] = True
-                self.caller.msg("Option '" + choice + "' toggled to '" \
+            self.caller.msg("Option '" + choice + "' toggled to '" \
                 + str(self.say_sets[choice]) + "'.")
+            return True
 
     def ooc_preprocess(self):
         """
@@ -204,7 +205,9 @@ In a freeform post, your name is always appended to the end.
             verb = self.statement_type_check(speech)
             message = self.msg_prefix + prefs("namecolor", "{n") + \
                 self.caller.name + " " + prefs("posecolor", "{n") + verb + \
-                ', {n' + speech + '{n' 
+                ', {n' + speech + '{n'
+            if not prefs("balance", True):
+                message += prefs("quotecolor", "{n") + prefs("quote", '"')
         return message
 
     def pose_format(self, speech):
@@ -242,8 +245,8 @@ In a freeform post, your name is always appended to the end.
         speech = " " + speech
         count = len(re.findall(r'[^\\](' + re.escape(delim_raw) + ')', speech))
 
-        # Remove that leading space and remove backslash escapes.
-        speech = speech[1:].replace("\\" + delim_raw, delim_raw)
+        # Remove that leading space.
+        speech = speech[1:]
 
         if (count + offset) % 2 and prefs("balance", True):
             speech = speech + delim_raw
@@ -295,6 +298,8 @@ In a freeform post, your name is always appended to the end.
                 else:
                     part += delim
             speech += part
+        # Remove the escapes for quotes.
+        speech = speech.replace("\\" + delim_raw, delim_raw)
         return speech
 
     def func(self):
