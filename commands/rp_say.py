@@ -23,7 +23,7 @@ class Say(default_cmds.MuxCommand):
     help_category = "General"
 
     def do_extended_help(self):
-        self.caller.msg("""
+        help_docs = ["""
 {c=={gSay extended options{c=={n
 
 Say/pose etc has several options for configuration. For instance, you can change the verbs of your say statements with:
@@ -38,6 +38,15 @@ If you don't supply a verb, any setting you have will be cleared and it will use
     say/quote ~
 Will make your statements like:
     Tom rumbles, ~This or that.~
+
+For more options, type say/help 2
+
+{c======================={n
+""",
+
+"""
+{c=={gSay extended options{c=={n
+
 You can set colors for your quote marks, your text in quote marks, and your text outside of quote marks with:
     say/quotecolor color
     say/saycolor color
@@ -51,8 +60,17 @@ say/saycolor blue
 say/saycolor bold blue
 ...will make the color a {bstrong blue{n.
 
+For more options, type say/help 3
+
+{c======================={n
+""",
+
+"""
+{c=={gSay extended options{c=={n
+
 This program will automatically balance your quote marks by default. You can escape a quote mark with a backslash. You can toggle quote balancing with:
     say/balance
+...as a result, poses will never have a quote mark appended automatically, and all 'say's will always have a quote appended.
 This program allows you to split statements with double commas. For example:
     say This is a strange place,,I'm not sure we belong here.
 would yield:
@@ -64,8 +82,15 @@ Would produce:
 In a freeform post, your name is always appended to the end.
 
 {c======================={n
-
-""")
+"""]
+        try:
+            doc = int(self.args) - 1
+        except:
+            doc = 0
+        try:
+            self.caller.msg(help_docs[doc])
+        except:
+            self.caller.msg("Sorry, no such help page exists for this program!")
 
     # To get these typles, lowercase a string, split it, and arrange
     # alphabetically before converting.
@@ -108,7 +133,6 @@ In a freeform post, your name is always appended to the end.
 
         choice = self.switches[0].lower()
         if choice == "help":
-            self.caller.msg("I ran, too!")
             self.do_extended_help()
             return True
 
