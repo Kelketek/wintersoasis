@@ -26,65 +26,65 @@ class Say(default_cmds.MuxCommand):
         self.caller.msg("""
 {c=={gSay extended options{c=={n
 
-    Say/pose etc has several options for configuration. For instance, you can change the verbs of your say statements with:
-
-say/say verb
-say/ask verb
-say/exclaim verb
-
+Say/pose etc has several options for configuration. For instance, you can change the verbs of your say statements with:
+    say/say verb
+    say/ask verb
+    say/exclaim verb
 So, if you typed:
-
-say/say rumbles
-
+    say/say rumbles
 Your statements would look something like:
-
-Tom rumbles, "This or that."
-
-    If you don't supply a verb, any setting you have will be cleared and it will use the default. You can also use an alternative quote mark:
-
-say/quote ~
-
+    Tom rumbles, "This or that."
+If you don't supply a verb, any setting you have will be cleared and it will use the default. You can also use an alternative quote mark.
+    say/quote ~
 Will make your statements like:
-
-Tom rumbles, ~This or that.~
-
+    Tom rumbles, ~This or that.~
 You can set colors for your quote marks, your text in quote marks, and your text outside of quote marks with:
-
-say/quotecolor color
-say/saycolor color
-say/posecolor color
-
+    say/quotecolor color
+    say/saycolor color
+    say/posecolor color
 The following colors are supported:
-{RRed{n, {GGreen{n, {YYellow{n, {BBlue{n, {MMagenta{n,
-{CCyan{n, {WWhite{n, and {nNormal, which uses 'uncolored' text.
-
-You can also specify that the color is to be bold. So,
+    {RRed{n, {GGreen{n, {YYellow{n, {BBlue{n, {MMagenta{n,
+    {CCyan{n, {WWhite{n, and {nNormal, which uses 'uncolored' text.
+You can also specify that the color is to be bold. So:
 say/saycolor blue
 ...will make the color {Bblue{n, but
 say/saycolor bold blue
 ...will make the color a {bstrong blue{n.
 
+This program will automatically balance your quote marks by default. You can escape a quote mark with a backslash. You can toggle quote balancing with:
+    say/balance
+This program allows you to split statements with double commas. For example:
+    say This is a strange place,,I'm not sure we belong here.
+would yield:
+    "This is a strange place," says Tom, "I'm not sure we belong here."
+You can also inject your name arbitrarily into your statement, or not have it at all. The spoof command allows you to do a free-form pose, and you can inject your own name with /self. Why use /self? Because it will use your namecolor. So, if Tom has his namecolor as blue, this:
+    spoof He looked over at his watch, and checked the time. /self wondered how long it would take his friend to get here.
+Would produce:
+    He looked over at his watch, and checked the time. {BTom{n wondered how long it would take his friend to get here. {C[{BTom{C]{n
+In a freeform post, your name is always appended to the end.
+
 {c======================={n
+
 """)
 
     # To get these typles, lowercase a string, split it, and arrange
     # alphabetically before converting.
     COLOR_MAP = {
         ("bold", "red") : "{r",
-    ("red",) : "{R",
-    ("bold", "green") : "{g",
-    ("green",) : "{G",
-    ("bold", "yellow") : "{y",
-    ("yellow",) : "{Y",
-    ("blue", "bold") : "{b",
-    ("blue",) : "{B",
-    ("bold", "magenta") : "{m",
-    ("magenta",) : "{M",
-    ("bold", "cyan") : "{c",
-    ("cyan",) : "{C",
-    ("bold", "white") : "{w",
-    ("white",) : "{W",
-    ("normal",) : "{n",
+        ("red",) : "{R",
+        ("bold", "green") : "{g",
+        ("green",) : "{G",
+        ("bold", "yellow") : "{y",
+        ("yellow",) : "{Y",
+        ("blue", "bold") : "{b",
+        ("blue",) : "{B",
+        ("bold", "magenta") : "{m",
+        ("magenta",) : "{M",
+        ("bold", "cyan") : "{c",
+        ("cyan",) : "{C",
+        ("bold", "white") : "{w",
+        ("white",) : "{W",
+        ("normal",) : "{n",
     }
 
 
@@ -104,10 +104,11 @@ say/saycolor bold blue
         """
         if len(self.switches) > 1:
             self.caller.msg("One setting at a time, please, or we'll end up confused!")
-        return
+            return
 
         choice = self.switches[0].lower()
         if choice == "help":
+            self.caller.msg("I ran, too!")
             self.do_extended_help()
             return True
 
@@ -133,7 +134,7 @@ say/saycolor bold blue
                     self.say_sets[choice] = self.args
                     self.caller.msg("Set '" + choice + "' to '" + self.args + "'.")
             self.caller.say = self.say_sets
-        return True
+            return True
         if choice in ["balance", "split"]:
             toggle = self.say_sets.get(choice)
             if toggle:
@@ -212,10 +213,19 @@ say/saycolor bold blue
         """
         prefs = self.say_sets.get
         self.msg_prefix += prefs("namecolor", "{n") + self.caller.name
-
         if speech[0] not in [ ":", ",", " ", "'", ";" ]:
-            speech = " " + speech 
+            speech = " " + speech
+        speech = self.process_quotes(speech)
         return self.msg_prefix + speech + '{n'
+
+    def freeform_format(self, speech):
+        """
+        Formats a free-form post
+        """
+        prefs = self.say_sets.get
+        speech = re.sub(r'([^\\]?)/self', r'\1' + prefs("namecolor", "{n") + self.caller.name + "{n", speech, flags=re.IGNORECASE)
+        return speech + " {C[" + prefs("namecolor", "{n") + self.caller.name + '{C]{n'
+
 
     def process_quotes(self, speech, offset = 0):
         """
@@ -235,7 +245,7 @@ say/saycolor bold blue
         # Remove that leading space and remove backslash escapes.
         speech = speech[1:].replace("\\" + delim_raw, delim_raw)
 
-        if (count + offset) % 2:
+        if (count + offset) % 2 and prefs("balance", True):
             speech = speech + delim_raw
 
         # How many items we've iterated over.
@@ -319,11 +329,15 @@ say/saycolor bold blue
             self.caller.msg("What? You need to specify what you want to pose/say.")
             return
 
-        if self.cmdstring.lower() in [ "say", '"', "'", "sing", "ponder", "think" ]:
+        if self.cmdstring.lower() in Say.aliases:
             say = True
             self.args = prefs("quote", '"') + self.args
         else:
             say = False
+
+        if self.cmdstring.lower() in Spoof.aliases:
+            message = self.process_quotes(self.args)
+            message = self.freeform_format(message)
 
         # ,, can be used to split a statement. For instance:
         # say This is a tough job,,but someone has to do it.
@@ -342,11 +356,11 @@ say/saycolor bold blue
         try:
             message
         except UnboundLocalError:
-            speech = self.process_quotes(self.args)
             if say:
+                speech = self.process_quotes(self.args)
                 message = self.say_format(speech)
             else:
-                message = self.pose_format(speech)
+                message = self.pose_format(self.args)
 
         # calling the speech hook on the location
         caller.location.at_say(caller, message)
@@ -398,4 +412,17 @@ class Ooc(Say):
     aliases = []
     locks = "cmd:all()"
     help_category = "General"
-    
+
+class Spoof(Say):
+    """
+    spoof - Allows you to make a freeform pose to the room.
+    Usage:
+      spoof <freeform text>
+
+    Example (If your username is Tom):
+      spoof The parade has started! [Tom]
+    """
+    key = "spoof"
+    aliases = ["|"]
+    locks = "cmd:all()"
+    help_category = "General"
