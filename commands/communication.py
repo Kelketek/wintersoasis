@@ -71,70 +71,77 @@ say/saycolor bold blue
     # alphabetically before converting.
     COLOR_MAP = {
         ("bold", "red") : "{r",
-	("red",) : "{R",
-	("bold", "green") : "{g",
-	("green",) : "{G",
-	("bold", "yellow") : "{y",
-	("yellow",) : "{Y",
-	("blue", "bold") : "{b",
-	("blue",) : "{B",
-	("bold", "magenta") : "{m",
-	("magenta",) : "{M",
-	("bold", "cyan") : "{c",
-	("cyan",) : "{C",
-	("bold", "white") : "{w",
-	("white",) : "{W",
-	("normal",) : "{n",
-	}
+    ("red",) : "{R",
+    ("bold", "green") : "{g",
+    ("green",) : "{G",
+    ("bold", "yellow") : "{y",
+    ("yellow",) : "{Y",
+    ("blue", "bold") : "{b",
+    ("blue",) : "{B",
+    ("bold", "magenta") : "{m",
+    ("magenta",) : "{M",
+    ("bold", "cyan") : "{c",
+    ("cyan",) : "{C",
+    ("bold", "white") : "{w",
+    ("white",) : "{W",
+    ("normal",) : "{n",
+    }
 
 
     def determine_color(self, color_string):
         """
-	    Get a user's input and check to see if it's in a color map. Return the value
+        Get a user's input and check to see if it's in a color map. Return the value
         if so.
-	"""
-	color  = tuple(sorted(color_string.lower().split()))
-	if color in Say.COLOR_MAP:
-	    return Say.COLOR_MAP[color]
-	return False
+        """
+        color  = tuple(sorted(color_string.lower().split()))
+        if color in Say.COLOR_MAP:
+            return Say.COLOR_MAP[color]
+        return False
 
     def pref_setter(self):
         """
-	Handles individual preference settings for say.
-	"""
+        Handles individual preference settings for say.
+        """
         if len(self.switches) > 1:
-	    self.caller.msg("One setting at a time, please, or we'll end up confused!")
-	    return
+            self.caller.msg("One setting at a time, please, or we'll end up confused!")
+        return
 
-	choice = self.switches[0].lower()
+        choice = self.switches[0].lower()
         if choice == "help":
             self.do_extended_help()
             return True
 
-	if choice in [
-	    "say", "ask", "exclaim", "quote",
-	    "posecolor", "quotecolor", "saycolor", "namecolor"
-	    ]:
-	    if not self.args.strip():
-	        try:
-		    del self.say_sets[choice]
-		except KeyError:
-		    pass
-		self.caller.msg("Setting '" + choice + "' cleared!")
-	    else:
-	        if choice in ["posecolor", "quotecolor", "saycolor", "namecolor"]:
-		    color = self.determine_color(self.args)
-		    if color:
-		        self.say_sets[choice] = color
-			self.caller.msg("Color set for " + color + choice + "{n.")
-		    else:
-		        self.caller.msg("Couldn't recognize color: " + self.args)
-			return True
-		else:
-	            self.say_sets[choice] = self.args
-		    self.caller.msg("Set '" + choice + "' to '" + self.args + "'.")
-	    self.caller.say = self.say_sets
-	    return True
+        if choice in [
+            "say", "ask", "exclaim", "quote",
+            "posecolor", "quotecolor", "saycolor", "namecolor"]:
+            if not self.args.strip():
+                try:
+                    del self.say_sets[choice]
+                except KeyError:
+                    pass
+                self.caller.msg("Setting '" + choice + "' cleared!")
+            else:
+                if choice in ["posecolor", "quotecolor", "saycolor", "namecolor"]:
+                    color = self.determine_color(self.args)
+                    if color:
+                        self.say_sets[choice] = color
+                        self.caller.msg("Color set for " + color + choice + "{n.")
+                    else:
+                        self.caller.msg("Couldn't recognize color: " + self.args)
+                    return True
+                else:
+                    self.say_sets[choice] = self.args
+                    self.caller.msg("Set '" + choice + "' to '" + self.args + "'.")
+            self.caller.say = self.say_sets
+        return True
+        if choice in ["balance", "split"]:
+            toggle = self.say_sets.get(choice)
+            if toggle:
+                self.say_sets[choice] = False
+            else:
+                self.say_sets[choice] = True
+                self.caller.msg("Option '" + choice + "' toggled to '" \
+                + str(self.say_sets[choice]) + "'.")
 
     def ooc_preprocess(self):
         """
@@ -153,7 +160,7 @@ say/saycolor bold blue
         if split_args[0].lower() == "pose":
             self.cmdstring = "pose"
             self.args = split_args[-1]
-	    return
+            return
         else:
             self.cmdstring = "say"
 
@@ -163,7 +170,11 @@ say/saycolor bold blue
         or an exclaimatory one.
         """
         prefs = self.say_sets.get
-        verb_map = { "." : prefs("say","says"), "?" : prefs("ask","asks"), "!" : prefs("exclaim","exclaims") }
+        verb_map = {
+            "." : prefs("say","says"),
+            "?" : prefs("ask","asks"),
+            "!" : prefs("exclaim","exclaims")
+        }
 
         delim = prefs("quotecolor","{n") + prefs("quote", '"') + "{n"
 
@@ -181,101 +192,105 @@ say/saycolor bold blue
 
     def say_format(self, speech, speech2=False):
         """
-	    Formats one or two strings as a 'say' type statement.
-	"""
-	prefs = self.say_sets.get
+        Formats one or two strings as a 'say' type statement.
+        """
+        prefs = self.say_sets.get
         if speech2:
-	    verb = self.statement_type_check(speech2)
-            message = self.msg_prefix + speech + prefs("posecolor", "{n") + " " + verb + " " + self.caller.name + ", " + speech2 + '{n'
+            verb = self.statement_type_check(speech2)
+            message = self.msg_prefix + speech + prefs("posecolor", "{n") \
+                + " " + verb + " " + self.caller.name + ", " + speech2 + '{n'
         else:
-	    verb = self.statement_type_check(speech)
-            message = self.msg_prefix + self.caller.name + " " + prefs("posecolor", "{n") + verb + ', {n' + speech + '{n' 
-	return message
+            verb = self.statement_type_check(speech)
+            message = self.msg_prefix + prefs("namecolor", "{n") + \
+                self.caller.name + " " + prefs("posecolor", "{n") + verb + \
+                ', {n' + speech + '{n' 
+        return message
 
     def pose_format(self, speech):
         """
-	Formats an action as a pose.
-	"""
-	self.msg_prefix += '{c%s{n' % self.caller.name
+        Formats an action as a pose.
+        """
+        prefs = self.say_sets.get
+        self.msg_prefix += prefs("namecolor", "{n") + self.caller.name
 
-	if speech[0] not in [ ":", ",", " ", "'", ";" ]:
-	    speech = " " + speech
-	return self.msg_prefix + speech
+        if speech[0] not in [ ":", ",", " ", "'", ";" ]:
+            speech = " " + speech 
+        return self.msg_prefix + speech + '{n'
 
     def process_quotes(self, speech, offset = 0):
         """
-	    Auto-add a " if the number of "s is not even. If offset is
-	specified, it will add that number to the count before determining if another
-	quote should be added.
+            Auto-add a " if the number of "s is not even. If offset is
+        specified, it will add that number to the count before determining if another
+        quote should be added.
 
-	Also, break the text into sections to colorize.
-	"""
-	prefs = self.say_sets.get
-	delim_raw = prefs("quote", '"')
-	delim = prefs("quotecolor","{n") + delim_raw + "{n"
-	# Add a leading space to make this regex work right.
-	speech = " " + speech
+        Also, break the text into sections to colorize.
+        """
+        prefs = self.say_sets.get
+        delim_raw = prefs("quote", '"')
+        delim = prefs("quotecolor","{n") + delim_raw + "{n"
+        # Add a leading space to make this regex work right.
+        speech = " " + speech
         count = len(re.findall(r'[^\\](' + re.escape(delim_raw) + ')', speech))
 
         # Remove that leading space and remove backslash escapes.
-	speech = speech[1:].replace("\\" + delim_raw, delim_raw)
+        speech = speech[1:].replace("\\" + delim_raw, delim_raw)
 
         if (count + offset) % 2:
-	    speech = speech + delim_raw
+            speech = speech + delim_raw
 
-	# How many items we've iterated over.
-	raw_count = 0
-	# How many times we've started a new colored section
+        # How many items we've iterated over.
+        raw_count = 0
+        # How many times we've started a new colored section
         count = 0
-	speech_parts = speech.split(prefs("quote", '"'))
-	speech = ""
-	# If the previous section ended with a backslash-- that is, is escaped.
-	marker = False
+        speech_parts = speech.split(prefs("quote", '"'))
+        speech = ""
+        # If the previous section ended with a backslash-- that is, is escaped.
+        marker = False
 
-	for part in speech_parts:
-	    raw_count += 1
-	    if marker:
-		if part[-1] == '\\':
-		    speech += part[:-1]
-		    marker = True
-		else:
-		    speech += part
-		    marker = False
-		if not raw_count == len(speech_parts):
-		    if marker:
-		        speech += delim_raw
-		    else:
-		        speech += delim
-		continue
-	    if not count % 2:
-	        part = prefs("posecolor", "{n") + part
-		if part[-1] == '\\':
-		    marker = True
-		    part = part[:-1]
-		else:
-		    count += 1
-		    marker = False
-		    part = part
-	    else:
-	        part = prefs("saycolor", "{n") + part
-		if part[-1] == '\\':
-		    marker = True
-		    part = part[:-1]
-		else:
-		    marker = False
-		    count += 1
-	    if not raw_count == len(speech_parts):
-	        if marker:
-		    part += delim_raw
-		else:
-		    part += delim
-	    speech += part
-	return speech
+        for part in speech_parts:
+            raw_count += 1
+            if marker:
+                if part[-1] == '\\':
+                    speech += part[:-1]
+                    marker = True
+                else:
+                    speech += part
+                    marker = False
+                if not raw_count == len(speech_parts):
+                    if marker:
+                        speech += delim_raw
+                    else:
+                        speech += delim
+                continue
+            if not count % 2:
+                part = prefs("posecolor", "{n") + part
+                if part[-1] == '\\':
+                    marker = True
+                    part = part[:-1]
+                else:
+                    count += 1
+                    marker = False
+                    part = part
+            else:
+                part = prefs("saycolor", "{n") + part
+                if part[-1] == '\\':
+                    marker = True
+                    part = part[:-1]
+                else:
+                    marker = False
+                    count += 1
+            if not raw_count == len(speech_parts):
+                if marker:
+                    part += delim_raw
+                else:
+                    part += delim
+            speech += part
+        return speech
 
     def func(self):
         """
         Route the action properly.
-	"""
+        """
         caller = self.caller
 
         # Determine if they have a dictionary of say settings.
@@ -288,9 +303,9 @@ say/saycolor bold blue
         prefs = self.say_sets.get
 
         if self.switches:
-	    if self.pref_setter():
-	        return
-	
+            if self.pref_setter():
+                return
+    
         if self.cmdstring.lower() == "ooc":
             self.ooc_preprocess()
             self.msg_prefix = "{C[OOC] {n"
@@ -298,36 +313,36 @@ say/saycolor bold blue
             self.msg_prefix = ""
 
         if not self.args and self.raw:
-	    self.args = self.raw
+            self.args = self.raw
 
         if not self.args:
             self.caller.msg("What? You need to specify what you want to pose/say.")
             return
 
         if self.cmdstring.lower() in [ "say", '"', "'", "sing", "ponder", "think" ]:
-	    say = True
-	    self.args = prefs("quote", '"') + self.args
-	else:
-	    say = False
+            say = True
+            self.args = prefs("quote", '"') + self.args
+        else:
+            say = False
 
         # ,, can be used to split a statement. For instance:
         # say This is a tough job,,but someone has to do it.
         # will yield:
         # "This is a tough job," says Tom, "but someone has to do it."
         if say and prefs("split", True):
-	    match = re.match(r'(.*?)(?!\\),,(.*)', self.args)
+            match = re.match(r'(.*?)(?!\\),,(.*)', self.args)
             if match:
                 speech, speech2 = match.groups()
                 speech = speech + ','
-		speech = self.process_quotes(speech)
-		speech2 = prefs("quote", '"') + speech2
-		speech2 = self.process_quotes(speech2)
+                speech = self.process_quotes(speech)
+                speech2 = prefs("quote", '"') + speech2
+                speech2 = self.process_quotes(speech2)
                 message = self.say_format(speech, speech2)
         
-	try:
+        try:
             message
         except UnboundLocalError:
-	    speech = self.process_quotes(self.args)
+            speech = self.process_quotes(self.args)
             if say:
                 message = self.say_format(speech)
             else:
@@ -383,3 +398,4 @@ class Ooc(Say):
     aliases = []
     locks = "cmd:all()"
     help_category = "General"
+    
