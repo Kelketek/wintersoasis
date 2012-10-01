@@ -265,8 +265,10 @@ In a freeform post, your name is always appended to the end.
         prefs = self.say_sets.get
         delim_raw = prefs("quote", '"')
         delim = prefs("quotecolor","{n") + delim_raw + "{n"
-        # Add a leading space to make this regex work right.
+        # Add a leading space to make these regexes work right.
         speech = " " + speech
+        # Transform all unescaped quotes into the user's quote mark.
+        speech = re.sub(r'([^\\])"', r'\1' + delim_raw, speech)
         count = len(re.findall(r'[^\\](' + re.escape(delim_raw) + ')', speech))
 
         # Remove that leading space.
@@ -287,6 +289,12 @@ In a freeform post, your name is always appended to the end.
         for part in speech_parts:
             raw_count += 1
             if marker:
+                try:
+                    part[-1]
+                except:
+                    marker = False
+                    count += 1
+                    continue
                 if part[-1] == '\\':
                     speech += part[:-1]
                     marker = True
@@ -358,13 +366,13 @@ In a freeform post, your name is always appended to the end.
             self.caller.msg("What? You need to specify what you want to pose/say.")
             return
 
-        if self.cmdstring.lower() in Say.aliases:
+        if self.cmdstring.lower() in Say.aliases + [Say.key]:
             say = True
             self.args = prefs("quote", '"') + self.args
         else:
             say = False
 
-        if self.cmdstring.lower() in Spoof.aliases:
+        if self.cmdstring.lower() in Spoof.aliases + [Spoof.key]:
             message = self.process_quotes(self.args)
             message = self.freeform_format(message)
 
