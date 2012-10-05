@@ -157,7 +157,7 @@ In a freeform post, your name is always appended to the end.
                 else:
                     self.say_sets[choice] = self.args
                     self.caller.msg("Set '" + choice + "' to '" + self.args + "'.")
-            self.caller.say = self.say_sets
+            self.caller.db.say = self.say_sets
             return True
         if choice in ["balance", "split"]:
             toggle = self.say_sets.get(choice)
@@ -342,8 +342,8 @@ In a freeform post, your name is always appended to the end.
 
         # Determine if they have a dictionary of say settings.
         try:
-            self.caller.say.keys
-            self.say_sets = self.caller.say
+            self.caller.db.say.keys
+            self.say_sets = self.caller.db.say
         except:
             self.say_sets = {}
 
