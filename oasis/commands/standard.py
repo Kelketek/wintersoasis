@@ -4,7 +4,7 @@ Winter's Oasis standard command sets.
 
 from ev import CmdSet, Command
 from ev import default_cmds
-from game.gamesrc.commands import quote, character_commands, communication
+from game.gamesrc.oasis.commands import quote, character_commands, rp_say
 
 from contrib import menusystem, lineeditor
 #from contrib import misc_commands
@@ -46,12 +46,12 @@ class DefaultCmdSet(default_cmds.DefaultCmdSet):
         # calling setup in src.commands.default.cmdset_default
         super(DefaultCmdSet, self).at_cmdset_creation()
         self.add(quote.Quote())
-	self.add(character_commands.WhoSpec())
-	self.add(character_commands.Sheet())
+        self.add(character_commands.WhoSpec())
+        self.add(character_commands.Sheet())
 
-	self.add(communication.Say())
-	self.add(communication.Pose())
-	self.add(communication.Ooc())
+        self.add(rp_say.Say())
+        self.add(rp_say.Pose())
+        self.add(rp_say.Ooc())
         #
         # any commands you add below will overload the default ones.
         #
