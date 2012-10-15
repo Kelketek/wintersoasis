@@ -4,7 +4,11 @@ Winter's Oasis standard command sets.
 
 from ev import CmdSet, Command
 from ev import default_cmds
-from game.gamesrc.oasis.commands import quote, character_commands, rp_say
+from src.commands.default import comms
+import ev_defaults
+import ev_ooc
+import ev_unloggedin
+from game.gamesrc.oasis.commands import quote, character_commands, rp_say, page, warps
 
 from contrib import menusystem, lineeditor
 #from contrib import misc_commands
@@ -27,11 +31,8 @@ class ExampleCmdSet(CmdSet):
         self.add(Command())
 
 
-class DefaultCmdSet(default_cmds.DefaultCmdSet):
+class DefaultCmdSet(ev_defaults.DefaultCmdSet):
     """
-    This is an example of how to overload the default command
-    set defined in src/commands/default/cmdset_default.py.
-
     Here we copy everything by calling the parent, but you can
     copy&paste any combination of the default command to customize
     your default set. Next you change settings.CMDSET_DEFAULT to point
@@ -52,6 +53,9 @@ class DefaultCmdSet(default_cmds.DefaultCmdSet):
         self.add(rp_say.Say())
         self.add(rp_say.Pose())
         self.add(rp_say.Ooc())
+        self.remove("page")
+        self.add(page.Page())
+        self.add(warps.Nexus())
         #
         # any commands you add below will overload the default ones.
         #
@@ -59,7 +63,7 @@ class DefaultCmdSet(default_cmds.DefaultCmdSet):
         self.add(lineeditor.CmdEditor())
         #self.add(misc_commands.CmdQuell())
 
-class UnloggedinCmdSet(default_cmds.UnloggedinCmdSet):
+class UnloggedinCmdSet(ev_unloggedin.UnloggedinCmdSet):
     """
     This is an example of how to overload the command set of the
     unloggedin commands, defined in
@@ -83,7 +87,7 @@ class UnloggedinCmdSet(default_cmds.UnloggedinCmdSet):
         # any commands you add below will overload the default ones.
         #
 
-class OOCCmdSet(default_cmds.OOCCmdSet):
+class OOCCmdSet(ev_ooc.OOCCmdSet):
     """
     This is set is available to the player when they have no
     character connected to them (i.e. they are out-of-character, ooc).

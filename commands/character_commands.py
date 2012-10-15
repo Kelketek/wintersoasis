@@ -149,7 +149,7 @@ class WhoSpec(default_cmds.MuxCommand):
 
         idle_threshhold = 180 # Three minutes minimum idle.
 
-        self.caller.msg("+-Stat---Name------------------Sex---------Species-----------------+")
+        self.caller.msg("+-Stat---Name----------------------------Sex---------Species-----------------+")
         for character in characters:
 	    if character.sessions:
 	        idle_time = time.time() - character.sessions[0].cmd_last_visible
@@ -163,6 +163,6 @@ class WhoSpec(default_cmds.MuxCommand):
 	    status = character.db.status
 	    if not status:
 	        status = ""
-            line = "| %-5s| %-20s| %-10s| %-24s|" % ( character.db.status, name, character.db.sex, character.db.species )
+            line = "| %-5s| %-30s| %-10s| %-24s|" % ( character.db.status, name, character.db.sex, character.db.species )
             self.caller.msg(line)
-        self.caller.msg("+------------------------------------------------------------------+")
+        self.caller.msg("+----------------------------------------------------------------------------+")
