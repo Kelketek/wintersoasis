@@ -31,7 +31,7 @@ class ExampleCmdSet(CmdSet):
         self.add(Command())
 
 
-class DefaultCmdSet(ev_defaults.DefaultCmdSet):
+class DefaultCmdSet(default_cmds.DefaultCmdSet):
     """
     Here we copy everything by calling the parent, but you can
     copy&paste any combination of the default command to customize
@@ -53,8 +53,7 @@ class DefaultCmdSet(ev_defaults.DefaultCmdSet):
         self.add(rp_say.Say())
         self.add(rp_say.Pose())
         self.add(rp_say.Ooc())
-        self.remove("page")
-        self.add(page.Page())
+        #self.add(page.Page())
         self.add(warps.Nexus())
         #
         # any commands you add below will overload the default ones.
@@ -63,7 +62,7 @@ class DefaultCmdSet(ev_defaults.DefaultCmdSet):
         self.add(lineeditor.CmdEditor())
         #self.add(misc_commands.CmdQuell())
 
-class UnloggedinCmdSet(ev_unloggedin.UnloggedinCmdSet):
+class UnloggedinCmdSet(default_cmds.UnloggedinCmdSet):
     """
     This is an example of how to overload the command set of the
     unloggedin commands, defined in
@@ -87,7 +86,7 @@ class UnloggedinCmdSet(ev_unloggedin.UnloggedinCmdSet):
         # any commands you add below will overload the default ones.
         #
 
-class OOCCmdSet(ev_ooc.OOCCmdSet):
+class OOCCmdSet(default_cmds.OOCCmdSet):
     """
     This is set is available to the player when they have no
     character connected to them (i.e. they are out-of-character, ooc).

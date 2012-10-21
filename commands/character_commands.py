@@ -63,18 +63,22 @@ and get their info.
        """
        Displays a character sheet.
        """
-       stat_dict = { "Body" : str(char.body), "Soul" : str(char.soul), "Mind" : str(char.mind), "Focus" : str(char.focus) }
+       if not char.db.stats:
+           stat_dict = { }
+       else:
+           stat_dict = char.db.stats
        self.caller.msg(char.name + ", the " + str(char.db.sex) + " " + str(char.db.species) + ":")
        self.caller.msg("")
 
        for key, value in stat_dict.items():
-            self.caller.msg(key + ": " + value)
+            self.caller.msg("{c%-11s: {y%s" % (key, str(value)))
 
        self.caller.msg("")
 
        if char.db.qualities:
            for key, value in char.qualities.items():
-                self.caller.msg(key + ": " + value)
+                line = "{c%-20s{b: {g%s{n" % (key, value)
+                self.caller.msg(line)
 
     def display_background(self, char):
         """

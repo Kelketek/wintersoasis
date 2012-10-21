@@ -17,8 +17,6 @@
 """
 
 from src.utils import utils
-from src.commands.connection_screen import DEFAULT_SCREEN
-
 WO_SCREEN = """
  __          ___       _             _        ____            _     
  \ \        / (_)     | |           ( )      / __ \          (_)    
