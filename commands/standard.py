@@ -5,10 +5,8 @@ Winter's Oasis standard command sets.
 from ev import CmdSet, Command
 from ev import default_cmds
 from src.commands.default import comms
-import ev_defaults
-import ev_ooc
-import ev_unloggedin
-from game.gamesrc.oasis.commands import quote, character_commands, rp_say, page, warps
+from contrib.extended_room import CmdExtendedLook 
+from game.gamesrc.oasis.commands import quote, character_commands, rp_say, page, warps, cmdset_default, cmdset_ooc, cmdset_unloggedin
 
 from contrib import menusystem, lineeditor
 #from contrib import misc_commands
@@ -31,7 +29,7 @@ class ExampleCmdSet(CmdSet):
         self.add(Command())
 
 
-class DefaultCmdSet(default_cmds.DefaultCmdSet):
+class DefaultCmdSet(cmdset_default.DefaultCmdSet):
     """
     Here we copy everything by calling the parent, but you can
     copy&paste any combination of the default command to customize
@@ -49,11 +47,12 @@ class DefaultCmdSet(default_cmds.DefaultCmdSet):
         self.add(quote.Quote())
         self.add(character_commands.WhoSpec())
         self.add(character_commands.Sheet())
+        self.add(CmdExtendedLook())
 
         self.add(rp_say.Say())
         self.add(rp_say.Pose())
         self.add(rp_say.Ooc())
-        #self.add(page.Page())
+        self.add(page.Page())
         self.add(warps.Nexus())
         #
         # any commands you add below will overload the default ones.
@@ -62,7 +61,7 @@ class DefaultCmdSet(default_cmds.DefaultCmdSet):
         self.add(lineeditor.CmdEditor())
         #self.add(misc_commands.CmdQuell())
 
-class UnloggedinCmdSet(default_cmds.UnloggedinCmdSet):
+class UnloggedinCmdSet(cmdset_unloggedin.UnloggedinCmdSet):
     """
     This is an example of how to overload the command set of the
     unloggedin commands, defined in
@@ -81,12 +80,11 @@ class UnloggedinCmdSet(default_cmds.UnloggedinCmdSet):
         """
         # calling setup in src.commands.default.cmdset_unloggedin
         super(UnloggedinCmdSet, self).at_cmdset_creation()
-
         #
         # any commands you add below will overload the default ones.
         #
 
-class OOCCmdSet(default_cmds.OOCCmdSet):
+class OOCCmdSet(cmdset_ooc.OOCCmdSet):
     """
     This is set is available to the player when they have no
     character connected to them (i.e. they are out-of-character, ooc).

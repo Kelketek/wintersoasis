@@ -45,46 +45,142 @@ strings, but case is preserved.
 
 class Page(default_cmds.MuxCommand):
     """
-        Send a private message to another player:
-        page someone=message
+        Send a private message to another player.
+    Usage:
+        msg someone=message
+
+    Options:
+        /r               Reply to whoever paged you last.
+        /ignore <user>   Ignore a character.
+        /unignore <user> Unignore a character.
     """
     # these need to be specified
 
-    key = "Msg"
-    aliases = ["message", "mesg", "p", "pa", "pag", "page"]
+    key = "page"
+    aliases = ["message", "mesg", "p", "pa", "pag", "msg"]
     locks = "cmd:all()"
     help_category = "General"
 
-    def validate_targets(self, name_list):
+    def check_ignores(self, ref_list):
+        targets = []
+        for target in ref_list:
+            ignore = target.db.page_ignore
+            if not ignore:
+                targets.append(target)
+                continue
+            if self.caller in ignore:
+                self.caller.msg("%s is ignoring you." % target.name)
+                continue
+            else:
+                targets.append(target)
+        return targets
+            
+
+    def eliminate_sleepers(self, ref_list):
+        targets = []
+        for ref in ref_list:
+            if ref.sessions:
+                targets.append(ref)
+            else:
+                self.caller.msg("%s is not connected to the game right now." % ref.name)
+        return targets
+
+    def validate_targets(self, name_list, check_ignores=True):
         targets = []
         MAIN = 0
         for name in name_list:
-            target = partial_pmatch(name)
-            if not target or len(target) > 1:
-                self.caller.msg("I don't know a character named '" + name + "'.")
-                continue
-            target = target[MAIN]
-            if not target.sessions:
-                self.caller.msg(name + " is not connected to the game right now.")
+            target = partial_pmatch(self.caller, name)
+            try:
+                if len(target) > 1:
+                    raise IndexError
+                target = target[0]
+            except IndexError:
+                self.caller.msg("I don't know a player named '%s'." % name)
                 continue
             targets.append(target)
+        if check_ignores:
+            targets = self.check_ignores(targets)
         return targets
 
-    def get_targets(self):
+    def toggle_ignores(self, switch):
+        """
+        Toggle whether or not some folks are ignored.
+        """
+        if not self.args:
+            return False
+        targets = self.validate_targets(self.arglist, check_ignores=False)
+        if not targets:
+            self.caller.msg("No valid targets found.")
+        if self.caller.db.page_ignore:
+            ignore = self.caller.db.page_ignore
+        else:
+            ignore = []
+        if switch:
+            for target in targets:
+                if target not in ignore:
+                    ignore.append(target)
+                    self.caller.msg("Ignoring %s." % target.name)
+                else:
+                    self.caller.msg("Already ignoring %s." % target.name)
+        else:
+            for target in targets:
+                if target not in ignore:
+                    self.caller.msg("You were not ignoring %s." % target.name)
+                else:
+                    ignore = [ person for person in ignore if person != target ]
+                    self.caller.msg("No longer ignoring %s." % target.name)
+        self.caller.db.page_ignore = ignore
+        return True
+
+    def switch_processor(self):
+        """
+        Handle command arguments.
+        """
         if 'r' in self.switches:
             if self.caller.ndb.page_recent:
-                return self.eliminate_sleepers(self.caller.ndb.page_recent)
+                self.targets = self.eliminate_sleepers(self.caller.ndb.page_recent)
             else:
                 self.caller.msg("No one has paged you recently.")
-                return []
-        if not self.lhs:
-            self.caller.msg("You must specify someone to page.")
-            return []
-        if not self.rhs:
-            self.caller.msg("You must specify a message to send. (Did you remember to include the = sign?)")
-            return []
-        return self.validate_targets(self.lhslist)
+            self.message = self.args
+            return True
+        if 'ignore' in self.switches:
+            if not self.toggle_ignores(True):
+                self.caller.msg("You must specify people you wish to ignore.")
+            return False
+        if 'unignore' in self.switches:
+            if not self.toggle_ignores(False):
+                self.caller.msg("You must specify folks you wish to unignore.")
+            return False
+        if self.rhs:
+            self.message = self.rhs
+        else:
+            self.caller.msg("You must specify a message to send. Did you forget the = sign?")
+            return False
+        if self.lhslist:
+            self.targets = self.validate_targets(self.lhslist)
+        else:
+            self.caller.msg("You must specify people to send the message to.")
+        return True
 
+    def send_message(self, message):
+        """
+        Does the actual paging.
+        """
+        targets = self.targets
+        names = [ target.name for target in targets ]
+        message = "Message from %s to %s: %s" % (self.caller.name, ", ".join(names), message)
+
+        # Make sure we get only one copy, and that it makes sense for one to be delivered at all.
+        if self.caller not in targets and targets:
+            self.caller.msg(message)
+
+        for target in targets:
+            target.msg(message)
+            reply_list = [ person for person in targets if person != target ]
+            reply_list.append(self.caller)
+            target.ndb.page_recent = reply_list
+
+        create.create_message(self.caller, message, receivers=targets)
 
     def func(self):
         """
@@ -93,15 +189,15 @@ class Page(default_cmds.MuxCommand):
          to all the variables defined therein.
         """
         MAIN = 0
+        self.targets = []
+        self.switches = [ switch.lower() for switch in self.switches ] #, bitches!
 
-        targets = self.get_targets()
+        if not self.switch_processor():
+             return
 
-        names = [ target.name for target in targets ]
-        message = "Message from " + self.caller.name + " to " + ", ".join(names) + ": " + self.rhs
+        try:
+            message = self.message
+        except:
+            message = self.rhs
 
-        # Make sure we get only one copy, and that it makes sense for one to be delivered at all.
-        if self.caller not in targets and targets:
-            self.caller.msg(message)
-
-        for target in targets:
-            target.msg(message)
+        self.send_message(message)
