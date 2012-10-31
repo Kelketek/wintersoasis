@@ -180,8 +180,6 @@ class Page(default_cmds.MuxCommand):
             reply_list.append(self.caller)
             target.ndb.page_recent = reply_list
 
-        create.create_message(self.caller, message, receivers=targets)
-
     def func(self):
         """
         This is the hook function that actually does all the work. It is called
