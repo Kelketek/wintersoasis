@@ -13,7 +13,10 @@ def partial_pmatch(me, name):
     """
     target = me.search("*" + name, global_search=True, ignore_errors=True)
     if target:
-        return  target
+        if type(target) == list:
+            return target
+        else:
+            return [ target ]
     matches = []
     for session in SESSIONS.sessions.values():
         if session.get_character().name.lower().startswith(name.lower()):

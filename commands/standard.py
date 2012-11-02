@@ -29,7 +29,7 @@ class ExampleCmdSet(CmdSet):
         self.add(Command())
 
 
-class DefaultCmdSet(cmdset_default.DefaultCmdSet):
+class DefaultCmdSet(default_cmds.DefaultCmdSet):
     """
     Here we copy everything by calling the parent, but you can
     copy&paste any combination of the default command to customize
@@ -61,7 +61,7 @@ class DefaultCmdSet(cmdset_default.DefaultCmdSet):
         self.add(lineeditor.CmdEditor())
         #self.add(misc_commands.CmdQuell())
 
-class UnloggedinCmdSet(cmdset_unloggedin.UnloggedinCmdSet):
+class UnloggedinCmdSet(default_cmds.UnloggedinCmdSet):
     """
     This is an example of how to overload the command set of the
     unloggedin commands, defined in
@@ -84,7 +84,7 @@ class UnloggedinCmdSet(cmdset_unloggedin.UnloggedinCmdSet):
         # any commands you add below will overload the default ones.
         #
 
-class OOCCmdSet(cmdset_ooc.OOCCmdSet):
+class OOCCmdSet(default_cmds.OOCCmdSet):
     """
     This is set is available to the player when they have no
     character connected to them (i.e. they are out-of-character, ooc).
@@ -97,6 +97,8 @@ class OOCCmdSet(cmdset_ooc.OOCCmdSet):
         """
         # calling setup in src.commands.default.cmdset_ooc
         super(OOCCmdSet, self).at_cmdset_creation()
+        self.remove(comms.CmdPage())
+
         #
         # any commands you add below will overload the default ones.
         #

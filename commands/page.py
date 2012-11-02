@@ -157,7 +157,7 @@ class Page(default_cmds.MuxCommand):
             self.caller.msg("You must specify a message to send. Did you forget the = sign?")
             return False
         if self.lhslist:
-            self.targets = self.validate_targets(self.lhslist)
+            self.targets = self.eliminate_sleepers(self.validate_targets(self.lhslist))
         else:
             self.caller.msg("You must specify people to send the message to.")
         return True
