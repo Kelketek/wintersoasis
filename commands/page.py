@@ -48,6 +48,10 @@ class Page(default_cmds.MuxCommand):
         Send a private message to another player.
     Usage:
         msg someone=message
+    To page multiple folks:
+        msg someone, someone_else, some_other_person=message
+    To page-pose:
+        msg someone=:some action.
 
     Options:
         /r               Reply to whoever paged you last.
