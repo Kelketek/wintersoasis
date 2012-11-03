@@ -162,12 +162,25 @@ class Page(default_cmds.MuxCommand):
             self.caller.msg("You must specify people to send the message to.")
         return True
 
+    def posify(self, message):
+        try:
+            if message[0] == ':':
+                message = message[1:]
+                if message[0] in [':', ';', ',', "'" ]:
+                    message = self.caller.name + message
+                else:
+                    message = self.caller.name + " " + message
+            return message
+        except IndexError:
+            return message
+
     def send_message(self, message):
         """
         Does the actual paging.
         """
         targets = self.targets
         names = [ target.name for target in targets ]
+        message = self.posify(message)
         message = "Message from %s to %s: %s" % (self.caller.name, ", ".join(names), message)
 
         # Make sure we get only one copy, and that it makes sense for one to be delivered at all.
