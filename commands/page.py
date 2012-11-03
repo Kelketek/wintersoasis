@@ -64,6 +64,8 @@ class Page(default_cmds.MuxCommand):
     aliases = ["message", "mesg", "p", "pa", "pag", "msg"]
     locks = "cmd:all()"
     help_category = "General"
+    local_only = False
+    message_format = "Message from %s to %s: %s"
 
     def check_ignores(self, ref_list):
         targets = []
@@ -93,13 +95,16 @@ class Page(default_cmds.MuxCommand):
         targets = []
         MAIN = 0
         for name in name_list:
-            target = partial_pmatch(self.caller, name)
+            target = partial_pmatch(self.caller, name, local_only=self.local_only)
             try:
                 if len(target) > 1:
                     raise IndexError
                 target = target[0]
             except IndexError:
-                self.caller.msg("I don't know a player named '%s'." % name)
+                if self.local_only:
+                    self.caller.msg("There's no one here named '%s'." % name)
+                else:
+                    self.caller.msg("I don't know a character named '%s'." % name)
                 continue
             targets.append(target)
         if check_ignores:
@@ -185,7 +190,7 @@ class Page(default_cmds.MuxCommand):
         targets = self.targets
         names = [ target.name for target in targets ]
         message = self.posify(message)
-        message = "Message from %s to %s: %s" % (self.caller.name, ", ".join(names), message)
+        message = self.message_format % (self.caller.name, ", ".join(names), message)
 
         # Make sure we get only one copy, and that it makes sense for one to be delivered at all.
         if self.caller not in targets and targets:
@@ -216,3 +221,14 @@ class Page(default_cmds.MuxCommand):
             message = self.rhs
 
         self.send_message(message)
+
+class Whisper(Page):
+    """
+    Whisper a message to someone in the room.
+    """
+    key = "page"
+    aliases = ["whisper", "whispe", "whisp", "whis", "whi", "wh"]
+    locks = "cmd:all()"
+    help_category = "General"
+    local_only = True
+    message_format = "%s whispers to %s: %s"
