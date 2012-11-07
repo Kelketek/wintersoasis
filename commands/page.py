@@ -8,7 +8,7 @@ from ev import default_cmds
 from ev import utils
 from src.server.sessionhandler import SESSIONS
 from settings import *
-from game.gamesrc.oasis.lib.oasis import partial_pmatch
+from game.gamesrc.oasis.lib.oasis import partial_pmatch, check_ignores, check_sleepers, validate_targets
 
 
 """
@@ -55,8 +55,6 @@ class Page(default_cmds.MuxCommand):
 
     Options:
         /r               Reply to whoever paged you last.
-        /ignore <user>   Ignore a character.
-        /unignore <user> Unignore a character.
     """
     # these need to be specified
 
@@ -67,106 +65,24 @@ class Page(default_cmds.MuxCommand):
     local_only = False
     message_format = "Message from %s to %s: %s"
 
-    def check_ignores(self, ref_list):
-        targets = []
-        for target in ref_list:
-            ignore = target.db.page_ignore
-            if not ignore:
-                targets.append(target)
-                continue
-            if self.caller in ignore:
-                self.caller.msg("%s is ignoring you." % target.name)
-                continue
-            else:
-                targets.append(target)
-        return targets
-            
-
-    def eliminate_sleepers(self, ref_list):
-        targets = []
-        for ref in ref_list:
-            if ref.sessions:
-                targets.append(ref)
-            else:
-                self.caller.msg("%s is not connected to the game right now." % ref.name)
-        return targets
-
-    def validate_targets(self, name_list, check_ignores=True):
-        targets = []
-        MAIN = 0
-        for name in name_list:
-            target = partial_pmatch(self.caller, name, local_only=self.local_only)
-            try:
-                if len(target) > 1:
-                    raise IndexError
-                target = target[0]
-            except IndexError:
-                if self.local_only:
-                    self.caller.msg("There's no one here named '%s'." % name)
-                else:
-                    self.caller.msg("I don't know a character named '%s'." % name)
-                continue
-            targets.append(target)
-        if check_ignores:
-            targets = self.check_ignores(targets)
-        return targets
-
-    def toggle_ignores(self, switch):
-        """
-        Toggle whether or not some folks are ignored.
-        """
-        if not self.args:
-            return False
-        targets = self.validate_targets(self.arglist, check_ignores=False)
-        if not targets:
-            self.caller.msg("No valid targets found.")
-        if self.caller.db.page_ignore:
-            ignore = self.caller.db.page_ignore
-        else:
-            ignore = []
-        if switch:
-            for target in targets:
-                if target not in ignore:
-                    ignore.append(target)
-                    self.caller.msg("Ignoring %s." % target.name)
-                else:
-                    self.caller.msg("Already ignoring %s." % target.name)
-        else:
-            for target in targets:
-                if target not in ignore:
-                    self.caller.msg("You were not ignoring %s." % target.name)
-                else:
-                    ignore = [ person for person in ignore if person != target ]
-                    self.caller.msg("No longer ignoring %s." % target.name)
-        self.caller.db.page_ignore = ignore
-        return True
-
     def switch_processor(self):
         """
         Handle command arguments.
         """
         if 'r' in self.switches:
             if self.caller.ndb.page_recent:
-                self.targets = self.eliminate_sleepers(self.caller.ndb.page_recent)
+                self.targets = check_sleepers(self.caller, self.caller.ndb.page_recent)
             else:
                 self.caller.msg("No one has paged you recently.")
             self.message = self.args
             return True
-        if 'ignore' in self.switches:
-            if not self.toggle_ignores(True):
-                self.caller.msg("You must specify people you wish to ignore.")
-            return False
-        if 'unignore' in self.switches:
-            if not self.toggle_ignores(False):
-                self.caller.msg("You must specify folks you wish to unignore.")
-            return False
         if self.rhs:
             self.message = self.rhs
         else:
             self.caller.msg("You must specify a message to send. Did you forget the = sign?")
             return False
         if self.lhslist:
-            self.targets = self.eliminate_sleepers(self.validate_targets(self.lhslist))
+            self.targets = check_sleepers(self.caller, validate_targets(self.caller, self.lhslist, local_only=self.local_only))
         else:
             self.caller.msg("You must specify people to send the message to.")
         return True
@@ -226,8 +142,8 @@ class Whisper(Page):
     """
     Whisper a message to someone in the room.
     """
-    key = "page"
-    aliases = ["whisper", "whispe", "whisp", "whis", "whi", "wh"]
+    key = "whisper"
+    aliases = ["whispe", "whisp", "whis", "whi", "wh"]
     locks = "cmd:all()"
     help_category = "General"
     local_only = True
