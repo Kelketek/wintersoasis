@@ -58,5 +58,8 @@ class Nexus(default_cmds.MuxCommand):
          by the cmdhandler right after self.parser() finishes, and so has access
          to all the variables defined therein.
         """
-        self.caller.location.msg(self.caller.name + " returns to the OOC nexus.")
+        try:
+            self.caller.location.msg(self.caller.name + " returns to the OOC nexus.")
+        except AttributeError:
+            pass
         self.caller.move_to(NEXUS)

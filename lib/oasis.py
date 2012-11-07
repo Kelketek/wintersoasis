@@ -1,7 +1,15 @@
 import ev
-from ev import utils
 import settings
+import smtplib
+from cgi import escape
+from email import Encoders
+from email.MIMEText import MIMEText
+from email.MIMEMultipart import MIMEMultipart
+from email.Utils import formatdate
+from string import Template
+from ev import utils
 from src.server.sessionhandler import SESSIONS
+from src.comms.models import Msg
 
 def partial_pmatch(me, name, local_only=False):
     """
@@ -33,26 +41,55 @@ def partial_pmatch(me, name, local_only=False):
             matches.append(session.get_character())
     return matches
 
-def create_mail(senderobj, message, channels=None,
-                   receivers=None, locks=None, title=None):
+def send_game_mail(message):
     """
-        Mail message. This is based on the Msg class, and will likely become
-    distinct as development progresses.
+    Sends mail from one player to another.
     """
-    if not message:
-        # we don't allow empty messages.
+    sender = message.senders[0].name
+    receivers = [ receiver for receiver in message.receivers if receiver.db.email ]
+    subject = message.header
+    body = message.message
+    if not (receivers):
         return
-    new_message = Mail(db_message=message)
-    new_message.save()
-    for sender in make_iter(senderobj):
-        new_message.senders = sender
-    new_message.title = title
-    for channel in make_iter(channels):
-        new_message.channels = channel
-    for receiver in make_iter(receivers):
-        new_message.receivers = receiver
-    if locks:
-        new_message.locks.add(locks)
-    new_message.save()
-    return new_message
 
+    HOST = 'localhost'
+    msg = MIMEMultipart('alternative')
+    msg['From'] = "Winter's Oasis <messages@wintersoasis.com>"
+    msg['Subject'] = subject
+    msg['Date'] = formatdate(localtime=True)
+
+    # HTML email part.
+    html_part = MIMEText('text', 'html')
+    html_source = Template("""
+<html>
+<body>
+You have a new message from <strong>${from}</strong> to <strong>${recipients}</strong>:<br />
+
+<p>${message}</p>
+
+To check and manage your in-game messages, log in! :D
+</body>
+</html>
+""")
+    value_map = { 'from' : sender, 'message' : escape(unicode(body)), 'recipients' : ', '.join([ receiver.name for receiver in receivers ]) }
+    html_part.set_payload(html_source.substitute(value_map))
+
+    text_source = Template("""
+You have a new message from ${from} to ${recipients}:
+
+${message}
+
+To check and manage your in-game messages, log in! :D
+""")
+    body = text_source.substitute(value_map)
+    text_part = MIMEText(unicode(body), 'plain', 'utf-8')
+    msg.attach(text_part)
+    msg.attach(html_part)
+
+    server = smtplib.SMTP(HOST)
+    for receiver in receivers:
+        msg['To'] = receiver.db.email
+        server.sendmail('messages@wintersoasis.com', receiver.db.email, msg.as_string())
+    server.quit()
+
+    server.close()

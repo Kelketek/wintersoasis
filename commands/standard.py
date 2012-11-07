@@ -6,7 +6,7 @@ from ev import CmdSet, Command
 from ev import default_cmds
 from src.commands.default import comms
 from contrib.extended_room import CmdExtendedLook 
-from game.gamesrc.oasis.commands import quote, character_commands, rp_say, page, warps, cmdset_default, cmdset_ooc, cmdset_unloggedin
+from game.gamesrc.oasis.commands import quote, character_commands, rp_say, page, warps, cmdset_default, cmdset_ooc, cmdset_unloggedin, mail
 
 from contrib import menusystem, lineeditor
 #from contrib import misc_commands
@@ -53,7 +53,9 @@ class DefaultCmdSet(default_cmds.DefaultCmdSet):
         self.add(rp_say.Pose())
         self.add(rp_say.Ooc())
         self.add(page.Page())
+        self.add(page.Whisper())
         self.add(warps.Nexus())
+        self.add(mail.Mail())
         #
         # any commands you add below will overload the default ones.
         #
