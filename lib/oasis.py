@@ -55,8 +55,8 @@ def send_message(senders, subject, body, receivers):
     """
     Send a mail message to specified recipients.
     """
-    message = create.create_message(senders, body,
-           receivers, header=subject)
+    message = create.create_message(senderobj=senders, message=body,
+           receivers=receivers, header=subject)
     for target in receivers:
         try:
             target.db.mail.append((message, message.date_sent))
@@ -160,9 +160,9 @@ def validate_targets(person, name_list, ignores=True, local_only=True, silent=Fa
         except IndexError:
             if not silent:
                 if local_only:
-                    self.caller.msg("There's no one here named '%s'." % name)
+                    persom.msg("There's no one here named '%s'." % name)
                 else:
-                    self.caller.msg("I don't know a character named '%s'." % name)
+                    person.msg("I don't know a character named '%s'." % name)
             continue
         targets.append(target)
     if ignores:
