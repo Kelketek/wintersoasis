@@ -61,4 +61,4 @@ class Nexus(default_cmds.MuxCommand):
             self.caller.location.msg(self.caller.name + " returns to the OOC nexus.")
         except AttributeError:
             pass
-        self.caller.move_to(NEXUS)
+        self.caller.move_to(self.caller.search(NEXUS))
