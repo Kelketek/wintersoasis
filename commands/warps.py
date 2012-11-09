@@ -9,7 +9,6 @@ from ev import utils
 from src.server.sessionhandler import SESSIONS
 from settings import *
 
-
 """
 This sets up the basis for a Evennia's 'MUX-like' command
     style. The idea is that most other Mux-related commands should

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import ev
-import src.objects.models as models
+from defaults.constants_default import *
 
-NEXUS=ev.search_object("#206")[0]
+# The values you set in this file will overwrite those in
+# defaults/constants_defaults.py.

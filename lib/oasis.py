@@ -3,13 +3,14 @@ Common functions used by other commands in the Winter's Oasis command sets.
 """
 import ev
 import settings
-import smtplib
 from cgi import escape
 from email import Encoders
 from email.MIMEText import MIMEText
 from email.MIMEMultipart import MIMEMultipart
 from email.Utils import formatdate
 from string import Template
+from twisted.mail.smtp import sendmail
+from constants import *
 from ev import utils
 from src.utils import create
 from src.server.sessionhandler import SESSIONS
@@ -51,19 +52,29 @@ def partial_pmatch(me, name, local_only=False):
             matches.append(session.get_character())
     return matches
 
-def send_message(senders, subject, body, receivers):
+def send_message(senders, subject, body, receivers, priority=False, silent_send=False, silent_receive=False, send_email=False):
     """
     Send a mail message to specified recipients.
     """
     message = create.create_message(senderobj=senders, message=body,
            receivers=receivers, header=subject)
+    successful = []
     for target in receivers:
         try:
-            target.db.mail.append((message, message.date_sent))
-        except AttributeError:
-            target.db.mail = [ (message, message.date_sent) ]
-    send_email_copy(message)
-
+            if len(target.db.mail) >= MAX_MESSAGES and not priority:
+                if not silent_send:
+                    for sender in senders:
+                        sender.msg(ALERT % "Mailbox of %s is full. Could not send message!" % target.name)
+                continue
+            target.db.mail.append([message, message.date_sent, False])
+        except (TypeError, AttributeError):
+            target.db.mail = [ [message, message.date_sent, False] ]
+        if not silent_receive:
+            target.msg(ALERT % "You have new mail! Check it by typing: mail")
+        successful.append(target)
+    if EMAIL and send_email:
+        send_email_copy(message)
+    return successful
 
 def send_email_copy(message):
     """
@@ -76,7 +87,6 @@ def send_email_copy(message):
     if not (receivers):
         return
 
-    HOST = 'localhost'
     msg = MIMEMultipart('alternative')
     msg['From'] = "Winter's Oasis <messages@wintersoasis.com>"
     msg['Subject'] = subject
@@ -84,38 +94,19 @@ def send_email_copy(message):
 
     # HTML email part.
     html_part = MIMEText('text', 'html')
-    html_source = Template("""
-<html>
-<body>
-You have a new message from <strong>${from}</strong> to <strong>${recipients}</strong>:<br />
-
-<p>${message}</p>
-
-To check and manage your in-game messages, log in! :D
-</body>
-</html>
-""")
+    html_source = Template(HTML_TEMPLATE)
     value_map = { 'from' : sender, 'message' : escape(unicode(body)), 'recipients' : ', '.join([ receiver.name for receiver in receivers ]) }
     html_part.set_payload(html_source.substitute(value_map))
 
-    text_source = Template("""
-You have a new message from ${from} to ${recipients}:
-
-${message}
-
-To check and manage your in-game messages, log in! :D
-""")
+    text_source = Template(TEXT_TEMPLATE)
     body = text_source.substitute(value_map)
     text_part = MIMEText(unicode(body), 'plain', 'utf-8')
     msg.attach(text_part)
     msg.attach(html_part)
 
-    server = smtplib.SMTP(HOST)
     for receiver in receivers:
         msg['To'] = receiver.db.email
-        server.sendmail('messages@wintersoasis.com', receiver.db.email, msg.as_string())
-    server.quit()
-    server.close()
+        sendmail(SMTP_HOST, MAIL_FROM, receiver.db.email, msg.as_string())
 
 def check_sleepers(person, ref_list, silent=False):
     targets = []

@@ -29,7 +29,7 @@ class Ignore(default_cmds.MuxCommand):
         """
         Toggle whether or not some folks are ignored.
         """
-        targets = validate_targets(self.caller, self.arglist, local_only=False)
+        targets = validate_targets(self.caller, self.arglist, ignores=False, local_only=False)
         if not targets:
             self.caller.msg("No valid targets found.")
             return
@@ -60,9 +60,9 @@ class Ignore(default_cmds.MuxCommand):
          to all the variables defined therein.
         """
         MAIN = 0
-        if not args:
+        if not self.args:
             self.caller.msg('You must specify someone.')
-        targets = 
+        self.toggle_ignores(self.ignoring)
         
         
 

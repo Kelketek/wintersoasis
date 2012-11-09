@@ -13,7 +13,3 @@ def at_server_reload_start():
     pass
 def at_server_reload_stop():
     pass
-# Module containing your custom at_server_start(), at_server_reload() and
-# at_server_stop() methods. These methods will be called every time
-# the server starts, reloads and resets/stops respectively.
-AT_SERVER_STARTSTOP_MODULE = ""

@@ -8,10 +8,26 @@ from ev import Command as BaseCommand
 from ev import default_cmds
 from src.utils import create, utils
 from game.gamesrc.oasis.lib.oasis import partial_pmatch, send_message, validate_targets
+from game.gamesrc.oasis.lib.constants import *
 
 class Mail(default_cmds.MuxCommand):
     """
-    Send a mail message to another player.
+Send and receive messages.
+
+To check your messages:
+    mail
+
+To check message number 3, type:
+    mail 3
+
+To send a message to someone named Thaddius:
+    mail Thaddius=Hello there, Thaddius!
+
+To delete message number 4, type:
+    mail/delete 4
+
+To delete all of your messages, type:
+    mail/delete/all
     """
     key = "mail"
     aliases = []
@@ -25,23 +41,43 @@ class Mail(default_cmds.MuxCommand):
         mail = self.caller.db.mail
         MESSAGE = 0
         TIMESTAMP = 1
+        READ = 2
         try:
-            messages = [item[MESSAGE] for item in mail if item[TIMESTAMP] <= item[MESSAGE].date_sent ]
+            messages = [item for item in mail if item[TIMESTAMP] <= item[MESSAGE].date_sent]
+            # Let's clean up mail storage for this user while we're at it.
+            self.caller.db.mail = messages
         except TypeError:
             messages = []
         header = '--------Mailbox for %s' % self.caller.name
         self.caller.msg(header)
         count = 1
         for message in messages:
-            self.caller.msg('%s. From %s: %s' % (count, message.senders[0], message.header))
+            if message[READ]:
+                read = ''
+            else:
+                read = '{w*'
+            self.caller.msg('%s%s. From %s: %s{n' % (read, count, message[MESSAGE].senders[0], message[MESSAGE].header))
+            count += 1
         self.caller.msg('-'*len(header))
+
+    def mail_check(self):
+        messages = self.caller.db.mail
+        count = 0
+        READ = 2
+        for message in messages:
+            if not message[READ]:
+                count += 1
+        if not count and not self.args.lower() == 'quiet':
+            self.caller.msg(ALERT % "You have no new messages.")
+        else:
+            self.caller.msg(ALERT % "You have %s new message(s). Check them with: mail" % count)
 
     def display_mail(self, message):
         """
         Display a mail message.
         """
-        senders = ', '.join([ sender.name for sender in message.senders if utils.inherits_from(sender, 'src.objects.models.ObjectDB') ])
-        receivers = ', '.join([ receiver.name for receiver in message.receivers if utils.inherits_from(receiver, 'src.objects.models.ObjectDB') ])
+        senders = ', '.join([ sender.name for sender in message.senders if utils.inherits_from(sender.typeclass, settings.BASE_CHARACTER_TYPECLASS) ])
+        receivers = ', '.join([ receiver.name for receiver in message.receivers if utils.inherits_from(receiver.typeclass, settings.BASE_CHARACTER_TYPECLASS) ])
         self.caller.msg('--------Mail to %s from %s.' % (senders, receivers))
         self.caller.msg('Sent on: %s' % message.date_sent)
         self.caller.msg('Subject: %s\n' % message.header)
@@ -53,20 +89,32 @@ class Mail(default_cmds.MuxCommand):
         Delete a specified message.
         """
         MESSAGE = 0
+        TIMESTAMP = 1
+        if 'all' in self.switches:
+            try:
+                messages = [item for item in self.caller.db.mail if item[TIMESTAMP] <= item[MESSAGE].date_sent]
+                for message in messages:
+                    message[MESSAGE].delete()
+            except TypeError, AttributeError:
+                pass
+            self.caller.db.mail = []
+            self.caller.msg(ALERT % "All mail deleted.")
+            return
         try:
             choice = int(self.args) - 1
-        except TypeError:
-            self.caller.msg("'%s' is not a valid message number.")
+        except ValueError:
+            self.caller.msg("'%s' is not a valid message number." % self.args)
             return
         try:
             message = self.caller.mail[choice][MESSAGE]
-        except TypeError, IndexError:
-            self.caller.msg("The message number %s does not exist." % choice + 1)
+        except (TypeError, IndexError):
+            self.caller.msg("The message number %s does not exist." % self.args)
             return
-        self.caller.msg('Deleted message from %s to %s entitled "%s".' % (', '.join([ target.name for target in message.senders if utils.inherits_from(target, 'src.objects.models.ObjectDB') ]),
-            ', '.join([ target.name for target in message.receivers if utils.inherits_from(target, 'src.objects.models.ObjectDB') ]), message.header))
+        self.caller.msg('Deleted message from %s to %s entitled "%s".' % (', '.join([ target.name for target in message.senders if utils.inherits_from(target.typeclass, settings.BASE_CHARACTER_TYPECLASS)]),
+            ', '.join([ target.name for target in message.receivers if utils.inherits_from(target.typeclass, settings.BASE_CHARACTER_TYPECLASS) ]), message.header))
         self.caller.mail[choice][MESSAGE].delete()
-        del self.caller.mail[choice]
+        del self.caller.db.mail[choice]
+        self.caller.save()
 
     def main_handler(self):
         """
@@ -74,24 +122,26 @@ class Mail(default_cmds.MuxCommand):
         'most obvious' action for different arguments.
         """
         MESSAGE = 0
+        READ = 2
         if not self.rhs and not self.lhs:
             self.list_mail()
             return
         if self.lhs and not self.rhs:
             try:
                 choice = int(self.lhs)
-            except TypeError:
+            except ValueError:
                 self.caller.msg("'%s' is not a mail message number. Did you mean to send a message to '%s'? If so, try: mail %s=Your message here." % \
                     (self.lhs, self.lhs, self.lhs))
                 return
-            #try:
+            try:
                 # Display numbers are offset.
-            message = self.caller.db.mail[choice - 1]
-            self.display_mail(message[MESSAGE])
-            return
-            #except TypeError, IndexError:
-            #    self.caller.msg('No such message number. To check your mail, type: mail')
-            #    return
+                message = self.caller.db.mail[choice - 1]
+                self.display_mail(message[MESSAGE])
+                message[READ] = True
+                return
+            except (TypeError, IndexError):
+                self.caller.msg('No such message number. To check your mail, type: mail')
+                return
         if self.rhs and not self.lhs:
             self.caller.msg('You must specify someone to send mail to.')
             return
@@ -100,10 +150,12 @@ class Mail(default_cmds.MuxCommand):
             self.caller.msg('No valid targets found!')
             return
         senders = [self.caller]
-        subject = 'Message from %s' % self.caller.name
+        subject = '( Quickmail )'
         body = self.rhs
-        send_message(senders, subject, body, receivers)
-        self.caller.msg('Mail sent.')
+        if send_message(senders, subject, body, receivers, send_email=True):
+            self.caller.msg('Mail sent.')
+        else:
+            self.caller.msg("No messages sent.")
 
     def func(self):
         """
@@ -115,5 +167,8 @@ class Mail(default_cmds.MuxCommand):
         if not self.switches:
             self.main_handler()
             return
-        if 'delete' in self.switches:
-            self.delete_handler() 
+        if 'delete' in self.switches or 'del' in self.switches:
+            self.delete_handler()
+            return
+        if 'check' in self.switches:
+            self.mail_check()
