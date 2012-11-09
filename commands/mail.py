@@ -31,7 +31,7 @@ To delete all of your messages, type:
     """
     key = "mail"
     aliases = []
-    locks = "pperm(Immortals)"
+    locks = "cmd:all()"
     help_category = "General"
 
     def list_mail(self):
