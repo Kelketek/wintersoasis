@@ -200,16 +200,16 @@ class CmdEditorGroup(CmdEditorBase):
             string = editor.display_help()
         elif cmd == ":w":
             # save without quitting
-            string = editor.save_buffer()
+            string = editor.save_buffer(quitting=False)
         elif cmd == ":wq":
             # save and quit
-            string = editor.save_buffer()
+            string = editor.save_buffer(quitting=True)
             string += " " + editor.quit()
         elif cmd == ":q":
             # quit. If not saved, will ask
             if self.editor.unsaved:
                 prompt_yesno(caller, "Save before quitting?",
-                             yescode = "self.caller.ndb._lineeditor.save_buffer()\nself.caller.ndb._lineeditor.quit()",
+                             yescode = "self.caller.ndb._lineeditor.save_buffer(quitting=True)\nself.caller.ndb._lineeditor.quit()",
                              nocode = "self.caller.msg(self.caller.ndb._lineeditor.quit())", default="Y")
             else:
                 string = editor.quit()
@@ -269,8 +269,8 @@ class CmdEditorGroup(CmdEditorBase):
                 string = "Copy buffer is empty."
             else:
                 buf = linebuffer[:lstart] + editor.copy_buffer + linebuffer[lstart:]
-            editor.update_buffer(buf)
-            string = "Copied buffer %s to %s." % (editor.copy_buffer, self.lstr)
+                editor.update_buffer(buf)
+                string = "Copied buffer %s to %s." % (editor.copy_buffer, self.lstr)
         elif cmd == ":i":
             # :i <l> <txt> - insert new line
             new_lines = self.args.split('\n')
@@ -381,13 +381,15 @@ class LineEditor(object):
     itself.
     """
 
-    def __init__(self, caller, loadcode="", savecode="", key=""):
+    def __init__(self, caller, loadcode=(lambda: '', {}), savecode=(lambda: '', {}), key=""):
         """
         caller - who is using the editor
         loadcode - code to execute in order to load already existing text into the buffer
         savecode - code to execute in order to save the result
         key = an optional key for naming this session (such as which attribute is being edited)
         """
+        FUNCTION = 0
+        ARGS = 1
         self.key = key
         self.caller = caller
         self.caller.ndb._lineeditor = self
@@ -395,7 +397,8 @@ class LineEditor(object):
         self.unsaved = False
         if loadcode:
             try:
-                exec(loadcode)
+                loadcode[ARGS]['editor_result'] = {'caller' : self.caller}
+                self.buffer = loadcode[FUNCTION](**loadcode[ARGS])
             except Exception, e:
                 caller.msg("%s\n{rBuffer loadcode failed. Could not load initial data.{n" % e)
 
@@ -451,13 +454,24 @@ class LineEditor(object):
         self.caller.cmdset.delete(EditorCmdSet)
         return "Exited editor."
 
-    def save_buffer(self):
-        "Saves the content of the buffer"
+    def save_buffer(self, quitting):
+        """
+            Saves the content of the buffer. The 'quitting' argument is a bool
+        indicating whether or not the editor intends to exit after saving.
+        """
+        FUNCTION = 0
+        ARGS = 1
         if self.unsaved:
             try:
-                exec(self.savecode)
-                self.unsaved = False
-                return "Buffer saved."
+                self.savecode[ARGS]['editor_result'] = {
+                    'buffer' : self.buffer, 'caller' : self.caller,
+                    'quitting' : quitting }
+                save_status = self.savecode[FUNCTION](**self.savecode[ARGS])
+                if save_status:
+                    self.unsaved = False
+                # Save codes should return a true value to indicate save worked.
+                # The saving function is responsible for any status messages.
+                return ""
             except Exception, e:
                 return "%s\n{rSave code gave an error. Buffer not saved." % e
         else:
@@ -583,28 +597,48 @@ class CmdEditor(Command):
     locks = "cmd:perm(editor) or perm(Builders)"
     help_category = "Building"
 
+    def save_prop(self, editor_result):
+        setattr(self.obj.db, self.attrname, editor_result['buffer'])
+        self.caller.msg("Saved.")
+        return True
+
+    def load_prop(self, editor_result):
+        target = getattr(self.obj.db, self.attrname)
+        if (not utils.inherits_from(target, unicode)) and (not target == None):
+            self.caller.msg("{rWARNING! If you save this buffer, you will overwrite this property of type '%s' with a unicode string!{n" % type(target).__name__)
+        return str(target)
+
     def func(self):
         "setup and start the editor"
 
         if not self.args or not '/' in self.args:
             self.caller.msg("Usage: @editor <obj>/<attrname>")
             return
-        objname, attrname = [part.strip() for part in self.args.split("/")]
-        obj = self.caller.search(objname)
-        if not obj:
+        self.objname, self.attrname = [part.strip() for part in self.args.split("/", 1)]
+        self.obj = self.caller.search(self.objname)
+        if not self.obj:
             return
 
-        # the load/save codes define what the editor shall do when wanting to
-        # save the result of the editing. The editor makes self.buffer and
-        # self.caller available for this code - self.buffer holds the editable text.
+        # The load/save codes define what the editor shall do when wanting to
+        # save the result of the editing. This should be a tuple with the first value as a
+        # function, and the second value as a dictionary.
 
-        loadcode = "obj = self.caller.search('%s')\n" % obj.id
-        loadcode += "if obj.db.%s: self.buffer = obj.db.%s" % (attrname, attrname)
+        # The save function will have the argument 'editor_result' which will contain a dictionary
+        # the line editor sends back. This dictionary will contain 'buffer', the line editor's buffer,
+        # and 'caller', the line editor's self.caller.
 
-        savecode = "obj = self.caller.search('%s')\n" % obj.id
-        savecode += "obj.db.%s = self.buffer" % attrname
+        # The load function will have the parameters defined by the dictionary in the tuple, as well as
+        # an argument 'editor_result', a dictionary which will contain the element 'caller', which holds
+        # self.caller. The function shall return a string that the editor can use as its starting buffer.
 
-        editor_key = "%s/%s" % (objname, attrname)
+        # The save function should return a true value if successful, and a false one if it failed.
+
+
+        loadcode = (self.load_prop, {})
+
+        savecode = (self.save_prop, {})
+
+        editor_key = "%s/%s" % (self.objname, self.attrname)
 
         # start editor, it will handle things from here.
         LineEditor(self.caller, loadcode=loadcode, savecode=savecode, key=editor_key)

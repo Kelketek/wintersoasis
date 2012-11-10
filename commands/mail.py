@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import datetime
+import re
 
 import ev
 import settings
@@ -7,8 +8,9 @@ import settings
 from ev import Command as BaseCommand
 from ev import default_cmds
 from src.utils import create, utils
-from game.gamesrc.oasis.lib.oasis import partial_pmatch, send_message, validate_targets
+from game.gamesrc.oasis.lib.oasis import partial_pmatch, send_message, validate_targets, check_ignores
 from game.gamesrc.oasis.lib.constants import *
+from game.gamesrc.oasis.commands.lineeditor import LineEditor
 
 class Mail(default_cmds.MuxCommand):
     """
@@ -110,11 +112,74 @@ To delete all of your messages, type:
         except (TypeError, IndexError):
             self.caller.msg("The message number %s does not exist." % self.args)
             return
-        self.caller.msg('Deleted message from %s to %s entitled "%s".' % (', '.join([ target.name for target in message.senders if utils.inherits_from(target.typeclass, settings.BASE_CHARACTER_TYPECLASS)]),
-            ', '.join([ target.name for target in message.receivers if utils.inherits_from(target.typeclass, settings.BASE_CHARACTER_TYPECLASS) ]), message.header))
+        self.caller.msg('Deleted message from %s to %s entitled "%s".' % (
+            ', '.join([ target.name for target in message.senders if utils.inherits_from(
+                target.typeclass, settings.BASE_CHARACTER_TYPECLASS)]),
+            ', '.join([ target.name for target in message.receivers if utils.inherits_from(
+                target.typeclass, settings.BASE_CHARACTER_TYPECLASS) ]),
+            message.header))
+
         self.caller.mail[choice][MESSAGE].delete()
         del self.caller.db.mail[choice]
         self.caller.save()
+
+    def send_buffer(self, senders, subject, receivers, editor_result):
+        """
+        This function is called by the line editor when its work is complete.
+        """
+        # If we're not quitting, we're not doing anything.
+        if not editor_result['quitting']:
+            self.caller.msg('Saving a draft is not yet supported. Use :wq to send the message.')
+            return False
+        # If you're typing out a really long mail, you may have annoyed someone in the interim.
+        body = editor_result['buffer']
+        receivers = check_ignores(self.caller, receivers)
+        if not receivers:
+            caller.msg('No valid recipients found!')
+            return False
+        if send_message(senders, subject, body, receivers, send_email=True):
+            self.caller.msg('Mail sent.')
+            return True
+        else:
+            self.caller.msg("No messages sent.")
+            return False
+
+    def long_handler(self):
+        """
+        Handles a long form message by calling a line editor.
+        """
+        receivers = validate_targets(self.caller, self.lhslist, local_only=False)
+        if not receivers:
+            self.caller.msg('No valid targets found!')
+            return
+        senders = [self.caller]
+        subject = self.rhs
+        if not subject:
+            self.caller.msg('You must specify a subject. Try: mail/long someone=Hello, there!')
+            return
+
+        # The load/save codes define what the editor shall do when wanting to
+        # save the result of the editing. This should be a tuple with the first value as a
+        # function, and the second value as a dictionary.
+
+        # The save function will have the argument 'editor_result' which will contain a dictionary
+        # the line editor sends back. This dictionary will contain 'buffer', the line editor's buffer,
+        # and 'caller', the line editor's self.caller.
+
+        # The load function will have the parameters defined by the dictionary in the tuple, as well as
+        # an argument 'editor_result', a dictionary which will contain the element 'caller', which holds
+        # self.caller.
+
+        # The save function should return a true value if successful, and a false one if it failed.
+
+        loadcode = (lambda **args: '', {}) # Just need an empty string.
+
+        savecode = (self.send_buffer, {'subject': subject, 'senders' : [self.caller], 'receivers' : receivers})
+
+        editor_key = "mail_message"
+
+        # Start the line editor
+        LineEditor(self.caller, loadcode=loadcode, savecode=savecode, key=editor_key)
 
     def main_handler(self):
         """
@@ -167,6 +232,8 @@ To delete all of your messages, type:
         if not self.switches:
             self.main_handler()
             return
+        if 'long' in self.switches:
+            self.long_handler()
         if 'delete' in self.switches or 'del' in self.switches:
             self.delete_handler()
             return

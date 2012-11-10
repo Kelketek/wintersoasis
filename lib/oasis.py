@@ -80,7 +80,6 @@ def send_email_copy(message):
     """
     Sends an email copy of a message to all relevant targets.
     """
-    sender = message.senders[0].name
     receivers = [ receiver for receiver in message.receivers if receiver.db.email ]
     subject = message.header
     body = message.message
@@ -95,9 +94,13 @@ def send_email_copy(message):
     # HTML email part.
     html_part = MIMEText('text', 'html')
     html_source = Template(HTML_TEMPLATE)
-    value_map = { 'from' : sender, 'message' : escape(unicode(body)), 'recipients' : ', '.join([ receiver.name for receiver in receivers ]) }
+    value_map = {
+        'from' : ', '.join([ sender.name for sender in message.senders ]),
+        'message' : escape(unicode(body)).replace('\n', '<br />'),
+        'recipients' : ', '.join([ receiver.name for receiver in message.receivers ]) }
     html_part.set_payload(html_source.substitute(value_map))
 
+    value_map['message'] = unicode(body)
     text_source = Template(TEXT_TEMPLATE)
     body = text_source.substitute(value_map)
     text_part = MIMEText(unicode(body), 'plain', 'utf-8')
@@ -151,7 +154,7 @@ def validate_targets(person, name_list, ignores=True, local_only=True, silent=Fa
         except IndexError:
             if not silent:
                 if local_only:
-                    persom.msg("There's no one here named '%s'." % name)
+                    person.msg("There's no one here named '%s'." % name)
                 else:
                     person.msg("I don't know a character named '%s'." % name)
             continue
