@@ -44,6 +44,8 @@ class Ignore(default_cmds.MuxCommand):
                     self.caller.msg("Ignoring %s." % target.name)
                 else:
                     self.caller.msg("Already ignoring %s." % target.name)
+                if target.locks.check_lockstring(target, 'admin:perm(Wizards)'):
+                    self.caller.msg('{rWARNING: Your ignore will be null as long as %s is an administrator.{n' % target.name)
         else:
             for target in targets:
                 if target not in ignore:

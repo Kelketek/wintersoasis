@@ -6,7 +6,7 @@ from ev import CmdSet, Command
 from ev import default_cmds
 from src.commands.default import comms
 from contrib.extended_room import CmdExtendedLook 
-from game.gamesrc.oasis.commands import quote, character_commands, rp_say, page, warps, mail, ignore, lineeditor, senses
+from game.gamesrc.oasis.commands import quote, character_commands, rp_say, page, warps, mail, ignore, lineeditor, senses, who
 
 from contrib import menusystem
 #from contrib import misc_commands
@@ -61,6 +61,7 @@ class DefaultCmdSet(default_cmds.DefaultCmdSet):
         self.add(senses.Taste())
         self.add(senses.Feel())
         self.add(senses.Smell())
+        self.add(who.Who())
         #
         # any commands you add below will overload the default ones.
         #

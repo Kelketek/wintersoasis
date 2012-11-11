@@ -125,6 +125,9 @@ def check_ignores(person, ref_list, silent=False):
         Check a list and eliminate all characters within it that are ignoring a
     person.
     """
+    # We don't ignore administrators.
+    if person.locks.check_lockstring(person, 'admin:perm(Wizards)'):
+        return ref_list
     targets = []
     for target in ref_list:
         ignore = target.db.ignore
