@@ -139,6 +139,16 @@ def check_ignores(person, ref_list, silent=False):
             targets.append(target)
     return targets
 
+def check_owner(person, target):
+    """
+    Checks to see if a user owns an object.
+    """
+    owner = target.db.owner
+    if not owner:
+        return False
+    owner, timestamp = owner
+    return owner == person and timestamp >= int(owner.dbobj.date_created.strftime('%s'))
+
 def validate_targets(person, name_list, ignores=True, local_only=True, silent=False):
     """
         Check a list and eliminate all targets that don't exist.

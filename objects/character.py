@@ -67,4 +67,3 @@ class WOCharacter(Character):
                 self.location.msg_contents("{c%s has disconnected.{n" % self.name, exclude=[self])
                 self.db.prelogout_location = self.location
                 self.location = None
-

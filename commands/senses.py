@@ -6,7 +6,7 @@ from ev import Command as BaseCommand
 from ev import default_cmds
 from ev import utils
 from game.gamesrc.oasis.lib.constants import ALERT
-from game.gamesrc.oasis.lib.oasis import validate_targets, check_ignores
+from game.gamesrc.oasis.lib.oasis import validate_targets, check_ignores, check_owner
 
 class Sense(default_cmds.MuxCommand):
     """
@@ -28,18 +28,30 @@ class Sense(default_cmds.MuxCommand):
         try:
             self.caller.msg(prefix + target.db.senses[self.key] + '{n')
         except (TypeError, IndexError, KeyError):
-            self.caller.msg('%s{cYou %s nothing special.{n' % (prefix, self.verb))
-        target.msg('{c%s just %s you.{n' % (self.caller.name, self.verbed))
+            self.caller.msg('%sYou %s nothing special.{n' % (prefix, self.verb))
+        target.msg(ALERT % '%s just %s you.' % (self.caller.name, self.verbed))
 
-    def set_sense(self):
+    def set_sense(self, target, message):
+        if not (check_owner(self.caller, target) or target.access(self.caller, 'control')):
+            self.caller.msg("{rPermission denied.{n")
+            return
         try:
-            self.caller.sb.senses[self.key] = self.args
+            target.db.senses[self.key] = self.rhs
         except TypeError:
-            self.caller.sb.senses = { self.key : self.args }
-        if not args:
+            target.db.senses = { self.key : self.rhs }
+        if not self.args:
             self.caller.msg('{cCleared.{n')
         else:
             self.caller.msg('{cSet.{n')
+
+    def set_sense_handler(self):
+        """
+        Parse input for handling the 'set' version of sense.
+        """
+        match = self.caller.search(self.lhs)
+        if not match:
+            return
+        self.set_sense(match, self.rhs)
 
     def func(self):
         """
@@ -47,7 +59,7 @@ class Sense(default_cmds.MuxCommand):
         """
         self.switches = [ switch.lower() for switch in self.switches ]
         if 'set' in self.switches:
-            self.set_sense()
+            self.set_sense_handler()
             return
         if 'here' in self.switches:
             targets = check_ignores(self.caller, self.caller.location.contents)
@@ -62,7 +74,14 @@ class Sense(default_cmds.MuxCommand):
 
 class Taste(Sense):
     """
-    Taste stuff. 
+    Reach out and lick someone!
+
+    If you want to taste someone named Thaddius:
+        taste Thaddius
+    If you want to taste everything in the room:
+        taste/here
+    If you want to set your taste:
+        taste/set me=It haz a flavr.
     """
     key = 'taste'
     verb = 'taste'
@@ -70,7 +89,14 @@ class Taste(Sense):
 
 class Smell(Sense):
     """
-    Smell stuff.
+    Depending on where you sniff, you may be shaking hands.
+
+    If you want to smell someone named Thaddius:
+        smell Thaddius
+    If you want to smell everything in the room:
+        smell/here
+    If you want to set your scent:
+        smell/set me=The funk of forty thousand years.
     """
     key = 'smell'
     verb = 'smell'
@@ -78,7 +104,14 @@ class Smell(Sense):
 
 class Feel(Sense):
     """
-    Feel stuff.
+    You should probably keep your paws to yourself, but...
+
+    If you want to feel someone named Thaddius:
+        feel Thaddius
+    If you want to feel everything in the room:
+        feel/here
+    If you want to set your texture:
+        feel/set me=Five O'clock shadow like 300 grain sandpaper.
     """
     key = 'feel'
     verb = 'feel'

@@ -47,7 +47,7 @@ class DefaultCmdSet(default_cmds.DefaultCmdSet):
         self.add(quote.Quote())
         self.add(character_commands.WhoSpec())
         self.add(character_commands.Sheet())
-        self.add(CmdExtendedLook())
+        #self.add(CmdExtendedLook())
 
         self.add(rp_say.Say())
         self.add(rp_say.Pose())
