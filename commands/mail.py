@@ -80,7 +80,7 @@ To delete all of your messages, type:
         """
         senders = ', '.join([ sender.name for sender in message.senders if utils.inherits_from(sender.typeclass, settings.BASE_CHARACTER_TYPECLASS) ])
         receivers = ', '.join([ receiver.name for receiver in message.receivers if utils.inherits_from(receiver.typeclass, settings.BASE_CHARACTER_TYPECLASS) ])
-        self.caller.msg('--------Mail to %s from %s.' % (senders, receivers))
+        self.caller.msg('--------Mail from %s to %s.' % (senders, receivers))
         self.caller.msg('Sent on: %s' % message.date_sent)
         self.caller.msg('Subject: %s\n' % message.header)
         self.caller.msg(message.message)

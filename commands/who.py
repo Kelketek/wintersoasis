@@ -48,7 +48,7 @@ class Who(default_cmds.MuxCommand):
         location = session.get_character().location
         if location and self.admin:
             return '%s(#%s)' % ( location, location.dbobj.id )
-        return
+        return location
     get_location.title = "Location"
     get_location.spacing = 20
     get_location.color = '{w'

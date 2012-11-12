@@ -3,6 +3,7 @@ Warp commands. takes a user to special places on the MUCK, saving state as neede
 """
 import time
 from game.gamesrc.oasis.lib.constants import *
+import ev
 from ev import Command as BaseCommand
 from ev import default_cmds
 from ev import utils
@@ -57,8 +58,14 @@ class Nexus(default_cmds.MuxCommand):
          by the cmdhandler right after self.parser() finishes, and so has access
          to all the variables defined therein.
         """
+        MAIN = 0
         try:
             self.caller.location.msg(self.caller.name + " returns to the OOC nexus.")
         except AttributeError:
             pass
-        self.caller.move_to(self.caller.search(NEXUS))
+        nexus = ev.search_object(NEXUS)[MAIN]
+        if self.caller.location == nexus:
+            self.caller.msg("{rYou are already in the Nexus.{n")
+            return
+        self.caller.move_to(nexus,quiet=False)
+        self.caller.location.msg("%s arrives from the IC realm." % self.caller.name)

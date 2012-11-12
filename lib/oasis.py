@@ -15,6 +15,8 @@ from ev import utils
 from src.utils import create
 from src.server.sessionhandler import SESSIONS
 from src.comms.models import Msg
+from twisted.internet.defer import Deferred
+from twisted.internet import reactor
 
 def partial_pmatch(me, name, local_only=False):
     """
@@ -38,7 +40,15 @@ def partial_pmatch(me, name, local_only=False):
             target.append(targets)
         return target
     else:
-        target = me.search("*" + name, global_search=True, ignore_errors=True)
+        try:
+            # In case user explicitely indicates a ref.
+            if name[0] in [ '*', '#' ]:
+                pass
+            else:
+                name = '*' + name
+        except IndexError:
+            pass
+        target = me.search(name, global_search=True, ignore_errors=True)
     if target:
         if type(target) == list:
             return target
@@ -51,6 +61,45 @@ def partial_pmatch(me, name, local_only=False):
         if session.get_character().name.lower().startswith(name.lower()):
             matches.append(session.get_character())
     return matches
+
+def current_object(thing, timestamp):
+    """
+        Takes an object and timestamp and returns True if that
+    object was made before or on that time stamp.
+    """
+    if not thing:
+        return
+    if timestamp >= int(thing.dbobj.date_created.strftime('%s')):
+        return thing
+    else:
+        return
+
+def check_follow(user, target, ignores=True):
+    """
+    Checks to see if user follows target.
+    """
+    CHARACTER = 0
+    TIMESTAMP = 1
+    following = user.db.following
+    if not following:
+        return False
+    following = [ current_object(thing, timestamp) for thing, timestamp in following if current_object(thing, timestamp) ]
+    if target in following:
+        if ignores:
+            if not check_ignores(target, [user], silent=True):
+                return False
+        return True
+
+def action_followers(user, function, kwargs, delay=0):
+    """
+        Perform an action for all followers.
+    """
+    online_users = [ session.get_character() for session in SESSIONS.sessions.values() if session.get_character() ]
+    for target in online_users:
+        if check_follow(target, user):
+            kwargs['target'] = target
+            kwargs['user'] = user
+            reactor.callLater(delay, function, **kwargs)
 
 def send_message(senders, subject, body, receivers, priority=False, silent_send=False, silent_receive=False, send_email=False):
     """
@@ -117,7 +166,8 @@ def check_sleepers(person, ref_list, silent=False):
         if ref.sessions:
             targets.append(ref)
         else:
-            self.caller.msg("%s is not connected to the game right now." % ref.name)
+            if not silent:
+                person.msg("%s is not connected to the game right now." % ref.name)
     return targets
 
 def check_ignores(person, ref_list, silent=False):
@@ -150,7 +200,7 @@ def check_owner(person, target):
     if not owner:
         return False
     owner, timestamp = owner
-    return owner == person and timestamp >= int(owner.dbobj.date_created.strftime('%s'))
+    return owner == person and current_character(owner, timestamp)
 
 def validate_targets(person, name_list, ignores=True, local_only=True, silent=False):
     """
