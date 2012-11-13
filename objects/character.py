@@ -18,7 +18,7 @@ this change, you have to convert them manually e.g. with the
 """
 import time
 from ev import Character
-from game.gamesrc.oasis.lib.oasis import action_followers, current_object, check_ignores, check_sleepers
+from game.gamesrc.oasis.lib.oasis import action_followers, current_object, check_ignores, check_sleepers, check_hiding, ignored_notifications
 from game.gamesrc.oasis.lib.constants import ALERT
 from settings import SERVERNAME
 
@@ -42,15 +42,18 @@ class WOCharacter(Character):
 
     """
     DELAY = 10
-    def announce_message(self, user, target, message, must_be_online=False):
+
+    def announce_message(self, user, target, message, message_key, must_be_online=False):
         """
-            Sends an announcement to other characters. must_be_online makes the
-        message cancel if the user disconnects before the targets receive it.
+            Sends an announcement to other characters.
+        message is a string to send.
+        message_key is a label for the type of message being sent. An
+            announcement that a user is connection might have this as "connection".
+        must_be_online makes the message cancel if the user disconnects before
+            the targets receive it.
         """
-        hiding_from = []
-        if user.db.hiding_from:
-            hiding_from = [ current_object(person) for person in user.db.hiding_from ]
-        if (must_be_online and not user.sessions) or ( not check_ignores(target, [user]) ) or (target in hiding_from) or user.db.hiding:
+        if (must_be_online and not self.sessions) or (not check_hiding(user, [target])) or (not check_ignores(target, [self], silent=True) ) \
+            or self.db.hiding or message_key in ignored_notifications(target):
             return
         target.msg(message)
 
@@ -72,27 +75,16 @@ class WOCharacter(Character):
         # Save login time.
         if len(self.sessions) <= 1:
             self.db.laston = time.time()
-        # Announce connection to followiers
-        if not self.db.hiding:
-            if len(self.sessions) == 1:
-                message = ALERT % "Somewhere on %s, %s has connected." % ( SERVERNAME, self.name )
-            else:
-                message = ALERT % "Somewhere on %s, %s has reconnected." % ( SERVERNAME, self.name )
-            action_followers(self, self.announce_message, delay=WOCharacter.DELAY, kwargs={ 'message' : message, 'must_be_online' : True })
+        # Announce connection to followers
+        if len(self.sessions) == 1:
+            message = ALERT % "Somewhere on %s, %s has connected." % ( SERVERNAME, self.name )
+        else:
+            message = ALERT % "Somewhere on %s, %s has reconnected." % ( SERVERNAME, self.name )
+        action_followers(self, self.announce_message, delay=WOCharacter.DELAY, kwargs={ 'message' : message, 'message_key' : 'connection', 'must_be_online' : True })
         # Call look.
         self.execute_cmd('look')
-        following_list = self.db.following
-        if not following_list:
-            self.msg(ALERT % "You are not following anyone. If you find someone interesting, or meet a friend, be sure to follow them with: follow YourFriend'sNameHere")
-        else:
-            following_list = [ current_object(character, timestamp) for character, timestamp in following_list if current_object(character, timestamp) ]
-            following_list = check_ignores(self, following_list, silent=True)
-            following_list = check_sleepers(self, following_list, silent=True)
-            ROW_LENGTH = 3
-            following_list = [following_list[i:i+ROW_LENGTH] for i in range(0, len(following_list), ROW_LENGTH)]
-            self.msg("{cPeople online that you are following:{n")
-            for group in following_list:
-                self.msg("%-20s"*len(group) % tuple(group))
+        self.execute_cmd('mail/check quiet')
+        self.execute_cmd('follow')
 
     def at_disconnect(self):
         """
@@ -108,6 +100,5 @@ class WOCharacter(Character):
                 self.location = None
                 self.db.lastoff = time.time()
                 if self.db.lastoff - self.db.laston >= WOCharacter.DELAY:
-                    if not self.db.hiding:
-                        message = ALERT % "Somewhere on %s, %s has disconnected." % ( SERVERNAME, self.name )
-                        action_followers(self, self.announce_message, kwargs={ 'message' : message })
+                    message = ALERT % "Somewhere on %s, %s has disconnected." % ( SERVERNAME, self.name )
+                    action_followers(self, self.announce_message, kwargs={ 'message' : message, 'message_key' : 'connection' })

@@ -3,6 +3,7 @@ Common functions used by other commands in the Winter's Oasis command sets.
 """
 import ev
 import settings
+import time
 from cgi import escape
 from email import Encoders
 from email.MIMEText import MIMEText
@@ -43,12 +44,12 @@ def partial_pmatch(me, name, local_only=False):
         try:
             # In case user explicitely indicates a ref.
             if name[0] in [ '*', '#' ]:
-                pass
+                global_name = name
             else:
-                name = '*' + name
+                global_name = '*' + name
         except IndexError:
             pass
-        target = me.search(name, global_search=True, ignore_errors=True)
+        target = me.search(global_name, global_search=True, ignore_errors=True)
     if target:
         if type(target) == list:
             return target
@@ -58,15 +59,53 @@ def partial_pmatch(me, name, local_only=False):
     if local_only:
         return matches
     for session in SESSIONS.sessions.values():
-        if session.get_character().name.lower().startswith(name.lower()):
-            matches.append(session.get_character())
+        character = session.get_character()
+        if character and character.name.lower().startswith(name.lower()):
+            matches.append(character)
     return matches
 
-def current_object(thing, timestamp):
+def object_stamp(thing):
     """
-        Takes an object and timestamp and returns True if that
-    object was made before or on that time stamp.
+        Create an 'object stamp'-- this is a tuple for storage of an object
+    refrence and the current time. Useful for seeing if the object ref has been
+    recycled since the item was stored.
     """
+    return (thing, time.time())
+
+def in_object_list(thing, object_list):
+    """
+    Take an object stamp and determine whether or not it exists in a specified list.
+    """
+    target = current_object(thing)
+    if target in distill_list(object_list):
+        return target
+
+def ferment_list(ref_list):
+    """
+    Converts a list of dbrefs into a list of object_stamps
+    """
+    return [ object_stamp(dbref) for dbref in ref_list if dbref ]
+
+def distill_list(object_list, preserve_format=False):
+    """
+        Take a list of object stamps and return the objects that are legit.
+    The preserve_format flag is for retaining the character stamp format instead
+    of just returning a list of characters.
+    """
+    if not object_list:
+        object_list = []
+    if preserve_format:
+        return [ thing for thing in object_list if current_object(thing) ]
+    else:
+        return [ current_object(thing) for thing in object_list if current_object(thing) ]
+
+def current_object(thing):
+    """
+        Takes an object stamp and returns the object if that
+    object was made before or on its time stamp.
+    """
+    thing, timestamp = thing
+    
     if not thing:
         return
     if timestamp >= int(thing.dbobj.date_created.strftime('%s')):
@@ -83,23 +122,51 @@ def check_follow(user, target, ignores=True):
     following = user.db.following
     if not following:
         return False
-    following = [ current_object(thing, timestamp) for thing, timestamp in following if current_object(thing, timestamp) ]
+    following = [ current_object(thing) for thing in following if current_object(thing) ]
     if target in following:
         if ignores:
             if not check_ignores(target, [user], silent=True):
                 return False
         return True
 
-def action_followers(user, function, kwargs, delay=0):
+def action_followers(user, function, kwargs, delay=0, respect_hide=True):
     """
-        Perform an action for all followers.
+        Perform an action for all followers. Delay is ignored for Wizards.
     """
     online_users = [ session.get_character() for session in SESSIONS.sessions.values() if session.get_character() ]
     for target in online_users:
         if check_follow(target, user):
             kwargs['target'] = target
             kwargs['user'] = user
-            reactor.callLater(delay, function, **kwargs)
+            if target.locks.check_lockstring(target, 'admin:perm(Wizards)'):
+                function(**kwargs)
+            elif respect_hide and check_hiding(target, [user]):
+                reactor.callLater(delay, function, **kwargs)
+
+def toggle_notifications(user, key, toggle):
+    """
+    Toggles whether or not a user gets messages identified by a certain key.
+    """
+    ignored_messages = user.db.ignored_message_keys
+    if not ignored_messages:
+        ignored_messages = []
+    if toggle:
+        ignored_messages = [ notification for notification in ignored_messages if notification != key.lower() ]
+    else:
+        if key.lower() in ignored_messages:
+            return
+        else:
+            ignored_messages.append(key.lower())
+    user.db.ignored_message_keys = ignored_message_keys
+
+def ignored_notifications(user):
+    """
+    Returns a list of message keys the user is ignoring.
+    """
+    if not user.db.ignored_message_keys:
+        return []
+    else:
+        return user.db.ignored_message_keys
 
 def send_message(senders, subject, body, receivers, priority=False, silent_send=False, silent_receive=False, send_email=False):
     """
@@ -180,10 +247,7 @@ def check_ignores(person, ref_list, silent=False):
         return ref_list
     targets = []
     for target in ref_list:
-        ignore = target.db.ignore
-        if not ignore:
-            targets.append(target)
-            continue
+        ignore = distill_list(target.db.ignore)
         if person in ignore:
             if not silent:
                 person.msg("%s is ignoring you." % target.name)
@@ -191,6 +255,12 @@ def check_ignores(person, ref_list, silent=False):
         else:
             targets.append(target)
     return targets
+
+def check_hiding(person, ref_list):
+    """
+    Remove players from a reflist who are hiding from a person or in general.
+    """
+    return [ item for item in ref_list if (not item.db.hiding) and (not person in distill_list(item.db.hiding_from)) ]
 
 def check_owner(person, target):
     """

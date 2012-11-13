@@ -64,6 +64,10 @@ To delete all of your messages, type:
 
     def mail_check(self):
         messages = self.caller.db.mail
+        if not messages:
+            if not self.args.lower() == 'quiet':
+                self.caller.msg(ALERT % "You have no new messages.")
+            return
         count = 0
         READ = 2
         for message in messages:
