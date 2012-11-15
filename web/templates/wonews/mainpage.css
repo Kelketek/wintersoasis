@@ -1,0 +1,74 @@
+body {
+    background-image:url('static/images/border_left.png'),
+                     url('static/images/border_right.png'),
+                     url('static/images/border_bottom.png'),
+                     url('static/images/border_top.png'),
+                     url('static/images/background.png');
+    background-repeat:no-repeat, no-repeat, no-repeat, no-repeat, repeat;
+    background-attachment:fixed;
+    background-size:50px 100%, 50px 100%, 100% 50px, 100% 50px, auto auto;
+    background-position:left, right, bottom, top;
+    margin: 0;
+    padding: 0;
+}
+#header {
+    background-image:url('static/images/border_left.png'),
+                     url('static/images/border_right.png'),
+                     url('static/images/border_top.png'),
+                     url('static/images/header.png'),
+                     url('static/images/compass.png');
+    background-repeat: no-repeat, no-repeat, no-repeat, repeat-x;
+    background-position:left, right, top, top;
+    background-size:50px 100%, 50px 100%, 100% 50px, auto auto;
+    box-shadow: 0px 10px 15px #000;
+    height: 175px;
+    overflow: auto;
+    
+}
+#header img {
+    position: absolute;
+}
+img.leftstatic {
+    position:fixed;
+    right:0px;
+}
+ul.nav {
+    margin:0;
+    padding:0;
+    position: absolute;
+    top: 110px;
+    left:100px;
+}
+ul.nav li {
+    background-image:url('static/images/button.png');
+    background-repeat: no-repeat;
+    width: 100px;
+    height: 70px;
+    display:inline;
+    padding-top: 38px;
+    float: left;
+    text-align: center;
+    text-shadow: 2px 2px 2px #FFF;
+}
+#main {
+    background-color: white;
+    min-height: 800px;
+    margin-left: 100px;
+    margin-right: 100px;
+    padding-top: 40px;
+    z-index:-2;
+    position: relative;
+}
+
+#container {
+    width:80%;
+    margin-left:auto;
+    margin-right:auto;
+    position: relative;
+    background-image:url('static/images/papertear_left.png'),
+                     url('static/images/papertear_right.png');
+    background-position:left, right;
+    background-repeat: repeat-y;
+    z-index:-1;
+    min-height: 800px;
+}

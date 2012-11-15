@@ -1,0 +1,147 @@
+/* Main background and vignetting */
+body {
+    background-image:url('../images/border_left.png'),
+                     url('../images/border_right.png'),
+                     url('../images/border_bottom.png'),
+                     url('../images/border_top.png'),
+                     url('../images/background.png');
+    background-repeat:no-repeat, no-repeat, no-repeat, no-repeat, repeat;
+    background-attachment:fixed;
+    background-size:50px 100%, 50px 100%, 100% 50px, 100% 50px, auto auto;
+    background-position:left, right, bottom, top;
+    margin: 0;
+    padding: 0;
+}
+/* Top bar. Vignetting has to be repeated here due to Z issues. */
+#header {
+    background-image:url('../images/border_left.png'),
+                     url('../images/border_right.png'),
+                     url('../images/border_top.png'),
+                     url('../images/header.png');
+    background-repeat: no-repeat, no-repeat, no-repeat, repeat-x;
+    background-position:left, right, top, top;
+    background-size:50px 100%, 50px 100%, 100% 50px, auto auto;
+    box-shadow: 0px 10px 15px #000;
+    height: 175px;
+    overflow: auto;
+    
+}
+
+/* Deals with images placed directly in the header. */
+#header img {
+    position: absolute;
+}
+
+/* Gives headers a nice little 'paper' background with a drop shadow. */
+h1 span {
+    font-family: 'Belgrano', serif;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 5px;
+    color: #DDDDDD;
+    width: auto;
+    text-shadow: 2px 2px 2px #000;
+    box-shadow: 0px 5px 7px #000;
+    background-image:url('../images/heading_backdrop.png');
+}
+
+/* Gives headers a nice little 'paper' background with a drop shadow. */
+h2 span {
+    font-family: 'Belgrano', serif;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 5px;
+    color: #DDDDDD;
+    width: auto;
+    text-shadow: 3px 3px 3px #000;
+    box-shadow: 0px 5px 7px #000;
+    background-image:url('../images/heading_backdrop.png');
+}
+
+/* This is used for the compass image in the header. */
+img.leftstatic {
+    position:fixed;
+    right: 0px;
+}
+
+/* Navigation list. Handles the positioning of the top navbar. */
+ul.nav {
+    margin:0;
+    padding:0;
+    position: absolute;
+    display: inline;
+    float: left;
+    top: 110px;
+    left:100px;
+}
+
+ul.hidden_menu {
+    Display: none;
+}
+
+ul.nav li:hover ul.hidden_menu {
+    Display: block;
+    position: absolute;
+    float: bottom;
+    top: 80px;
+}
+
+/* Navigation list items. Gives them their background picture, aligned with their text style */
+ul.nav li {
+    background-image:url('../images/button.png');
+    font-family: 'Belgrano', serif;
+    background-repeat: no-repeat;
+    width: 100px;
+    height: 70px;
+    display:inline;
+    padding-top: 38px;
+    float: left;
+    text-align: center;
+    text-shadow: 2px 2px 2px #FFF;
+}
+
+/* Main div, contains site content. */
+#main {
+    font-family: 'Belgrano', serif;
+    background-image:url('../images/paper_texture.png');
+    min-height: 800px;
+    margin-left: 100px;
+    margin-right: 100px;
+    padding-top: 40px;
+    z-index:-2;
+    position: relative;
+}
+
+/* Style applied to all images in the main area. */
+#main img {
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    color: #DDDDDD;
+    width: auto;
+    background-image:url('../images/heading_backdrop.png');
+}
+
+/* Style applied to images in the main area aligned left */
+#main img.left {
+    box-shadow: 5px 5px 7px #000;
+    margin-right: 15px;
+    margin-top: 10px;
+    margin-bottom: 15px;
+    float: left;
+}
+
+/* Adds the torn paper borders */
+#container {
+    width:80%;
+    margin-left:auto;
+    margin-right:auto;
+    position: relative;
+    background-image:url('../images/papertear_left.png'),
+                     url('../images/papertear_right.png');
+    background-position:left, right;
+    background-repeat: repeat-y;
+    z-index:-1;
+    min-height: 800px;
+}

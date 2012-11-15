@@ -44,7 +44,7 @@ urlpatterns = patterns('',
     # Front page
     url(r'^', include('src.web.website.urls')),
     # News stuff
-    url(r'^news/', include('src.web.news.urls')),
+    #url(r'^news/', include('src.web.news.urls')),
 
     # Page place-holder for things that aren't implemented yet.
     url(r'^tbi/', 'src.web.website.views.to_be_implemented'),
@@ -89,3 +89,7 @@ if (settings.DEBUG):
             'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
     )
 
+# Django-article
+urlpatterns += patterns('',
+    url(r'^news/', include('articles.urls')),
+)
