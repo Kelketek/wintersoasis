@@ -25,7 +25,7 @@ class Who(default_cmds.MuxCommand):
     """
     key = "who"
     aliases = ["findall", "fa", "wa", "whereare"]
-    locks = "cmd:perm(Immortals)"
+    locks = "cmd:all()"
     help_category = "General"
 
     # Each of these takes a list of lists. The first element in each list
@@ -50,7 +50,7 @@ class Who(default_cmds.MuxCommand):
             return '%s(#%s)' % ( location, location.dbobj.id )
         return location
     get_location.title = "Location"
-    get_location.spacing = 20
+    get_location.spacing = 40
     get_location.color = '{w'
 
     def get_online_time(self, session):
@@ -58,7 +58,7 @@ class Who(default_cmds.MuxCommand):
         online_time = time.time() - session.conn_time
         return utils.time_format(online_time, FULL)
     get_online_time.title = "On For"
-    get_online_time.spacing = 8
+    get_online_time.spacing = 10
     get_online_time.color = '{M'
 
     def get_idle_time(self, session):
@@ -66,7 +66,7 @@ class Who(default_cmds.MuxCommand):
         delta_cmd = time.time() - session.cmd_last_visible
         return utils.time_format(delta_cmd, PARTIAL)
     get_idle_time.title = "Idle"
-    get_idle_time.spacing = 8
+    get_idle_time.spacing = 10
     get_idle_time.color = '{y'
 
     def get_ip(self, session):

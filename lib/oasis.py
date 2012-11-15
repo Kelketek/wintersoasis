@@ -269,8 +269,7 @@ def check_owner(person, target):
     owner = target.db.owner
     if not owner:
         return False
-    owner, timestamp = owner
-    return owner == person and current_character(owner, timestamp)
+    return person == current_object(owner)
 
 def validate_targets(person, name_list, ignores=True, local_only=True, silent=False):
     """

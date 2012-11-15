@@ -36,9 +36,9 @@ class Sense(default_cmds.MuxCommand):
             self.caller.msg("{rPermission denied.{n")
             return
         try:
-            target.db.senses[self.key] = self.rhs
+            target.db.senses[self.key] = message
         except TypeError:
-            target.db.senses = { self.key : self.rhs }
+            target.db.senses = { self.key : message }
         if not self.args:
             self.caller.msg('{cCleared.{n')
         else:
@@ -48,6 +48,9 @@ class Sense(default_cmds.MuxCommand):
         """
         Parse input for handling the 'set' version of sense.
         """
+        if not self.rhs and self.args:
+            self.set_sense(self.caller, self.args)
+            return
         match = self.caller.search(self.lhs)
         if not match:
             return
@@ -65,7 +68,7 @@ class Sense(default_cmds.MuxCommand):
             targets = check_ignores(self.caller, self.caller.location.contents)
         else:
             if not self.args:
-                self.caller.msg('You must specify a target.')
+                self.caller.msg('You must specify a scent to set on yourself or a target and scent.')
                 return
             targets = validate_targets(self.caller, self.arglist)
         prefix = len(targets) > 1
@@ -81,7 +84,9 @@ class Taste(Sense):
     If you want to taste everything in the room:
         taste/here
     If you want to set your taste:
-        taste/set me=It haz a flavr.
+        taste/set It haz a flavr.
+    If you want to set the taste of an object called peanut:
+        taste/set peanut=Salty.
     """
     key = 'taste'
     verb = 'taste'
@@ -96,7 +101,9 @@ class Smell(Sense):
     If you want to smell everything in the room:
         smell/here
     If you want to set your scent:
-        smell/set me=The funk of forty thousand years.
+        smell/set The funk of forty thousand years.
+    If you want to set the scent of an object called trophy:
+        smell/set trophy=Sweet, sweet victory.
     """
     key = 'smell'
     verb = 'smell'
@@ -111,7 +118,9 @@ class Feel(Sense):
     If you want to feel everything in the room:
         feel/here
     If you want to set your texture:
-        feel/set me=Five O'clock shadow like 300 grain sandpaper.
+        feel/set Five O'clock shadow like 300 grain sandpaper.
+    If you want to set the texture of an object called dog:
+        feel/set dog=It has a course, ruff coat.
     """
     key = 'feel'
     verb = 'feel'
