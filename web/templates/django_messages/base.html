@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% load i18n %}  
+{% block bodyclass %}about{% endblock %}
+{% block content %}  
+{% endblock %}
+{% block sidebar %}
+<span class="bar"><a href="{% url messages_inbox %} ">&raquo;&nbsp;{% trans "Inbox" %}</a></span>
+<span class="bar"><a href="{% url messages_outbox %} ">&raquo;&nbsp;{% trans "Sent Messages" %}</a></span>
+<span class="bar"><a href="{% url messages_compose %} ">&raquo;&nbsp;{% trans "New Message" %}</a></span>
+<span class="bar"><a href="{% url messages_trash %} ">&raquo;&nbsp;{% trans "Trash" %}</a></span>
+{% endblock %}

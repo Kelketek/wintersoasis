@@ -1,35 +1,22 @@
+{% load forum_extras %}
 <!DOCTYPE html>
 <html>
     <head>
+        <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
         <title>{{game_name}} - {% if flatpage %}{{flatpage.title}}{% else %}{% block titleblock %}{{page_title}}{% endblock %}{% endif %}</title>
-        <link rel='stylesheet' type='text/css' href='media/css/wonews-main.css' />
-        <link href='http://fonts.googleapis.com/css?family=Belgrano' rel='stylesheet' type='text/css'>
+{% include 'wonews/styles.html' %}
     </head>
     <body>
-        <div id='header'>
-            <img src='media/images/wo_title.png' />
-            <img class='leftstatic' src='media/images/compass.png' />
-                <ul class="nav">
-                    <li>Home</li>
-                    <li>News</li>
-                    <li><ul class="hidden_menu">
-                            <li>History</li>
-                            <li>Theme</li>
-                            <li>Wildlife</li>
-                        </ul>
-					Game Info</li>
-                        
-                    <li>Rules</li>
-                    <li>Staff</li>
-                    <li>Links</li>
-                    <li>Play now!</li>
-                </ul>
-        </div>
+{% include 'wonews/header.html' %}
         <div id='container'>
             <div id='main'>
                 {% block content %}
                 {% endblock %}
+                <div class="branding">
+                    Winter's Oasis is a <a href='http://www.vulpinetheory.net'>Vulpine Theory Project.</a> Vulpine Theory is a subsidiary of <a href='http://www.kelketek.com'>Kelketek Enterprises LLC</a>
+                </div>
             </div>
         </div>
+{% include 'wonews/footer.html' %}
     </body>
 </html>
