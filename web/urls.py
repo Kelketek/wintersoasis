@@ -27,6 +27,8 @@ from registration.forms import RegistrationFormUniqueEmail
 from djangobb_forum import settings as forum_settings
 #from sitemap import SitemapForum, SitemapTopic
 
+#from django.contrib.auth.views import login
+#from django.contrib.auth.views import logout
 # loop over all settings.INSTALLED_APPS and execute code in 
 # files named admin.py in each such app (this will add those
 # models to the admin site)
@@ -38,16 +40,16 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     # User Authentication
-    url(r'^accounts/login',  'django.contrib.auth.views.login'),
-    url(r'^accounts/logout', 'django.contrib.auth.views.logout'),
+    url(r'^login/', 'django.contrib.auth.views.login'),
+    url(r'^logout/', 'django.contrib.auth.views.logout'),
 
     # Front page
-    url(r'^', include('src.web.website.urls')),
+    url(r'^', include('game.gamesrc.oasis.web.website.urls')),
     # News stuff
     #url(r'^news/', include('src.web.news.urls')),
 
     # Page place-holder for things that aren't implemented yet.
-    url(r'^tbi/', 'src.web.website.views.to_be_implemented'),
+    url(r'^tbi/', 'game.gamesrc.oasis.web.website.views.to_be_implemented'),
     
     # Admin interface
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
@@ -57,15 +59,17 @@ urlpatterns = patterns('',
     url(r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url':'/media/images/favicon.ico'}),
 
     # ajax stuff
-    url(r'^webclient/',include('src.web.webclient.urls')),
+    url(r'^webclient/',include('game.gamesrc.oasis.web.webclient.urls')),
 
     # Wiki
     url(r'^notify/', get_notify_pattern()),
     url(r'^wiki/', get_wiki_pattern()),
 
+    #(r'^mail/', include('game.gamesrc.oasis.web.mail_urls')),
+
     # Forum
     (r'^forum/account/', include('django_authopenid.urls')),
-    (r'^forum/', include('djangobb_forum.urls', namespace='djangobb')),
+    (r'^forum/', include('game.gamesrc.oasis.web.bb_urls', namespace='djangobb')),
 )
 
 # This sets up the server if the user want to run the Django
@@ -80,7 +84,7 @@ if settings.SERVE_MEDIA:
 # PM Extension
 if (forum_settings.PM_SUPPORT):
     urlpatterns += patterns('',
-        (r'^forum/pm/', include('django_messages.urls')),
+        (r'^mail/', include('game.gamesrc.oasis.web.mail_urls')),
    )
 
 if (settings.DEBUG):

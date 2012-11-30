@@ -10,7 +10,7 @@
     <tbody>
 {% for message in message_list %} 
     <tr>
-        <td>{{ message.sender }}</td>
+        <td>{{ message.sender_names }}</td>
         <td>
             {% if message.new %}<strong>{% endif %}
             {% if message.replied %}<em>{% endif %}
@@ -18,7 +18,6 @@
             {% if message.replied %}</em>{% endif %}
             {% if message.new %}</strong>{% endif %}</td>
         <td>{{ message.sent_at|date:_("DATETIME_FORMAT") }}</td>
-        <td><a href="{% url messages_delete message.id %}">{% trans "delete" %}</a></td>
     </tr>
 {% endfor %}
     </tbody>

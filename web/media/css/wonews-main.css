@@ -2,26 +2,23 @@
 body {
     background-image:url('../images/border_left.png'),
                      url('../images/border_right.png'),
-                     url('../images/border_bottom.png'),
                      url('../images/border_top.png'),
-                     url('../images/background.png');
-    background-repeat:no-repeat, no-repeat, no-repeat, no-repeat, repeat;
+                     url('../images/natural_paper.png');
+    background-repeat:no-repeat, no-repeat, no-repeat, repeat;
     /* background-attachment:fixed; */
-    background-size:50px 100%, 50px 100%, 100% 50px, 100% 50px, auto auto;
-    background-position:left, right, bottom, top;
+    background-size:50px 100%, 50px 100%, 100% 50px, auto auto;
+    background-position:left, right, top;
     margin: 0;
     padding: 0;
 }
 /* Top bar. Vignetting has to be repeated here due to Z issues. */
 #header {
-    background-image:url('../images/border_left.png'),
-                     url('../images/border_right.png'),
-                     url('../images/border_top.png'),
-                     url('../images/header.png');
-    background-repeat: no-repeat, no-repeat, no-repeat, repeat-x;
-    background-position:left, right, top, top;
-    background-size:50px 100%, 50px 100%, 100% 50px, auto auto;
+    background-image: url('../images/header.png');
+    background-repeat: repeat-x;
+    background-position: top;
+    background-size: auto auto;
     box-shadow: 0px 10px 15px #000;
+    font-family: 'Belgrano', serif;
     height: 30px;
     width: 100%;
     position: fixed;
@@ -36,7 +33,7 @@ body {
     background-repeat: no-repeat, no-repeat, no-repeat, repeat-x;
     background-position:left, right, bottom, top;
     background-size:50px 100%, 50px 100%, 100% 50px, auto auto;
-    box-shadow: 0px -10px 15px #000;
+    box-shadow: 0px -3px 15px 15px #000;
     height: 70px;
     width: 100%;
     /* overflow: auto; */
@@ -62,6 +59,21 @@ body {
     position: absolute;
     bottom: 3px;
     left: 80px;
+    padding-bottom: 0px;
+    margin: 0px;
+}
+
+#sidebar {
+    width: 1px;
+    position: fixed;
+    margin-top: 50px;
+    margin-left: 0px;
+    z-index: 2;
+}
+
+#sidebar ul {
+    list-style-type: none;
+    padding-left: 0px;
 }
 
 /* Deals with images placed directly in the header. */
@@ -96,20 +108,52 @@ h2.main span {
 }
 
 /* Used for the search bar. */
-form.search {
+#header form {
     position:fixed;
-    top: 9px;
+    top: 9px !important;
     right: 10px;
     border: 0px;
     color: #000000;
+    font-family: 'Belgrano', serif;
+    font-size: 12pt;
+    margin: 0px;
 }
 
-input.search-query {
+#footer form {
+    position:fixed;
+    bottom: 2px;
+    color: #000000;
+    font-family: 'Belgrano', serif;
+    font-size: 12pt;
+    margin: 0px;
+}
+
+#header input {
+    background-color: #b98d47;
+    border: 0px;
+    color: #111111;
+    font-size: 100%;
+    font-family: 'Belgrano', serif;
+    font-weight: normal;
+    padding: 0px;
+    border-radius: 0px;
+    vertical-align: default;
+    width: 10em;
+}
+
+#footer input {
     background-color: #b98d47;
     border: 0px;
     color: #111111;
     font-family: 'Belgrano', serif;
+    font-size: 100%;
+    font-weight: normal;
+    padding: 0px;
+    border-radius: 0px;
+    width: 10em;
+    margin-bottom: 0px;
 }
+
 
 form.login {
     position: relative;
@@ -117,7 +161,7 @@ form.login {
 }
 
 /* Navigation list. Handles the positioning of the top navbar. */
-ul.nav {
+ul.wonav {
     margin:0;
     padding:0;
     position: absolute;
@@ -127,9 +171,10 @@ ul.nav {
     left: 10px;
 }
 
-ul.nav li {
+ul.wonav li {
     display: inline;
     position: relative;
+    line-height: default !important;
     margin-right: 10px;
 }
 
@@ -141,6 +186,7 @@ span.bar {
     color: #111111;
     width: auto;
     font-weight: bold;
+    font-size: 12pt;
     text-shadow: 1px 1px 1px #DDD;
     box-shadow: 0px 0px 7px #000;
     background-image:url('../images/goldbar.png');
@@ -156,22 +202,47 @@ span.bar a:visited {
     color: #111111;
 }
 
+#sidebar li {
+    font-family: 'Belgrano', serif;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 2px;
+    color: #111111;
+    width: 5em;
+    font-weight: bold;
+    text-shadow: 1px 1px 1px #DDD;
+    box-shadow: 0px 0px 7px #000;
+    background-image:url('../images/goldbar.png');
+}
+
+#sidebar a:link {
+    text-decoration:none;
+    color: #111111;
+}
+
+#sidebar a:visited {
+    text-decoration:none;
+    color: #111111;
+}
+
+
 /* Main div, contains site content. */
 #main {
     font-family: 'Belgrano', serif;
-    background-image:url('../images/paper_texture.png');
-    margin-left: 100px;
-    margin-right: 100px;
+    background-image:url('../images/redox.png');
+    margin-left: 50px;
+    margin-right: 50px;
     padding-top: 50px;
-    padding-left: 10px;
-    padding-right: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
     position: relative;
     height: 100%;
     bottom: 0;
     top: 0;
     left: 0;
     right: 0;
-    color: #111111
+    color: #111111;
+    box-shadow: 0px 5px 10px 5px #000;
 }
 
 /* Style applied to all images in the main area. */
@@ -209,20 +280,21 @@ span.bar a:visited {
 
 /* Adds the torn paper borders */
 #container {
-    width:95%;
+    width:100%;
     margin-left:auto;
     margin-right:auto;
     position: relative;
-    background-image:url('../images/papertear_left.png'),
-                     url('../images/papertear_right.png');
+    /*background-image:url('../images/papertear_left.png'),
+                     url('../images/papertear_right.png');*/
     background-position:left, right;
     background-repeat: repeat-y;
     z-index:0;
     height: 100%;
+    padding-bottom: 70px;
 }
 
 div.branding {
     font-size: 8pt;
     text-align: center;
     padding-top: 50px;
-}    
+}

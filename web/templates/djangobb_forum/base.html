@@ -49,15 +49,19 @@
 	{% block content %}{% endblock %}
 	<div id="brdfooter" class="block">
 	<h2><span>{% trans "Board footer" %}</span></h2>
+        {% block nocontrols %}
         <div class="box">
             <div class="inbox">
                 {% block controls %}
                 {% endblock %}
                 <div class="clearer"></div>
+                <div>Winter's Oasis is a Vulpine Theory Project. <a href="http://www.vulpinetheory.net">Vulpine Theory</a> is a subsidiary of Kelketek Enterprises LLC.</div>
+                <div class="clearer"></div>
                 {% block lofi %}
                 {% endblock %}
             </div>
         </div>
+        {% endblock nocontrols %}
     </div>
 </div>
 </div>

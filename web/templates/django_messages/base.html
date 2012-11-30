@@ -4,8 +4,10 @@
 {% block content %}  
 {% endblock %}
 {% block sidebar %}
-<span class="bar"><a href="{% url messages_inbox %} ">&raquo;&nbsp;{% trans "Inbox" %}</a></span>
-<span class="bar"><a href="{% url messages_outbox %} ">&raquo;&nbsp;{% trans "Sent Messages" %}</a></span>
-<span class="bar"><a href="{% url messages_compose %} ">&raquo;&nbsp;{% trans "New Message" %}</a></span>
-<span class="bar"><a href="{% url messages_trash %} ">&raquo;&nbsp;{% trans "Trash" %}</a></span>
+<ul>
+    <li><a href="{% url messages_inbox %} ">&raquo;&nbsp;{% trans "Inbox" %}</a></li>
+    <li><a href="{% url messages_compose %} ">&raquo;&nbsp;{% trans "New" %}</a></li>
+    <li><a href="{% url messages_outbox %} ">&raquo;&nbsp;{% trans "Sent" %}</a></li>
+    <li><a href="{% url messages_trash %} ">&raquo;&nbsp;{% trans "Trash" %}</a></li>
+</ul>
 {% endblock %}

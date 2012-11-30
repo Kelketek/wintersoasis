@@ -9,7 +9,7 @@
           {% else %}
             <img class='avatar' alt="Not logged in." src='/media/images/unlogged.png' />
             <div id="authlinks">
-            <form name="loginform" method="post" class="login" action="login/">
+            <form name="loginform" method="post" class="login" action="/login/">
                 {% csrf_token %}
                 <input type="text" name="username" placeholder="Username" />
                 <input type="password" name="password" placeholder="Password" />

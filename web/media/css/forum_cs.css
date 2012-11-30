@@ -75,7 +75,7 @@ DIV.blockpost H2 SPAN.conr {COLOR: #CCC}
 
 /* 3.1 All external borders */
 
-DIV.box {background-image: url('../images/paper_texture.png');BORDER-COLOR: #111111}
+DIV.box {background-image: url('../images/redox.png');BORDER-COLOR: #111111;box-shadow: 0px 3px 10px 3px; }
 
 /* 3.2 Makes the top border of posts match the colour used for post headers */
 

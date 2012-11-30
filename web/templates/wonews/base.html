@@ -8,6 +8,10 @@
     </head>
     <body>
 {% include 'wonews/header.html' %}
+        <div id='sidebar'>
+        {% block sidebar %}
+        {% endblock %}
+        </div>
         <div id='container'>
             <div id='main'>
                 {% block content %}

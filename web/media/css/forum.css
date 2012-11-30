@@ -63,7 +63,7 @@ DIV.linksb LI, DIV.postlinksb LI, .blockmenu LI, .djangobb SPAN.warntext, .djang
 
 /* 3.2 Underline on hover for links in headers and main menu */
 
-#brdmenu .blockpost H2 A:hover {background-image: url('../images/paper_texture.png');font-weight: bold;TEXT-DECORATION: none}
+#brdmenu .blockpost H2 A:hover {background-image: url('../images/natural_paper.png');font-weight: bold;TEXT-DECORATION: none}
 #brdmenu A:hover {color: #FFFFFF; text-decoration:underline;}
 
 /****************************************************************/
