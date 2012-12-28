@@ -4,20 +4,15 @@ Common functions used by other commands in the Winter's Oasis command sets.
 import ev
 import settings
 import time
-from cgi import escape
-from email import Encoders
-from email.MIMEText import MIMEText
-from email.MIMEMultipart import MIMEMultipart
-from email.Utils import formatdate
-from string import Template
-from twisted.mail.smtp import sendmail
 from constants import *
 from ev import utils
-from src.utils import create
 from src.server.sessionhandler import SESSIONS
-from src.comms.models import Msg
-from twisted.internet.defer import Deferred
-from twisted.internet import reactor
+
+if "notification" in settings.INSTALLED_APPS:
+    from notification import models as notification
+else:
+    notification = None
+
 
 def partial_pmatch(me, name, local_only=False):
     """
@@ -167,65 +162,6 @@ def ignored_notifications(user):
         return []
     else:
         return user.db.ignored_message_keys
-
-def send_message(senders, subject, body, receivers, priority=False, silent_send=False, silent_receive=False, send_email=False):
-    """
-    Send a mail message to specified recipients.
-    """
-    message = create.create_message(senderobj=senders, message=body,
-           receivers=receivers, header=subject)
-    successful = []
-    for target in receivers:
-        try:
-            if len(target.db.mail) >= MAX_MESSAGES and not priority:
-                if not silent_send:
-                    for sender in senders:
-                        sender.msg(ALERT % "Mailbox of %s is full. Could not send message!" % target.name)
-                continue
-            target.db.mail.append([message, message.date_sent, False])
-        except (TypeError, AttributeError):
-            target.db.mail = [ [message, message.date_sent, False] ]
-        if not silent_receive:
-            target.msg(ALERT % "You have new mail! Check it by typing: mail")
-        successful.append(target)
-    if EMAIL and send_email:
-        send_email_copy(message)
-    return successful
-
-def send_email_copy(message):
-    """
-    Sends an email copy of a message to all relevant targets.
-    """
-    receivers = [ receiver for receiver in message.receivers if receiver.db.email ]
-    subject = message.header
-    body = message.message
-    if not (receivers):
-        return
-
-    msg = MIMEMultipart('alternative')
-    msg['From'] = "Winter's Oasis <messages@wintersoasis.com>"
-    msg['Subject'] = subject
-    msg['Date'] = formatdate(localtime=True)
-
-    # HTML email part.
-    html_part = MIMEText('text', 'html')
-    html_source = Template(HTML_TEMPLATE)
-    value_map = {
-        'from' : ', '.join([ sender.name for sender in message.senders ]),
-        'message' : escape(unicode(body)).replace('\n', '<br />'),
-        'recipients' : ', '.join([ receiver.name for receiver in message.receivers ]) }
-    html_part.set_payload(html_source.substitute(value_map))
-
-    value_map['message'] = unicode(body)
-    text_source = Template(TEXT_TEMPLATE)
-    body = text_source.substitute(value_map)
-    text_part = MIMEText(unicode(body), 'plain', 'utf-8')
-    msg.attach(text_part)
-    msg.attach(html_part)
-
-    for receiver in receivers:
-        msg['To'] = receiver.db.email
-        sendmail(SMTP_HOST, MAIL_FROM, receiver.db.email, msg.as_string())
 
 def check_sleepers(person, ref_list, silent=False):
     targets = []

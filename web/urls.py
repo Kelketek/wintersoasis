@@ -9,6 +9,7 @@
 from django.conf.urls.defaults import *
 from django.conf import settings
 from django.contrib import admin
+from django.views.generic.simple import direct_to_template
 
 # Wiki imports
 from wiki.urls import get_pattern as get_wiki_pattern
@@ -43,6 +44,8 @@ urlpatterns = patterns('',
     url(r'^login/', 'django.contrib.auth.views.login'),
     url(r'^logout/', 'django.contrib.auth.views.logout'),
 
+    url(r'^accounts/login', 'views.login_gateway'),
+
     # Front page
     url(r'^', include('game.gamesrc.oasis.web.website.urls')),
     # News stuff
@@ -69,7 +72,7 @@ urlpatterns = patterns('',
 
     # Forum
     (r'^forum/account/', include('django_authopenid.urls')),
-    (r'^forum/', include('game.gamesrc.oasis.web.bb_urls', namespace='djangobb')),
+    (r'^forum/', include('bb_urls', namespace='djangobb')),
 )
 
 # This sets up the server if the user want to run the Django
@@ -84,7 +87,7 @@ if settings.SERVE_MEDIA:
 # PM Extension
 if (forum_settings.PM_SUPPORT):
     urlpatterns += patterns('',
-        (r'^mail/', include('game.gamesrc.oasis.web.mail_urls')),
+        (r'^mail/', include('mail_urls')),
    )
 
 if (settings.DEBUG):

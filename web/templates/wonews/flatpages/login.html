@@ -1,0 +1,10 @@
+{% extends 'wonews/flatpages/default.html' %}
+{% block content %}
+{% if user.is_authenticated %}
+<h1>Hey there, buddy!</h1>
+<p>Good to have you back with us! Go ahead and return <a href="/">home</a> now that you're signed in.</p>
+{% else %}
+<h1>Whoa there!</h1>
+<p>What's the password? I can't let you in without the password! Please login before accessing this feature.</p>
+{% endif %}
+{% endblock content %}

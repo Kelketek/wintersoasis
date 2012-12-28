@@ -80,7 +80,11 @@ CHANNEL_CONNECTINFO = ("MUDconnections", '', 'Connection log',
 # Config for Django
 #####################################################################
 
-DEBUG = True
+DEBUG = False
+
+ADMINS = ('kelketek@gmail.com',)
+
+SERVER_EMAIL = 'messages@wintersoasis.com'
 
 ROOT_URLCONF = "game.gamesrc.oasis.web.urls"
 
@@ -125,22 +129,23 @@ INSTALLED_APPS = tuple(set(INSTALLED_APPS + (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
-    'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sitemaps',
     'django.contrib.admin',
     'django.contrib.admindocs',
     'django.contrib.humanize',
+    'django.contrib.messages',
     'registration',
     'pagination',
     'django_authopenid',
     'djangobb_forum',
     'haystack',
-    'django_messages',
+    'polls',
+    'raven.contrib.django',
 )))
 
 MIDDLEWARE_CLASSES = (
-    'sslify.middleware.SSLifyMiddleware',
+    #'sslify.middleware.SSLifyMiddleware',
     'pagination.middleware.PaginationMiddleware',
 ) + MIDDLEWARE_CLASSES
 
@@ -157,7 +162,7 @@ SESSION_COOKIE_SECURE = True
 SESSION_COOKIE_HTTPONLY = False
 
 # Gravitar support for DjangoBB
-DJANGOBB_GRAVATAR_SUPPORT = True
+DJANGOBB_GRAVATAR_SUPPORT = False
 GRAVATAR_DEFAULT = 'identicon'
 
 # Haystack settings
@@ -166,6 +171,7 @@ HAYSTACK_SEARCH_ENGINE = 'whoosh'
 HAYSTACK_WHOOSH_PATH = os.path.join(GAME_DIR, 'gamesrc', 'oasis', 'web', 'djangobb_index')
 
 # Django-article additions
+"""
 INSTALLED_APPS = tuple(set(INSTALLED_APPS + (
     'django.contrib.admin',
     'django.contrib.auth',
@@ -177,6 +183,7 @@ INSTALLED_APPS = tuple(set(INSTALLED_APPS + (
     'django.contrib.syndication',
     'articles',
 )))
+"""
 
 TEMPLATE_CONTEXT_PROCESSORS = tuple(set(TEMPLATE_CONTEXT_PROCESSORS + (
     'django.contrib.auth.context_processors.auth',
@@ -190,3 +197,8 @@ TEMPLATE_LOADERS = ('templateloaderwithpriorities.Loader', ) + TEMPLATE_LOADERS
 TEMPLATE_LOADER_PRIORITIES = [
     os.path.join(GAME_DIR, 'gamesrc', 'oasis', 'web', 'templates')
 ]
+
+FILE_UPLOAD_PERMISSIONS = 0644
+
+AUTHENTICATION_BACKENDS = ('game.gamesrc.oasis.web.models.CaseInsensitiveModelBackend',)
+

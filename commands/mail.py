@@ -8,7 +8,8 @@ import settings
 from ev import Command as BaseCommand
 from ev import default_cmds
 from src.utils import create, utils
-from game.gamesrc.oasis.lib.oasis import partial_pmatch, send_message, validate_targets, check_ignores
+from game.gamesrc.oasis.lib.mail import send_message
+from game.gamesrc.oasis.lib.oasis import partial_pmatch, validate_targets, check_ignores
 from game.gamesrc.oasis.lib.constants import *
 from game.gamesrc.oasis.commands.lineeditor import LineEditor
 

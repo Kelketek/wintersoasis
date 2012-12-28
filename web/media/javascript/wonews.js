@@ -10,11 +10,17 @@ var resizer = function () {
         elem.css({'height' : $(document).height()});
     }
 }
-$(document).load(resizer);
-$(document).ready(resizer);
+//$(document).load(resizer);
+//$(document).ready(resizer);
 $(window).resize(resizer);
+$(window).load(resizer);
 
 function footer_login (){
   document.loginform.value = 'login';
+  document.loginform.submit();
+}
+
+function footer_logout (){
+  document.loginform.value = 'logout';
   document.loginform.submit();
 }

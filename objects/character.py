@@ -42,6 +42,9 @@ class WOCharacter(Character):
 
     """
     DELAY = 10
+    def __str__(self):
+        return self.name
+    __repr__ = __str__
 
     def announce_message(self, user, target, message, message_key, must_be_online=False):
         """

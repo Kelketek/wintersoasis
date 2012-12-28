@@ -1,10 +1,8 @@
 {% load forum_extras %}
         <div id='footer'>
-          {% if user.forum_profile.avatar and post.user.forum_profile.show_avatar %}
-            <img class ="avatar" alt="{{user.username}}" src="{{ post.user.forum_profile.avatar.url }}" />
-          {% elif forum_settings.GRAVATAR_SUPPORT and user.is_authenticated %}
-            <img class="avatar" alt="{{user.username}}" src="{% gravatar user.email %}" />
-          {% elif user.is_authenticated and not user.forum_profile.avatar %}
+          {% if user.is_authenticated and user.forum_profile.avatar.url %}
+            <img class ="avatar" alt="{{user.username}}" src="{{ user.forum_profile.avatar.url }}" />
+          {% elif user.is_authenticated %}
             <img class='avatar' alt="{{user.username}}" src='/media/images/unlogged.png' />
           {% else %}
             <img class='avatar' alt="Not logged in." src='/media/images/unlogged.png' />
@@ -15,14 +13,18 @@
                 <input type="password" name="password" placeholder="Password" />
                 <span class='bar'><a href="javascript:footer_login()">Log In &laquo;</a></span>
                 <span class='bar'><a href="/tbi">Register &laquo;</a></span>
-                <input type="submit" value="login" style="position: absolute; left: -9999px" >
-                <input type="hidden" name="next" value="{{ request.get_full_path }}" />
+                <input type="submit" value="Login" style="position: absolute; left: -9999px" >
+                <input type="hidden" name="next" value="{{next|default:request.get_full_path}}" />
             </form>
           {% endif %}
           {% if user.is_authenticated %}
             <div id="authlinks">
-                <span class='bar'>Logged in as {{user.username}}</span>
-                <span class='bar'><a href="/logout/">Log Out &laquo;</a></span>
+                <form name="loginform" method="post" class="login" action="/logout/">
+                    {% csrf_token %}
+                    <span class='bar'>Logged in as {{user.username}}</span>
+                    <span class='bar'><a href="javascript:footer_logout()">Log Out &laquo;</a></span>
+                    <input type="hidden" name="next" value="{{ next|default:request.get_full_path}}" />
+                </form>
           {% endif %}
             {% block sidebar %}
             {% endblock %}
