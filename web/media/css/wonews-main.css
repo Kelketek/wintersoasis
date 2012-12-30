@@ -284,8 +284,6 @@ span.bar a:visited {
     margin-left:auto;
     margin-right:auto;
     position: relative;
-    /*background-image:url('../images/papertear_left.png'),
-                     url('../images/papertear_right.png');*/
     background-position:left, right;
     background-repeat: repeat-y;
     z-index:0;
@@ -297,4 +295,24 @@ div.branding {
     font-size: 8pt;
     text-align: center;
     padding-top: 50px;
+}
+
+/* Special classes for forms */
+span.form_error ul {
+    color: #FF0000;
+}
+
+table.form_entry td.form_label {
+    text-decoration: bold;
+    min-width: 15em;
+}
+
+/* This is mostly for scrollable text like the AUP */
+div.scrollable_text {
+    overflow-y: scroll;
+    width: 100%;
+    height: 15em;
+    box-shadow: 0px 5px 10px 0px #000;
+    margin-top: 2em;
+    margin-bottom: 2em;
 }

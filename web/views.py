@@ -20,3 +20,6 @@ def login_gateway(request):
     login_vars = {}
     login_vars['next'] = request.GET.get('next', default=request.POST.get('next', None))
     return render_to_response('flatpages/login.html', login_vars, context_instance)
+
+def custom_500(request):
+    return render_to_response('500.html', {}, RequestContext(request))
