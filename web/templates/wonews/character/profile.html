@@ -1,0 +1,56 @@
+{% extends 'wonews/character/default.html' %}
+{% include forum_extras %}
+{% load markup %}
+{% block titleblock %}{% if character %}{{ character.name }}{% else %}Profiles{% endif %}{% endblock %}
+{% block content %}
+{% if not character %}
+<h1>Not Found</h1>
+<p>The character you're seaching for does not exist, or you have not specified one.</p>
+{% else %}
+<h1>
+{% if target.forum_profile.avatar %}
+    <img class ="avatar" alt="" src="{{ target.forum_profile.avatar.url }}" />
+{% else %}
+    <img class='avatar' alt="{{character.name}}" src='/media/images/unlogged.png' />
+{% endif %}
+Dossier: {{ character.name }}</h1>
+<div class="character_sex_and_species">
+<table>
+    <tr>
+        <td class="profile_key">Sex:</td>
+        <td class="profile_value">{{ character.db.sex }}</td>
+    </tr>
+    <tr>
+        <td class="profile_key">Species:</td>
+        <td class="profile_value">{{character.db.species }}</td>
+    </tr>
+</table>
+</div>
+{% if perms.is_alt or perms.same_user or perms.staff %}
+    <div class="character_stats">
+        <table>
+            {% for key, value in character.db.stats.items %}
+            <tr>
+                <td class="profile_key"><img class="character_stat_icon" src="{{ MEDIA_URL }}/images/{{ key }}.png" alt="">{{ key }}:</td>
+                <td class="profile_value">{{value}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="character_qualities">
+        <table class="character_quality_table">
+            {% for key, value in character.db.qualities.items %}
+            <tr>
+                <td class="quality_key"><span class="quality_key">{{ key }}</span></td>
+                <td class="quality_value">{{value}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <h2>History</h2>
+        {{ character.db.background|markdown:"safe" }}
+{% endif %}
+<h2>Appearance</h2>
+{{ character.db.desc|markdown:"safe" }}
+{% endif %}
+{% endblock content %}
