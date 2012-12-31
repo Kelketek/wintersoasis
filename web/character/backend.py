@@ -1,6 +1,7 @@
 """
 Backend functions for the character application.
 """
+import string
 from src.utils.create import create_player
 from django.conf import settings
 from django.contrib.auth import login
@@ -35,7 +36,8 @@ def send_activation_email(character, context):
         Generate an activation key, set it on a player, then have the user
     emailed with the relevant info.
     """
-    key = unicode(str(random.randint(1000000000000000000000, 9999999999999999999999)))
+    lst = [random.choice(string.ascii_letters + string.digits) for n in xrange(30)]
+    key = "".join(lst)
     character.player.db.activation_key = key
     send_mail(
     "Character Activation",

@@ -160,9 +160,11 @@ CACHES = {
 SESSION_COOKIE_SECURE = True
 SESSION_COOKIE_HTTPONLY = False
 
-# Gravitar support for DjangoBB
+# DjangoBB settings
 DJANGOBB_GRAVATAR_SUPPORT = False
 GRAVATAR_DEFAULT = 'identicon'
+USE_TZ = True
+TIME_ZONE = "America/Chicago"
 
 # Haystack settings
 HAYSTACK_SITECONF = os.path.join('game.gamesrc.oasis.web.search_sites')
@@ -201,6 +203,8 @@ FILE_UPLOAD_PERMISSIONS = 0644
 
 AUTHENTICATION_BACKENDS = ('game.gamesrc.oasis.web.models.CaseInsensitiveModelBackend',)
 
+# Character App Settings
+
 AUP = """
 
 Lorem Ipsum
@@ -221,3 +225,6 @@ Aliquam sed nulla elit. Morbi volutpat eleifend quam. Lorem ipsum dolor sit amet
 
 Fusce rutrum ullamcorper lorem vitae lacinia. Integer vel dui augue. Aenean a erat eget arcu volutpat tempor quis nec urna. Phasellus ultrices, eros ac tincidunt porttitor, magna nunc dapibus nunc, nec rutrum ligula nisi eget mi. Cras blandit vehicula sollicitudin. Nam scelerisque urna nec dui condimentum venenatis. Etiam tincidunt tortor quis velit vehicula vitae blandit turpis consequat. Sed vitae risus dui. Vestibulum eros lectus, volutpat ut porttitor vel, vehicula in nisl. Vivamus faucibus nibh nec elit rhoncus et mollis quam tempor. Nullam a tortor sit amet mauris hendrerit faucibus sit amet non magna. Donec elementum adipiscing dui eu varius. Curabitur dignissim pellentesque sollicitudin. Donec posuere leo in dolor lacinia pharetra. Mauris nunc justo, consequat eget blandit eu, pulvinar vitae nisl. In hac habitasse platea dictumst.
 """
+
+# Wiki settings
+WIKI_ACCOUNT_HANDLING = False

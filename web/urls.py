@@ -75,8 +75,7 @@ urlpatterns = patterns('',
     (r'^forum/', include('bb_urls', namespace='djangobb')),
     # Favicon
     (r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/media/images/favicon.ico'}),
-    # Polls
-    url(r'^polls/', include('polls.urls')),
+
     # Character related stuff.
     url(r'^character/', include('character.urls', namespace='character')),
 )

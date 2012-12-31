@@ -1,9 +1,13 @@
 # Create your views here.
+from django.contrib.auth.models import User
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from character.forms import NewCharacter
 from django.conf import settings
 from character.backend import new_player, activate_player
+
+class Generic:
+    pass
 
 def new(request):
     """
@@ -31,7 +35,8 @@ def new(request):
             'new_character' : form,
             'complete' : False,
             'aup' : settings.AUP,
-        }, RequestContext(request)
+        },
+        RequestContext(request)
     )
 
 def activate(request, uid, activation_key):
@@ -39,11 +44,58 @@ def activate(request, uid, activation_key):
     Account activation
     """
     activated = activate_player(uid, activation_key, request)
-    print activated
     return render_to_response(
         'character/activation.html',
         { 
             'activated' : activated,
-        }, RequestContext(request)
+        },
+        RequestContext(request)
         
+    )
+
+def permissions_bundle(request, target):
+    """
+        Dictionary of permissions values that can be used to determine what a player
+    can and can't do through the interface, relative to a target user.
+    """
+    requester = request.user
+    perms = Generic()
+    perms.administrator = False # Highest power level
+    perms.wizard = False # Most needed tasks
+    perms.staff = False # Some helpful tasks
+    perms.helpstaff = False # Some helper functions may exist here.
+    perms.is_alt = False # If the users are owned by the same activated email, this will become true.
+    perms.same_player = False # If the requesting user and the target are the same
+
+    if not target or not request.user:
+        return perms
+    if request.user == target:
+        perms.same_player = True
+    try:
+        if ( requester.email.lower() == target.email.lower() ) and requester.is_authenticated() and requester.is_active and target.is_active:
+            perms.is_alt = True
+    except AttributeError:
+        pass
+    # Other permissions to be put in later.
+    return perms
+
+def profile(request, username):
+    """
+    Character profile
+    """
+    try:
+        user = User.objects.get(username__iexact=username)
+        character = user.get_profile().character
+    except User.DoesNotExist:
+        character = None
+        user = None
+    perms = permissions_bundle(request, user)
+    return render_to_response(
+        'character/profile.html',
+        {
+            'character' : character,
+            'perms'     : perms,
+            'target'    : user,
+        },
+        RequestContext(request)
     )
