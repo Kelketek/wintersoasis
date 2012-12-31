@@ -8,8 +8,8 @@
     <meta name="author" content="www.django-wiki.org">
 
     <!-- Le styles -->
-    <link href="{{ STATIC_URL }}wiki/bootstrap/css/bootstrap.css" rel="stylesheet">
-    <link href="{{ STATIC_URL }}wiki/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet">
+    <link href="{{ MEDIA_URL }}wiki/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="{{ MEDIA_URL }}wiki/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet">
     {% include 'wonews/styles.html' %}
     
     <!-- TODO: Put all this stuff in Less -->
@@ -87,8 +87,8 @@
       }
     </style>
     
-    <script src="{{ STATIC_URL }}wiki/js/core.js"></script>
-    <script src="{{ STATIC_URL }}wiki/bootstrap/js/bootstrap.min.js"></script>
+    <script src="{{ MEDIA_URL }}wiki/js/core.js"></script>
+    <script src="{{ MEDIA_URL }}wiki/bootstrap/js/bootstrap.min.js"></script>
     {% render_block "css" %}
     {% render_block "js" %}
     
