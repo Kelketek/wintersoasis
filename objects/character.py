@@ -20,6 +20,7 @@ import time
 from ev import Character
 from game.gamesrc.oasis.lib.oasis import action_followers, current_object, check_ignores, check_sleepers, check_hiding, ignored_notifications
 from game.gamesrc.oasis.lib.constants import ALERT
+from web.character.models import TagCategory, Tag
 from settings import SERVERNAME
 
 class WOCharacter(Character):
@@ -59,6 +60,26 @@ class WOCharacter(Character):
             or self.db.hiding or message_key in ignored_notifications(target):
             return
         target.msg(message)
+
+    def get_tags(self):
+        """
+            Get tags on this characted back, organized into a dictionary by category name.
+        """
+        tags_dict = {}
+        tags = Tag.objects.filter(character=self.dbobj)
+        for category in list(TagCategory.objects.all()):
+            tags_dict[category] = [ tag for tag in tags if tag.tag.category == category ]
+        return tags_dict
+
+    def delete(self):
+        """
+            Delete the object with all standard checks, and any extras we've defined for it.
+        """
+        result = super(WOCharacter, 'delete')
+        if result:
+            for tag in Tag.objects.filter(character=self.dbobj):
+                tag.delete()
+        return result
 
     def at_post_login(self):
         """

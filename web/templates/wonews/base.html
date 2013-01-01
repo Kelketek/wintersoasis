@@ -5,6 +5,7 @@
         <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
         <title>{{game_name}} - {% if flatpage %}{{flatpage.title}}{% else %}{% block titleblock %}{{page_title}}{% endblock %}{% endif %}</title>
 {% include 'wonews/styles.html' %}
+{% block extra_styles %}{% endblock extra_styles %}
     </head>
     <body>
 {% include 'wonews/header.html' %}
@@ -22,5 +23,6 @@
             </div>
         </div>
 {% include 'wonews/footer.html' %}
+{% block footer_scripts %}{% endblock footer_scripts %}
     </body>
 </html>

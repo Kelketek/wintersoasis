@@ -5,6 +5,7 @@ from django.template import RequestContext
 from character.forms import NewCharacter
 from django.conf import settings
 from character.backend import new_player, activate_player
+from character.models import TagCategory, Tag
 
 class Generic:
     pass
@@ -77,6 +78,13 @@ def permissions_bundle(request, target):
     except AttributeError:
         pass
     # Other permissions to be put in later.
+    if request.user.is_superuser:
+        perms.wizard = True
+        perms.staff = True
+        perms.helpstaff = True
+    if request.user.is_staff:
+        perms.staff = True
+        perms.helpstaff = True
     return perms
 
 def profile(request, username):
@@ -86,9 +94,11 @@ def profile(request, username):
     try:
         user = User.objects.get(username__iexact=username)
         character = user.get_profile().character
+        tags = character.get_tags()
     except User.DoesNotExist:
         character = None
         user = None
+        tags = {}
     perms = permissions_bundle(request, user)
     return render_to_response(
         'character/profile.html',
@@ -96,6 +106,7 @@ def profile(request, username):
             'character' : character,
             'perms'     : perms,
             'target'    : user,
+            'tags'      : tags,
         },
         RequestContext(request)
     )

@@ -9,9 +9,9 @@
 {% else %}
 <h1>
 {% if target.forum_profile.avatar %}
-    <img class ="avatar" alt="" src="{{ target.forum_profile.avatar.url }}" />
+    <img class ="left" alt="" src="{{ target.forum_profile.avatar.url }}" />
 {% else %}
-    <img class='avatar' alt="{{character.name}}" src='/media/images/unlogged.png' />
+    <img class='left' alt="{{character.name}}" src='/media/images/unlogged.png' />
 {% endif %}
 Dossier: {{ character.name }}</h1>
 <div class="character_sex_and_species">
@@ -52,5 +52,54 @@ Dossier: {{ character.name }}</h1>
 {% endif %}
 <h2>Appearance</h2>
 {{ character.db.desc|markdown:"safe" }}
+<h2>Role-Play Tags</h2>
+<div class="character_tag_listing">
+{% if tags %}
+    {% for category, tag_list in tags.items %}
+        <div class="tags_{{category.name}}">
+        <h3>{{ category.name }}</h3>
+        {% for tag in tag_list %}
+            <span class="tag">{{ tag.tag.name }}<div class="tag_description" style="display: none;">{{ tag.tag.description }}</div></span>
+        {% endfor %}
+        </div>
+    {% endfor %}
+{% else %}
+    This character has not set any RP Tags.
+{% endif %}
+</div>
 {% endif %}
 {% endblock content %}
+{% block footer_scripts %}
+        <script src="{{ MEDIA_URL }}javascript/qtip.js"></script>
+        <script src="{{ MEDIA_URL }}javascript/Markdown.Converter.js"></script>
+        <script src="{{ MEDIA_URL }}javascript/Markdown.Sanitizer.js"></script>
+        <script type="text/javascript">
+rp_tags = $('div.character_tag_listing span.tag');
+var converter = Markdown.getSanitizingConverter();
+for (var i=0;i<rp_tags.length;i++) {
+    $(rp_tags[i]).qtip({
+        content: converter.makeHtml($(rp_tags[i]).find("div.tag_description").html()),
+        show: {
+            event:'mouseover',
+            solo: true,
+        },
+        hide: {
+            fixed: true,
+            delay: 1000,
+            event: 'mouseleave',
+            mouse: false,
+        },
+        position: {
+            corner: {
+            target: 'topMiddle',
+            tooltip: 'bottomRight'
+            },
+            adjust: {
+                screen: true,
+            },
+        },
+    });
+}
+</script>
+
+{% endblock footer_scripts %}
