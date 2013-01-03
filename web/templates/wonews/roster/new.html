@@ -1,0 +1,67 @@
+{% extends 'wonews/roster/default.html' %}
+{% load markup %}
+{% block titleblock %}Create a New Character{% endblock %}
+{% block content %}
+{% if not complete %}
+{% if not user.is_authenticated %}
+<h1>Make a New Character</h1>
+<p>Welcome to Winter's Oasis. You can register for a new character first. Before you fill out this form, be sure to read up on the game so you know what to expect.</p>
+<form action="{% url roster:new %}" method="post">
+    {% csrf_token %}
+    <table class="form_entry">
+        <tr>
+            <td class="form_label"><label>&raquo; Name:</label></td>
+            <td>{{ new_character.name }}</td>
+        </tr>
+    </table>
+    <span class="form_error">{{ new_character.name.errors }}</span>
+    <p>You will only want to put the first name of your character here, as this is also the name you will use to sign in. Spaces are not allowed, but underscores and hyphens are fine.</p>
+    <table class="form_entry">
+        <tr>
+            <td class="form_label"><label>&raquo; Password:</label></td>
+            <td>{{ new_character.password }}</td>
+        </tr>
+    </table>
+    <span class="form_error">{{ new_character.password.errors }}</span>
+    <p>A good password is best made by creating a nonsense phrase you can remember. For instance, "JulesVerneKickedInTheJewels".</p>
+    <table class="form_entry">
+        <tr>
+            <td class="form_label"><label>&raquo; Password Again:</label></td>
+            <td>{{ new_character.password2 }}</td>
+        </tr>
+    </table>
+    <span class="form_error">{{ new_character.password2.errors }}</span>
+    <p>Type your password one more time to double-check that you've entered it correctly. If you haven't typed it the same twice, you may have made a typo in the original!</p>
+    <table class="form_entry">
+        <tr>
+            <td class="form_label"><label>&raquo; Email:</label></td>
+            <td>{{ new_character.email }}</td>
+        </tr>
+    </table>
+    <span class="form_error">{{new_character.email.errors }}</span>
+    <p>Specify your contact email address. If you have multiple characters, be sure to use the same email address for all of them. This allows alternate character aware features to work.</p>
+    <table class="form_entry">
+        <tr>
+            <td class="form_label"><label>&raquo; Email Again:</label></td>
+            <td>{{ new_character.email2 }}</td>
+        </tr>
+    </table>
+    <span class="form_error">{{ new_character.email2.errors }}</span>
+    <p>Type your email one more time to double-check that you've entered it correctly. If you haven't typed it the same twice, you may have made a typo in the original!</p>
+    <div class="scrollable_text">{{ aup|markdown:"safe" }}</div>
+    <p>&raquo; I have read and agree to the Acceptable Use Policy. {{ new_character.aup }}</p>
+    <span class="form_error">{{ new_character.aup.errors }}</span><br />
+    {{ new_character.captcha }}
+    <span class="form_error">{{ new_character.captcha.errors }}</span>
+    <p>This last part's just a formality. We want to make sure you are a human, whether or not your character is. :)</p>
+    <input type="submit", value="Sign up!" />
+</form>
+{% else %}
+<h1>You already have a character!</h1>
+<p>To make a new character, log out first.</p>
+{% endif %}
+{% else %}
+<h1>Check your email!</h1>
+<p>A link to validate your email and activate your character has just been sent. If you don't see it, be sure to check your spam box as well.</p>
+{% endif %}
+{% endblock content %}
