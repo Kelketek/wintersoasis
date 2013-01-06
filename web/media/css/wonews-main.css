@@ -369,10 +369,19 @@ td.profile_value {
     padding-bottom: 0px;
 }
 
+div.character_tag_listing div {
+    line-height: 2em;
+}
 div.character_tag_listing span.tag {
     background-color: #E0EAF1;
     color: #3E6D8E;
     padding: 3px;
     border-right: 1px solid #2E5D7E;
     border-bottom: 1px solid #2E5D7E;
+    white-space: nowrap;
+}
+
+div.spacer {
+    margin-top: 2em;
+    margin-bottom: 2em;
 }

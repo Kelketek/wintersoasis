@@ -1,58 +1,26 @@
-# Create your views here.
+from django.contrib.auth import login
 from django.contrib.auth.models import User
+from django.http import HttpResponseRedirect, Http404, HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from character.forms import NewCharacter
 from django.conf import settings
-from character.backend import new_player, activate_player
+from django.db import transaction
 from character.models import TagCategory, Tag
+from src.objects.models import ObjectDB
 
 class Generic:
-    pass
+    def __str__(self):
+        return str(self.__dict__)
 
-def new(request):
+def is_alt(request, target):
     """
-    Basic Registration
+    Determines if a user is another user's alt.
     """
-    if request.method == 'POST':
-        form  = NewCharacter(request.POST) # A character generation request was submitted.
-        if form.is_valid(): # Everything's good to go!
-            # We'll process the data here, now that it's been deemed sane.
-            data = form.cleaned_data
-            new_player(name=data['name'], email=data['email'],
-                password=data['password'], context=request)
-            return render_to_response(
-                'character/new.html',
-                {
-                    'complete' : True,
-                },
-                RequestContext(request)
-            )
-    else:
-            form = NewCharacter() # New request. empty form.
-    return render_to_response(
-        'character/new.html',
-        {
-            'new_character' : form,
-            'complete' : False,
-            'aup' : settings.AUP,
-        },
-        RequestContext(request)
-    )
-
-def activate(request, uid, activation_key):
-    """
-    Account activation
-    """
-    activated = activate_player(uid, activation_key, request)
-    return render_to_response(
-        'character/activation.html',
-        { 
-            'activated' : activated,
-        },
-        RequestContext(request)
-        
-    )
+    try:
+        return request.user.get_profile().character in target.get_profile().character.get_alts()
+    except:
+        return False
 
 def permissions_bundle(request, target):
     """
@@ -67,25 +35,47 @@ def permissions_bundle(request, target):
     perms.helpstaff = False # Some helper functions may exist here.
     perms.is_alt = False # If the users are owned by the same activated email, this will become true.
     perms.same_player = False # If the requesting user and the target are the same
+    perms.me = False # If either is_alt or same_player is true.
 
-    if not target or not request.user:
+    if not target or not requester.is_authenticated:
         return perms
-    if request.user == target:
+    if requester == target:
         perms.same_player = True
-    try:
-        if ( requester.email.lower() == target.email.lower() ) and requester.is_authenticated() and requester.is_active and target.is_active:
-            perms.is_alt = True
-    except AttributeError:
-        pass
+    perms.is_alt = is_alt(request, target)
+    if perms.same_player or perms.is_alt:
+        perms.me = True
+
     # Other permissions to be put in later.
-    if request.user.is_superuser:
+    if requester.is_superuser:
         perms.wizard = True
         perms.staff = True
         perms.helpstaff = True
-    if request.user.is_staff:
+    if requester.is_staff:
         perms.staff = True
         perms.helpstaff = True
     return perms
+
+def switch(request):
+    """
+        Allows one to switch to another user. Optionally logs in, if the user
+    is an alt of the other user.
+    """
+    if not request.method == 'POST' or not request.user.is_authenticated:
+        raise Http404
+    post = dict(request.POST)
+    print post['target']
+    try:
+        MAIN = 0
+        user = User.objects.get(username__iexact=post['target'][MAIN])
+    except (User.DoesNotExist, KeyError):
+        # Bogus entry, go back to user's page.
+        user = request.user
+    do_login = post.get('login', False)
+    if is_alt(request, user) and do_login:
+        user.backend = 'django.contrib.auth.backends.ModelBackend' 
+        login(request, user)
+    next_page = user.get_profile().character.get_absolute_url()
+    return HttpResponseRedirect(next_page)
 
 def profile(request, username):
     """
@@ -100,6 +90,7 @@ def profile(request, username):
         user = None
         tags = {}
     perms = permissions_bundle(request, user)
+    print perms
     return render_to_response(
         'character/profile.html',
         {
@@ -107,6 +98,7 @@ def profile(request, username):
             'perms'     : perms,
             'target'    : user,
             'tags'      : tags,
+            'request'   : request,
         },
         RequestContext(request)
     )

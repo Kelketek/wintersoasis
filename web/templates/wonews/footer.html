@@ -12,7 +12,7 @@
                 <input type="text" name="username" placeholder="Username" />
                 <input type="password" name="password" placeholder="Password" />
                 <span class='bar'><a href="javascript:footer_login()">Log In &laquo;</a></span>
-                <span class='bar'><a href="/tbi">Register &laquo;</a></span>
+                <span class='bar'><a href="{% url roster:new %}">Register &laquo;</a></span>
                 <input type="submit" value="Login" style="position: absolute; left: -9999px" >
                 <input type="hidden" name="next" value="{{next|default:request.get_full_path}}" />
             </form>
@@ -21,7 +21,7 @@
             <div id="authlinks">
                 <form name="loginform" method="post" class="login" action="/logout/">
                     {% csrf_token %}
-                    <span class='bar'>Logged in as {{user.username}}</span>
+                    <span class='bar'><a href="{% url character:profile user.username %}">Logged in as {{user.username}}</a></span>
                     <span class='bar'><a href="javascript:footer_logout()">Log Out &laquo;</a></span>
                     <input type="hidden" name="next" value="{{ next|default:request.get_full_path}}" />
                 </form>

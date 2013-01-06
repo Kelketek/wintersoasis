@@ -23,3 +23,10 @@ def login_gateway(request):
 
 def custom_500(request):
     return render_to_response('500.html', {}, RequestContext(request))
+
+def page_index(request):
+    """
+    Main root page.
+    """
+    context_instance = RequestContext(request)
+    return render_to_response('index.html', context_instance)

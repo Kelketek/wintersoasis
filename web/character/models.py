@@ -1,5 +1,6 @@
 from django.db import models
 from src.objects.models import ObjectDB
+from src.players.models import PlayerDB
 
 class TagCategory(models.Model):
     """
@@ -18,6 +19,14 @@ class TagDef(models.Model):
     description = models.TextField()
     def __unicode__(self):
         return unicode(self.name)
+    def character_check(self, character):
+        """
+            Check to see if a character has this tag.
+        """
+        if Tag.objects.filter(tag=self, character=character):
+            return True
+        else:
+            return False
 
 class Tag(models.Model):
     """

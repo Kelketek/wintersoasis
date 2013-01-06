@@ -17,9 +17,9 @@ from django_notify.urls import get_pattern as get_notify_pattern
 
 # fix to resolve lazy-loading bug
 # https://code.djangoproject.com/ticket/10405#comment:11
-from django.db.models.loading import cache as model_cache
-if not model_cache.loaded:
-    model_cache.get_models()
+#from django.db.models.loading import cache as model_cache
+#if not model_cache.loaded:
+#    model_cache.get_models()
 
 # Forum imports
 from django_authopenid.urls import urlpatterns as authopenid_urlpatterns
@@ -35,9 +35,11 @@ from djangobb_forum import settings as forum_settings
 # models to the admin site)
 admin.autodiscover()
 
-
-
 # Setup the root url tree from / 
+
+# AJAX stuff.
+from dajaxice.core import dajaxice_autodiscover, dajaxice_config
+dajaxice_autodiscover()
 
 urlpatterns = patterns('',
     # User Authentication
@@ -46,8 +48,6 @@ urlpatterns = patterns('',
 
     url(r'^accounts/login', 'views.login_gateway'),
 
-    # Front page
-    url(r'^', include('game.gamesrc.oasis.web.website.urls')),
     # News stuff
     #url(r'^news/', include('src.web.news.urls')),
 
@@ -76,8 +76,19 @@ urlpatterns = patterns('',
     # Favicon
     (r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/media/images/favicon.ico'}),
 
+    # Registration stuff
+    url(r'^roster/', include('roster.urls', namespace='roster')),
+
     # Character related stuff.
     url(r'^character/', include('character.urls', namespace='character')),
+
+    # Search utilities
+    url(r'^search/', include('haystack.urls', namespace='search')),
+
+    # AJAX stuff
+    url(dajaxice_config.dajaxice_url, include('dajaxice.urls')),
+
+    url(r'^$', 'views.page_index'),
 )
 
 # 500 Errors:

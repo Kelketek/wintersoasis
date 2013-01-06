@@ -1,4 +1,5 @@
 from django.conf.urls.defaults import *
+from django.views.generic.simple import redirect_to
 
 from djangobb_forum import settings as forum_settings
 from djangobb_forum import views as forum_views
@@ -49,7 +50,7 @@ urlpatterns = patterns('',
         'template': 'djangobb_forum/profile/profile_personal.html'
         }, name='forum_profile_personal'),
     url('^user/(?P<username>.*)/essentials/$', forum_views.user, name='forum_profile_essentials'),
-    url('^user/(?P<username>.*)/$', forum_views.user, name='forum_profile'),
+    url('^user/(?P<username>.*)/$', redirect_to, {'url': '/character/profile/%(username)s/'}, name='forum_profile'),
     url('^users/$', forum_views.users, name='forum_users'),
 
     # Topic

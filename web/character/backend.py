@@ -4,10 +4,18 @@ Backend functions for the character application.
 import string
 from src.utils.create import create_player
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.contrib.auth import login
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from Crypto.Random import random
+
+def switch_to(request, target):
+    """
+    Switch to another user.
+    """
+    target.backend = 'django.contrib.auth.backends.ModelBackend'
+    login(request, target)
 
 def activate_player(uid, activation_key, request):
     """
@@ -21,8 +29,7 @@ def activate_player(uid, activation_key, request):
         if user.get_profile().db.activation_key == activation_key:
             user.is_active = True
             user.save()
-            user.backend = 'django.contrib.auth.backends.ModelBackend'
-            login(request, user)
+            switch_to(request, user)
             return True
         else:
             print "Else'd!"
@@ -46,10 +53,10 @@ Hello there!
 
     You recently registered an account with Winter's Oasis. In order to use this account, you will need to activate it. You can activate the account by visiting the following URL:
 
-    https://%s/character/activate/%s/%s/
+    https://%s%s/%s/%s/
 
     If you didn't register with Winter's Oasis, you can ignore this email. The account will be deleted within a few days if it is not activated.
-""" % (context.META['HTTP_HOST'], character.player.user.id, key), settings.SERVER_EMAIL,
+""" % (context.META['HTTP_HOST'], reverse('roster.views.activate', args=(character.player.user.id, key))), settings.SERVER_EMAIL,
     [character.player.user.email]
     )
     

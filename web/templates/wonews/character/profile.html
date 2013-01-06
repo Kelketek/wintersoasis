@@ -1,5 +1,6 @@
 {% extends 'wonews/character/default.html' %}
 {% include forum_extras %}
+{% load dajaxice_templatetags %}
 {% load markup %}
 {% block titleblock %}{% if character %}{{ character.name }}{% else %}Profiles{% endif %}{% endblock %}
 {% block content %}
@@ -14,6 +15,15 @@
     <img class='left' alt="{{character.name}}" src='/media/images/unlogged.png' />
 {% endif %}
 Dossier: {{ character.name }}</h1>
+{% if user.is_authenticated and not perms.same_player %}
+<button id="following_button" onclick="call_button('following', '#following_button', true);"></button>
+<button id="hiding_from_button" onclick="call_button('hiding_from', '#hiding_from_button', true);"></button>
+<button id="ignoring_button" onclick="call_button('ignoring', '#ignoring_button', true);"></button>
+{% endif %}
+{% if perms.same_player %}
+<br /><a href="{% url djangobb:forum_profile_upload_avatar character.name %}">Change Avatar</a>
+{% endif %}
+</a>
 <div class="character_sex_and_species">
 <table>
     <tr>
@@ -25,8 +35,19 @@ Dossier: {{ character.name }}</h1>
         <td class="profile_value">{{character.db.species }}</td>
     </tr>
 </table>
-</div>
-{% if perms.is_alt or perms.same_user or perms.staff %}
+{% if perms.me and character.get_alts %}
+    <form method="POST" action="{% url character:switch %}" />
+    {% csrf_token %}
+    <select name="target">
+        {% for alt in character.get_alts %}
+            <option>{{ alt.name }}</option>
+        {% endfor %}
+    </select>
+    <input type="Submit" value="Switch Characters" />
+    <input type="checkbox" name="login" />Log in
+    </form>
+{% endif %}
+{% if perms.me or perms.staff %}
     <div class="character_stats">
         <table>
             {% for key, value in character.db.stats.items %}
@@ -52,19 +73,31 @@ Dossier: {{ character.name }}</h1>
 {% endif %}
 <h2>Appearance</h2>
 {{ character.db.desc|markdown:"safe" }}
-<h2>Role-Play Tags</h2>
+<h2>Role-Play Tags</h2>{% if perms.me or perms.staff %}<button class="show_tag_form" onclick="show_tag_form(true);">Edit</button>{% endif %}
 <div class="character_tag_listing">
-{% if tags %}
-    {% for category, tag_list in tags.items %}
-        <div class="tags_{{category.name}}">
-        <h3>{{ category.name }}</h3>
-        {% for tag in tag_list %}
-            <span class="tag">{{ tag.tag.name }}<div class="tag_description" style="display: none;">{{ tag.tag.description }}</div></span>
-        {% endfor %}
-        </div>
+{% for category, tag_dict in tags.items %}
+    <div class="tags_{{category.name}}">
+    <h3>{{ category.name }}</h3>
+    {% for tag, tag_set in tag_dict.items %}
+        {% if tag_set %}
+            <span class="tag">
+        {% elif perms.me or perms.staff %}
+            <span class="tag" style="display: none;">
+        {% endif %}
+        {% if perms.me or perms.staff %}
+            <input class="tag_toggle" type="checkbox" name="tag_check" value="{{tag.id}}" {% if tag_set %}checked{% endif %} style="display: none;" />
+        {% endif %}
+        {% if tag_set or perms.me or perms.staff %}
+        <span class="tag_name">{{ tag.name }}</span><div class="tag_description" style="display: none;">{{ tag.description }}</div></span>
+        {% endif %}
     {% endfor %}
-{% else %}
-    This character has not set any RP Tags.
+    </div>
+{% endfor %}
+{% if perms.me or perms.staff %}
+    <br />
+    <span id="tag_error"></span>
+    <button class="save_tags" onclick="show_tag_form(false);save_tags();" style="display:none;">Save</button>
+    <div class="spacer"></div>
 {% endif %}
 </div>
 {% endif %}
@@ -85,7 +118,7 @@ for (var i=0;i<rp_tags.length;i++) {
         },
         hide: {
             fixed: true,
-            delay: 1000,
+            delay: 150,
             event: 'mouseleave',
             mouse: false,
         },
@@ -101,5 +134,42 @@ for (var i=0;i<rp_tags.length;i++) {
     });
 }
 </script>
-
+{% dajaxice_js_import %}
+<script src="{{ STATIC_URL }}dajax/jquery.dajax.core.js"></script>
+    <script>
+    {% if user.is_authenticated %}
+    var call_button = function (listname, elementid, toggle) {
+        Dajaxice.character.list_toggle(Dajax.process,{'character': '{{character.name}}', 'toggle': toggle, 'listname': listname, 'elementid': elementid});
+    }
+    call_button('following', '#following_button', false);
+    call_button('hiding_from', '#hiding_from_button', false);
+    call_button('ignoring', '#ignoring_button', false);
+    {% endif %}
+    {% if perms.me or perms.staff %}
+    var show_tag_form = function (toggle) {
+        if (toggle) {
+            $('.tag').show();
+            $('.tag_toggle').show();
+            $('.save_tags').show();
+            $('.show_tag_form').hide();
+        } else {
+            $('.save_tags').hide();
+            $('.tag').hide();
+            $(':checked').each( function() {
+                $(this).hide();
+                $(this).parent().show();
+            });
+            $('.show_tag_form').show();
+        }
+    }
+    var save_tags = function () {
+        var tag_list = [];
+        $('.character_tag_listing :checked').each( function() {
+            console.log($(this).next().text());
+            tag_list.push($(this).next().text());
+        });
+        Dajaxice.character.tags_save(Dajax.process,{ 'tag_list' : tag_list, 'character' : '{{character.name}}' });
+    }
+    {% endif %}
+</script>
 {% endblock footer_scripts %}

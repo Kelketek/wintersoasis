@@ -5,7 +5,7 @@
                     <li><span class='bar'><a href='/forum/'>Play on the forums</a></span></li>
                     <li><span class='bar'><a href='/webclient/'>Play in real time!</a></span></li>
                 </ul>
-                <form class="search-header" method="get" action="dummy.html">
-                    <input type="text" name="query" class="search-header-query" placeholder="Search..." />
+                <form class="search-header" method="get" action="{% url search:haystack_search %}">
+                    <input type="text" name="q" class="search-header-query" placeholder="Search..." />
                 </form>
         </div>

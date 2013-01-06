@@ -10,10 +10,10 @@ var resizer = function () {
         elem.css({'height' : $(document).height()});
     }
 }
-//$(document).load(resizer);
-//$(document).ready(resizer);
-$(window).resize(resizer);
+//$(document).resize(resizer);
 $(window).load(resizer);
+$(window).ready(resizer);
+$(window).resize(resizer);
 
 function footer_login (){
   document.loginform.value = 'login';

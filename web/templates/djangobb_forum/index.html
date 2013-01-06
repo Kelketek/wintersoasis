@@ -79,7 +79,7 @@
 			</dl>
 			<dl class="conl">
 				<dt><strong>{% trans "User information" %}</strong></dt>
-				<dd>{% trans "Newest registered user:" %} {{ last_user|profile_link }}</dd>
+				<dd>{% trans "Newest registered user:" %} <a href={% url character:profile last_user %}>{{last_user}}</a></dd>
 				<dd>{% trans "Registered users online:" %} <strong>{{ online_count }}</strong></dd>
 				<dd>{% trans "Guests online:" %} <strong>{{ guest_count }}</strong></dd>
 			</dl>

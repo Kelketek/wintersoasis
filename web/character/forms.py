@@ -46,7 +46,6 @@ class Username(CharField):
             raise ValidationError("A character with that name already exists.")
         except User.DoesNotExist:
             pass
-            
 
 class NewCharacter(forms.Form):
     name = Username()

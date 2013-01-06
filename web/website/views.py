@@ -7,13 +7,11 @@ templates on the fly.
 """
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-#from django.contrib.auth.models import User
 from django.conf import settings
 
 #from src.objects.models import ObjectDB
 #from src.typeclasses.models import TypedObject
 #from src.players.models import PlayerDB
-from src.web.news.models import NewsEntry
 
 from djangobb_forum.templatetags import forum_extras
 
@@ -26,15 +24,8 @@ def page_index(request):
     # Some misc. configurable stuff.
     # TODO: Move this to either SQL or settings.py based configuration.
 
-    # A QuerySet of recent news entries.
-    news_entries = NewsEntry.objects.all().order_by('-date_posted')[:fpage_news_entries]
-    pagevars = {
-        "page_title": "Front Page",
-        "news_entries": news_entries,
-    }
-
     context_instance = RequestContext(request)
-    return render_to_response('index.html', pagevars, context_instance)
+    return render_to_response('index.html', context_instance)
 
 def to_be_implemented(request):
     """
