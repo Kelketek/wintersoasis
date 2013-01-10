@@ -64,7 +64,7 @@ CHANNEL_PUBLIC = ("Public", ('pub',), 'Public discussion',
                   "control:perm(Wizards);listen:all();send:all()")
 
 # Newbie channel
-CHANNEL_NEWBIE = ("Public", ('pub',), 'Newbie Channel',
+CHANNEL_NEWBIE = ("Newbie", ('new',), 'Newbie Channel',
                   "control:perm(Wizards);listen:all();send:all()")
 # General info about the server
 CHANNEL_MUDINFO = ("MUDinfo", '', 'Informative messages',
@@ -101,10 +101,10 @@ TEMPLATE_CONTEXT_PROCESSORS = tuple(set( TEMPLATE_CONTEXT_PROCESSORS + (
     'django.core.context_processors.request',
     'django_authopenid.context_processors.authopenid',
     'djangobb_forum.context_processors.forum_settings',
+    'django.contrib.messages.context_processors.messages',
 )))
 
 MEDIA_ROOT = os.path.join(GAME_DIR, "gamesrc", "oasis", "web", "media")
-
 STATIC_ROOT = os.path.join(GAME_DIR, "gamesrc", "oasis", "web", "static") 
 
 SERVE_MEDIA = True
@@ -113,15 +113,15 @@ MEDIA_URL = '/media/'
 
 STATIC_URL = '/static/'
 
-INSTALLED_APPS = tuple(set(INSTALLED_APPS + (
+INSTALLED_APPS = tuple(set((
     'south',
     'django_notify',
     'mptt',
     'sekizai',
     'sorl.thumbnail',
+    'wiki.plugins.notifications',
     'wiki',
     'wiki.plugins.attachments',
-    'wiki.plugins.notifications',
     'wiki.plugins.images',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -139,9 +139,31 @@ INSTALLED_APPS = tuple(set(INSTALLED_APPS + (
     'djangobb_forum',
     'haystack',
     'character',
+    'roster',
     'raven.contrib.django',
     'captcha',
+    'django.contrib.auth',
+    'django.contrib.sites',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.admin',
+    'django.contrib.admindocs',
+    'django.contrib.flatpages',
+    'src.server',
+    'src.players',
+    'src.objects',
+    'src.comms',
+    'src.help',
+    'src.scripts',
+    'dajaxice',
+    'dajax',
 )))
+
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'dajaxice.finders.DajaxiceFinder',
+)
 
 MIDDLEWARE_CLASSES = (
     #'sslify.middleware.SSLifyMiddleware',
@@ -165,26 +187,12 @@ DJANGOBB_GRAVATAR_SUPPORT = False
 GRAVATAR_DEFAULT = 'identicon'
 USE_TZ = True
 TIME_ZONE = "America/Chicago"
+DJANGOBB_DEFAULT_MARKUP = 'markdown'
 
 # Haystack settings
 HAYSTACK_SITECONF = os.path.join('game.gamesrc.oasis.web.search_sites')
 HAYSTACK_SEARCH_ENGINE = 'whoosh'
 HAYSTACK_WHOOSH_PATH = os.path.join(GAME_DIR, 'gamesrc', 'oasis', 'web', 'djangobb_index')
-
-# Django-article additions
-"""
-INSTALLED_APPS = tuple(set(INSTALLED_APPS + (
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.humanize',
-    'django.contrib.markup',
-    'django.contrib.sessions',
-    'django.contrib.sites',
-    'django.contrib.syndication',
-    'articles',
-)))
-"""
 
 TEMPLATE_CONTEXT_PROCESSORS = tuple(set(TEMPLATE_CONTEXT_PROCESSORS + (
     'django.contrib.auth.context_processors.auth',
@@ -193,7 +201,12 @@ TEMPLATE_CONTEXT_PROCESSORS = tuple(set(TEMPLATE_CONTEXT_PROCESSORS + (
     'django.core.context_processors.request',
 )))
 
-TEMPLATE_LOADERS = ('templateloaderwithpriorities.Loader', ) + TEMPLATE_LOADERS
+TEMPLATE_LOADERS = (
+    'templateloaderwithpriorities.Loader',
+    'django.template.loaders.filesystem.Loader',
+    'django.template.loaders.app_directories.Loader',
+    'django.template.loaders.eggs.Loader',
+ ) + TEMPLATE_LOADERS
 
 TEMPLATE_LOADER_PRIORITIES = [
     os.path.join(GAME_DIR, 'gamesrc', 'oasis', 'web', 'templates')
@@ -228,3 +241,6 @@ Fusce rutrum ullamcorper lorem vitae lacinia. Integer vel dui augue. Aenean a er
 
 # Wiki settings
 WIKI_ACCOUNT_HANDLING = False
+
+#DAJAX
+DAJAXICE_MEDIA_PREFIX="dajaxice"

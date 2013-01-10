@@ -13,6 +13,8 @@ if "notification" in settings.INSTALLED_APPS:
 else:
     notification = None
 
+CHARACTER = 0
+TIMESTAMP = 1
 
 def partial_pmatch(me, name, local_only=False):
     """
@@ -100,29 +102,12 @@ def current_object(thing):
     object was made before or on its time stamp.
     """
     thing, timestamp = thing
-    
     if not thing:
         return
     if timestamp >= int(thing.dbobj.date_created.strftime('%s')):
         return thing
     else:
         return
-
-def check_follow(user, target, ignores=True):
-    """
-    Checks to see if user follows target.
-    """
-    CHARACTER = 0
-    TIMESTAMP = 1
-    following = user.db.following
-    if not following:
-        return False
-    following = [ current_object(thing) for thing in following if current_object(thing) ]
-    if target in following:
-        if ignores:
-            if not check_ignores(target, [user], silent=True):
-                return False
-        return True
 
 def action_followers(user, function, kwargs, delay=0, respect_hide=True):
     """

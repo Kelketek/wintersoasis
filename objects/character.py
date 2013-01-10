@@ -18,9 +18,12 @@ this change, you have to convert them manually e.g. with the
 """
 import time
 from ev import Character
-from game.gamesrc.oasis.lib.oasis import action_followers, current_object, check_ignores, check_sleepers, check_hiding, ignored_notifications
+from collections import OrderedDict
+from django.core.urlresolvers import reverse
+from django.contrib.auth.models import User
+from game.gamesrc.oasis.lib.oasis import action_followers, object_stamp, current_object, check_ignores, check_sleepers, check_hiding, ignored_notifications, distill_list, CHARACTER, TIMESTAMP
 from game.gamesrc.oasis.lib.constants import ALERT
-from web.character.models import TagCategory, Tag
+from web.character.models import TagCategory, TagDef, Tag
 from settings import SERVERNAME
 
 class WOCharacter(Character):
@@ -61,21 +64,83 @@ class WOCharacter(Character):
             return
         target.msg(message)
 
-    def get_tags(self):
+    def get_tags(self, flat=False):
         """
-            Get tags on this characted back, organized into a dictionary by category name.
+            Get tags on this characted back, organized into an OrderedDict by
+        category name. The tags in each category will also be a dictionary of
+        true/false values. This method is only really practical if the number
+        of defined tags remains relativly small.
+
+        I'd say avoid doing this if you have more than a couple hundred tags.
         """
         tags_dict = {}
-        tags = Tag.objects.filter(character=self.dbobj)
-        for category in list(TagCategory.objects.all()):
-            tags_dict[category] = [ tag for tag in tags if tag.tag.category == category ]
+        categories = list(TagCategory.objects.all())
+        tag_defs = list(TagDef.objects.all())
+        character_tags = [tag.tag for tag in Tag.objects.filter(character=self) ]
+        if flat:
+            return character_tags
+        for category in categories:
+            tags_dict[category] = OrderedDict(sorted({tagdef : (tagdef in character_tags) for tagdef in TagDef.objects.filter(category=category)}.items(), key=lambda tagkey: tagkey[0].name))
         return tags_dict
+
+    def get_alts(self, raw=False):
+        """
+            Get all verified alts of a character. If raw is true, gets even
+        unverified characters. Don't use raw for security purpose, only for
+        investigative purposes.
+            If raw is false and the user is not active, always returns an empty
+        list.
+        """
+        user = self.player.user
+        if not raw and not user.is_active:
+            return []
+        try:
+            alts = [ alt.get_profile().character for alt in User.objects.filter(email__iexact=user.email) if alt.is_active or raw ]
+            return alts
+        except AttributeError:
+            return []
+
+    def check_list(self, target, listname, ignores=True):
+        """
+        Checks to see if target is in one of the character's personal lists.
+        """
+        list_to_check = getattr(self.db, listname)
+        if not list_to_check:
+            return False
+        list_to_check = distill_list(list_to_check)
+        if target in list_to_check:
+            if ignores:
+                if not check_ignores(target, [self], silent=True):
+                    return False
+            return True
+        return False
+
+    def toggle_list(self, target, toggle, listname):
+        """
+        Toggles the presence of a user in a personal list.
+        """
+        CHARACTER = 0
+        if toggle:
+             character_list = distill_list(getattr(self.db, listname), preserve_format=True)
+             character_list.append(object_stamp(target))
+             setattr(self.db, listname, character_list)
+        else:
+             old_list = distill_list(getattr(self.db, listname), preserve_format=True)
+             new_list = [ stamp for stamp in old_list if stamp[CHARACTER] != target ]
+             setattr(self.db, listname, new_list)
+
+
+    def get_absolute_url(self):
+        """
+        Get the URL to a user's profile.
+        """
+        return reverse('character:profile', args=[self.name])
 
     def delete(self):
         """
             Delete the object with all standard checks, and any extras we've defined for it.
         """
-        result = super(WOCharacter, 'delete')
+        result = super(WOCharacter, self).delete()
         if result:
             for tag in Tag.objects.filter(character=self.dbobj):
                 tag.delete()
