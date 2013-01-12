@@ -97,25 +97,12 @@ class Approval(models.Model):
     approvers = models.ManyToManyField(ObjectDB, related_name='+', default=None, symmetrical=False)
     queued = models.BooleanField(default=True)
 
-class Sex(models.Model):
-    """
-    Defines a gender and its associated pronouns.
-    """
-    name = models.CharField(max_length=30)
-    absolute = models.CharField(max_length=10)
-    subjective = models.CharField(max_length=10)
-    objective = models.CharField(max_length=10)
-    possessive = models.CharField(max_length=10)
-    reflexive = models.CharField(max_length=10)
-
 class CharacterInfo(models.Model):
     """
     Character's Description and Background.
     """
     character = models.ForeignKey(ObjectDB, db_index=True, unique=True, related_name='+')
     background = models.TextField(max_length=32768)
-    sex = models.ForeignKey(Sex, null=True, default=None)
-    species = models.CharField(max_length=30)
     upgrades = models.IntegerField(default=0)
 
 class ApplaudCategory(models.Model):
@@ -134,5 +121,5 @@ class Applaud(models.Model):
     applauder = models.ForeignKey(ObjectDB, db_index=True, related_name='+')
     category = models.ForeignKey(ApplaudCategory, db_index=True, related_name='+')
     time = models.DateField(auto_now_add=True)
-    scene_desc = models.TextField()
-    action_desc = models.TextField()
+    scene_desc = models.TextField(max_length=2048)
+    action_desc = models.TextField(max_length=2048)
