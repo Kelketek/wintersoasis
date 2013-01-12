@@ -115,7 +115,7 @@ def action_followers(user, function, kwargs, delay=0, respect_hide=True):
     """
     online_users = [ session.get_character() for session in SESSIONS.sessions.values() if session.get_character() ]
     for target in online_users:
-        if check_follow(target, user):
+        if user.check_list(target, "following"):
             kwargs['target'] = target
             kwargs['user'] = user
             if target.locks.check_lockstring(target, 'admin:perm(Wizards)'):

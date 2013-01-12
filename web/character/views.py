@@ -8,6 +8,7 @@ from django.conf import settings
 from django.db import transaction
 from character.models import TagCategory, Tag
 from src.objects.models import ObjectDB
+from src.utils.idmapper.base import flush_cache
 
 class Generic:
     def __str__(self):
@@ -81,6 +82,7 @@ def profile(request, username):
     """
     Character profile
     """
+    flush_cache()
     try:
         user = User.objects.get(username__iexact=username)
         character = user.get_profile().character
