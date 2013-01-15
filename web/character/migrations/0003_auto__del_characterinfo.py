@@ -8,126 +8,19 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'StatDef'
-        db.create_table('character_statdef', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=20)),
-            ('description', self.gf('django.db.models.fields.CharField')(max_length=4086)),
-        ))
-        db.send_create_signal('character', ['StatDef'])
-
-        # Adding model 'StaffNote'
-        db.create_table('character_staffnote', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('character', self.gf('django.db.models.fields.related.ForeignKey')(related_name='+', to=orm['objects.ObjectDB'])),
-            ('staffer', self.gf('django.db.models.fields.related.ForeignKey')(default=None, related_name='+', null=True, to=orm['objects.ObjectDB'])),
-            ('time', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-        ))
-        db.send_create_signal('character', ['StaffNote'])
-
-        # Adding model 'Quality'
-        db.create_table('character_quality', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('character', self.gf('django.db.models.fields.related.ForeignKey')(related_name='+', to=orm['objects.ObjectDB'])),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=50)),
-            ('description', self.gf('django.db.models.fields.CharField')(max_length=280)),
-        ))
-        db.send_create_signal('character', ['Quality'])
-
-        # Adding model 'PlayerSortName'
-        db.create_table('character_playersortname', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(unique=True, max_length=30)),
-        ))
-        db.send_create_signal('character', ['PlayerSortName'])
-
-        # Adding model 'Stat'
-        db.create_table('character_stat', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('character', self.gf('django.db.models.fields.related.ForeignKey')(related_name='+', to=orm['objects.ObjectDB'])),
-            ('category', self.gf('django.db.models.fields.related.ForeignKey')(related_name='+', to=orm['character.StatDef'])),
-            ('value', self.gf('django.db.models.fields.IntegerField')()),
-        ))
-        db.send_create_signal('character', ['Stat'])
-
-        # Adding model 'PlayerSort'
-        db.create_table('character_playersort', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('character', self.gf('django.db.models.fields.related.ForeignKey')(related_name='+', to=orm['objects.ObjectDB'])),
-            ('category', self.gf('django.db.models.fields.related.ForeignKey')(related_name='+', to=orm['character.PlayerSortName'])),
-        ))
-        db.send_create_signal('character', ['PlayerSort'])
-
-        # Adding model 'Approval'
-        db.create_table('character_approval', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('character', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['objects.ObjectDB'], unique=True)),
-            ('time_submitted', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now)),
-            ('queued', self.gf('django.db.models.fields.BooleanField')(default=False)),
-        ))
-        db.send_create_signal('character', ['Approval'])
-
-        # Adding M2M table for field approvers on 'Approval'
-        db.create_table('character_approval_approvers', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('approval', models.ForeignKey(orm['character.approval'], null=False)),
-            ('objectdb', models.ForeignKey(orm['objects.objectdb'], null=False))
-        ))
-        db.create_unique('character_approval_approvers', ['approval_id', 'objectdb_id'])
-
-        # Adding model 'CharacterInfo'
-        db.create_table('character_characterinfo', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('character', self.gf('django.db.models.fields.related.ForeignKey')(related_name='+', unique=True, to=orm['objects.ObjectDB'])),
-            ('background', self.gf('django.db.models.fields.CharField')(max_length=32768)),
-            ('sex', self.gf('django.db.models.fields.related.ForeignKey')(default=None, to=orm['character.Sex'], null=True)),
-            ('species', self.gf('django.db.models.fields.CharField')(max_length=30)),
-        ))
-        db.send_create_signal('character', ['CharacterInfo'])
-
-        # Adding model 'Sex'
-        db.create_table('character_sex', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=30)),
-            ('absolute', self.gf('django.db.models.fields.CharField')(max_length=10)),
-            ('subjective', self.gf('django.db.models.fields.CharField')(max_length=10)),
-            ('objective', self.gf('django.db.models.fields.CharField')(max_length=10)),
-            ('possessive', self.gf('django.db.models.fields.CharField')(max_length=10)),
-            ('reflexive', self.gf('django.db.models.fields.CharField')(max_length=10)),
-        ))
-        db.send_create_signal('character', ['Sex'])
-
-
-    def backwards(self, orm):
-        # Deleting model 'StatDef'
-        db.delete_table('character_statdef')
-
-        # Deleting model 'StaffNote'
-        db.delete_table('character_staffnote')
-
-        # Deleting model 'Quality'
-        db.delete_table('character_quality')
-
-        # Deleting model 'PlayerSortName'
-        db.delete_table('character_playersortname')
-
-        # Deleting model 'Stat'
-        db.delete_table('character_stat')
-
-        # Deleting model 'PlayerSort'
-        db.delete_table('character_playersort')
-
-        # Deleting model 'Approval'
-        db.delete_table('character_approval')
-
-        # Removing M2M table for field approvers on 'Approval'
-        db.delete_table('character_approval_approvers')
-
         # Deleting model 'CharacterInfo'
         db.delete_table('character_characterinfo')
 
-        # Deleting model 'Sex'
-        db.delete_table('character_sex')
+
+    def backwards(self, orm):
+        # Adding model 'CharacterInfo'
+        db.create_table('character_characterinfo', (
+            ('player', self.gf('django.db.models.fields.related.ForeignKey')(related_name='+', unique=True, to=orm['players.PlayerDB'])),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('background', self.gf('django.db.models.fields.TextField')(max_length=32768)),
+            ('upgrades', self.gf('django.db.models.fields.IntegerField')(default=0)),
+        ))
+        db.send_create_signal('character', ['CharacterInfo'])
 
 
     models = {
@@ -160,27 +53,37 @@ class Migration(SchemaMigration):
             'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'}),
             'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
         },
+        'character.applaud': {
+            'Meta': {'object_name': 'Applaud'},
+            'action_desc': ('django.db.models.fields.TextField', [], {'max_length': '2048'}),
+            'applauder': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'to': "orm['players.PlayerDB']"}),
+            'category': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'to': "orm['character.ApplaudCategory']"}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'player': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'to': "orm['players.PlayerDB']"}),
+            'scene_desc': ('django.db.models.fields.TextField', [], {'max_length': '2048'}),
+            'time': ('django.db.models.fields.DateField', [], {'auto_now_add': 'True', 'blank': 'True'})
+        },
+        'character.applaudcategory': {
+            'Meta': {'object_name': 'ApplaudCategory'},
+            'archived': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
+            'player': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'to': "orm['players.PlayerDB']"})
+        },
         'character.approval': {
             'Meta': {'object_name': 'Approval'},
-            'approvers': ('django.db.models.fields.related.ManyToManyField', [], {'default': 'None', 'related_name': "'+'", 'symmetrical': 'False', 'to': "orm['objects.ObjectDB']"}),
-            'character': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['objects.ObjectDB']", 'unique': 'True'}),
+            'approvers': ('django.db.models.fields.related.ManyToManyField', [], {'default': 'None', 'related_name': "'+'", 'symmetrical': 'False', 'to': "orm['players.PlayerDB']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'queued': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'time_submitted': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'})
-        },
-        'character.characterinfo': {
-            'Meta': {'object_name': 'CharacterInfo'},
-            'background': ('django.db.models.fields.CharField', [], {'max_length': '32768'}),
-            'character': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'unique': 'True', 'to': "orm['objects.ObjectDB']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'sex': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': "orm['character.Sex']", 'null': 'True'}),
-            'species': ('django.db.models.fields.CharField', [], {'max_length': '30'})
+            'player': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['players.PlayerDB']", 'unique': 'True'}),
+            'queued': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
+            'time_submitted': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'db_index': 'True'})
         },
         'character.playersort': {
             'Meta': {'object_name': 'PlayerSort'},
             'category': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'to': "orm['character.PlayerSortName']"}),
-            'character': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'to': "orm['objects.ObjectDB']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'player': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'to': "orm['players.PlayerDB']"}),
+            'target': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'to': "orm['players.PlayerDB']"})
         },
         'character.playersortname': {
             'Meta': {'object_name': 'PlayerSortName'},
@@ -189,34 +92,24 @@ class Migration(SchemaMigration):
         },
         'character.quality': {
             'Meta': {'object_name': 'Quality'},
-            'character': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'to': "orm['objects.ObjectDB']"}),
-            'description': ('django.db.models.fields.CharField', [], {'max_length': '280'}),
+            'description': ('django.db.models.fields.CharField', [], {'max_length': '300'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
-        },
-        'character.sex': {
-            'Meta': {'object_name': 'Sex'},
-            'absolute': ('django.db.models.fields.CharField', [], {'max_length': '10'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
-            'objective': ('django.db.models.fields.CharField', [], {'max_length': '10'}),
-            'possessive': ('django.db.models.fields.CharField', [], {'max_length': '10'}),
-            'reflexive': ('django.db.models.fields.CharField', [], {'max_length': '10'}),
-            'subjective': ('django.db.models.fields.CharField', [], {'max_length': '10'})
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
+            'player': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'to': "orm['players.PlayerDB']"})
         },
         'character.staffnote': {
             'Meta': {'object_name': 'StaffNote'},
-            'character': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'to': "orm['objects.ObjectDB']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'staffer': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'related_name': "'+'", 'null': 'True', 'to': "orm['objects.ObjectDB']"}),
+            'player': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'to': "orm['players.PlayerDB']"}),
+            'staffer': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'related_name': "'+'", 'null': 'True', 'to': "orm['players.PlayerDB']"}),
             'time': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'})
         },
         'character.stat': {
             'Meta': {'object_name': 'Stat'},
             'category': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'to': "orm['character.StatDef']"}),
-            'character': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'to': "orm['objects.ObjectDB']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'value': ('django.db.models.fields.IntegerField', [], {})
+            'player': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'to': "orm['players.PlayerDB']"}),
+            'value': ('django.db.models.fields.IntegerField', [], {'default': '0'})
         },
         'character.statdef': {
             'Meta': {'object_name': 'StatDef'},
@@ -226,8 +119,8 @@ class Migration(SchemaMigration):
         },
         'character.tag': {
             'Meta': {'object_name': 'Tag'},
-            'character': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'to': "orm['objects.ObjectDB']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'player': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'to': "orm['players.PlayerDB']"}),
             'tag': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['character.TagDef']"})
         },
         'character.tagcategory': {

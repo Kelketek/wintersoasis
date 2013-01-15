@@ -76,7 +76,7 @@ class WOCharacter(Character):
         tags_dict = {}
         categories = list(TagCategory.objects.all())
         tag_defs = list(TagDef.objects.all())
-        character_tags = [tag.tag for tag in Tag.objects.filter(character=self) ]
+        character_tags = [tag.tag for tag in Tag.objects.filter(player=self.player) ]
         if flat:
             return character_tags
         for category in categories:

@@ -38,8 +38,8 @@ class Tag(models.Model):
             return unicode(self.tag.name)
         except:
             return unicode("((Defunct))")
-    character = models.ForeignKey(ObjectDB, db_index=True, related_name='+')
-    tag = models.ForeignKey(TagDef, db_index=True)
+    player = models.ForeignKey(PlayerDB, db_index=True, related_name='+')
+    tag = models.ForeignKey(TagDef, db_index=True, related_name='+')
 
 class PlayerSortName(models.Model):
     """
@@ -53,63 +53,32 @@ class PlayerSort(models.Model):
     """
     A list of players one may keep to define things like friends lists, or ignores.
     """
-    character = models.ForeignKey(ObjectDB, db_index=True, related_name='+')
-    target = models.ForeignKey(ObjectDB, db_index=True, related_name='+')
+    player = models.ForeignKey(PlayerDB, db_index=True, related_name='+')
+    target = models.ForeignKey(PlayerDB, db_index=True, related_name='+')
     category = models.ForeignKey(PlayerSortName, db_index=True, related_name='+')
 
 class StaffNote(models.Model):
     """
     Notes written by staff members about a player and their application.
     """
-    character = models.ForeignKey(ObjectDB, db_index=True, related_name='+')
-    staffer = models.ForeignKey(ObjectDB, db_index=True, null=True, default=None, related_name='+')
+    player = models.ForeignKey(PlayerDB, db_index=True, related_name='+')
+    staffer = models.ForeignKey(PlayerDB, db_index=True, null=True, default=None, related_name='+')
     time = models.DateTimeField(auto_now_add=True)
-
-class StatDef(models.Model):
-    """
-    Class used for defining the stats the game uses.
-    """
-    name = models.CharField(max_length=20)
-    description = models.CharField(max_length=4086)
-
-class Stat(models.Model):
-    """
-    The value of a stat for a character.
-    """
-    character = models.ForeignKey(ObjectDB, db_index=True, related_name='+')
-    category = models.ForeignKey(StatDef, related_name='+')
-    value = models.IntegerField(default=0)
-
-class Quality(models.Model):
-    """
-    Custom Character Qualities.
-    """
-    character = models.ForeignKey(ObjectDB, db_index=True, related_name='+')
-    name = models.CharField(max_length=50)
-    description = models.CharField(max_length=280)
 
 class Approval(models.Model):
     """
     Approval Status.
     """
-    character = models.ForeignKey(ObjectDB, db_index=True, unique=True)
+    player = models.ForeignKey(PlayerDB, db_index=True, unique=True)
     time_submitted = models.DateTimeField(default=datetime.now, db_index=True)
-    approvers = models.ManyToManyField(ObjectDB, related_name='+', default=None, symmetrical=False)
-    queued = models.BooleanField(default=True)
-
-class CharacterInfo(models.Model):
-    """
-    Character's Description and Background.
-    """
-    character = models.ForeignKey(ObjectDB, db_index=True, unique=True, related_name='+')
-    background = models.TextField(max_length=32768)
-    upgrades = models.IntegerField(default=0)
+    approvers = models.ManyToManyField(PlayerDB, related_name='+', default=None, symmetrical=False)
+    queued = models.BooleanField(default=True, db_index=True)
 
 class ApplaudCategory(models.Model):
     """
     A category of applause for a user.
     """
-    character = models.ForeignKey(ObjectDB, db_index=True, related_name='+')
+    player = models.ForeignKey(PlayerDB, db_index=True, related_name='+')
     name = models.CharField(max_length=30)
     archived = models.BooleanField(default=False)
 
@@ -117,9 +86,9 @@ class Applaud(models.Model):
     """
     A commendation given from one user to another.
     """
-    character = models.ForeignKey(ObjectDB, db_index=True, related_name='+')
-    applauder = models.ForeignKey(ObjectDB, db_index=True, related_name='+')
-    category = models.ForeignKey(ApplaudCategory, db_index=True, related_name='+')
+    player = models.ForeignKey(PlayerDB, db_index=True, related_name='+')
+    applauder = models.ForeignKey(PlayerDB, db_index=True, null=True, related_name='+')
+    category = models.ForeignKey(ApplaudCategory, null=True, db_index=True, related_name='+')
     time = models.DateField(auto_now_add=True)
     scene_desc = models.TextField(max_length=2048)
     action_desc = models.TextField(max_length=2048)
