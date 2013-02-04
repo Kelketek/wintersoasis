@@ -1,6 +1,3 @@
-"""
-Forms used for Character manipulation
-"""
 import regex
 from django.contrib.auth.models import User
 from django import forms
@@ -33,6 +30,8 @@ class ComposeMail(forms.Form):
         MAIN = 0
         if recipients:
             for recipient in [ target.strip() for target in recipients.split(',') ]:
+                if not recipient:
+                    continue
                 try:
                     recipient = ev.search_player(recipient)[MAIN].character
                 except IndexError:
@@ -41,5 +40,7 @@ class ComposeMail(forms.Form):
                     raise ValidationError('Player %s is ignoring you.' % recipient.name)
                 targets.append(recipient)
         else:
+            raise ValidationError('You must specify recipients.')
+        if not targets:
             raise ValidationError('You must specify recipients.')
         return targets

@@ -82,6 +82,9 @@ urlpatterns = patterns('',
     # Character related stuff.
     url(r'^character/', include('character.urls', namespace='character')),
 
+    # Mail stuff
+    url(r'^mail/', include('mail.urls', namespace='mail')),
+
     # Search utilities
     url(r'^search/', include('haystack.urls', namespace='search')),
 

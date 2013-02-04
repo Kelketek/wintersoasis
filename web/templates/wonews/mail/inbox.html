@@ -1,4 +1,4 @@
-{% extends "character/mail/base.html" %} 
+{% extends "mail/base.html" %} 
 {% load i18n %} 
 {% block content %}
 <h1>{% trans "Inbox" %}</h1>
@@ -13,14 +13,15 @@
     <tbody>
 {% for message in message_list %} 
     <tr>
+        {% if message.new %}<strong>{% endif %}
         <td>{{ message.sender_names }}</td>
         <td>
             {% if message.new %}<strong>{% endif %}
-            {% if message.replied %}<em>{% endif %}
             <a href="{{message.get_absolute_url }}">{{ message.subject }}</a>
-            {% if message.replied %}</em>{% endif %}
-            {% if message.new %}</strong>{% endif %}</td>
+            {% if message.new %}</strong>{% endif %}
+        </td>
         <td>{{ message.sent_at|date:_("DATETIME_FORMAT") }}</td>
+        {% if message.new %}</strong>{% endif %}
     </tr>
 {% endfor %}
     </tbody>
@@ -28,4 +29,7 @@
 {% else %}
 <p>{% trans "No messages." %}</p>
 {% endif %}  
+<form method="link" action="{% url mail:compose %}">
+<input type="submit" value="Compose message" />
+</form>
 {% endblock %}

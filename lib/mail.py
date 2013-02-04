@@ -28,7 +28,7 @@ class Mail:
         Creates a wrapper around a stored mail message to make more easily
     manipulated for mail purposes.
     """
-    def __init__(self, message):
+    def __init__(self, message, character):
        message, timestamp, read = message
        self.message = message
        self.id = message.id
@@ -39,7 +39,8 @@ class Mail:
        self.body = message.message
        self.sender_names = ', '.join([ sender.name for sender in self.senders ])
        self.recipient_names =  ', '.join([ recipient.name for recipient in self.recipients ])
-       self.get_absolute_url = reverse('character:view_message', kwargs={ 'msg_id' : self.message.id })
+       self.get_absolute_url = reverse('mail:view_message', kwargs={ 'msg_id' : self.message.id })
+       self.reply_all = ', '.join([ self.sender_names ] + [ name.strip() for name in self.recipient_names.split(',') if character.name != name.strip() ])
        if read:
            self.new = False
        else:
@@ -61,6 +62,7 @@ On %s, %s wrote:
             return True
         else:
             return False
+
     def delete(self, character):
         """
            Deletes a message from a character's inbox.
