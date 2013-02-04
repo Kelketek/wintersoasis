@@ -6,6 +6,8 @@ from defaults.constants_default import *
 
 NEXUS = "#206"
 
-EMAIL = True
+IC_START = "#492"
+
+EMAIL = False
 
 MAIL_FROM = 'messages@wintersoasis.com'

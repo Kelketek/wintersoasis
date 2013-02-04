@@ -1,0 +1,54 @@
+{% extends "character/mail/base.html" %} 
+{% load i18n %}
+{% block extra_styles %}
+
+{% endblock %} 
+{% block content %} 
+<h1>{% trans "Compose Message"%}</h1>
+<form action="" method="post">
+{% csrf_token %}
+    <table class="form_entry">
+        <tr>
+            <td class="form_label"><label>&raquo; To:</label></td>
+            <td>{{ form.to }}</td>
+        </tr>
+    </table>
+    <span class="form_error">{{ form.to.errors }}</span>
+    <table class="form_entry">
+        <tr>
+            <td class="form_label"><label>&raquo; Subject:</label></td>
+            <td>{{ form.subject }}</td>
+        </tr>
+    </table>
+    <span class="form_error">{{ form.subject.errors }}</span>
+    <table class="form_entry">
+        <tr>
+            <td class="form_label"><label>&raquo; Message:</label></td>
+            <td>{{ form.message }}</td>
+        </tr>
+    </table>
+    <span class="form_error">{{ form.message.errors }}</span>
+    <table class="form_entry">
+       <tr>
+            <td class="form_label"></td>
+            <td><input type="submit" value="{% trans "Send" %} &raquo;"/></td>
+        </tr>
+    </table>
+    <input type="hidden" name="send" value="True" />
+</form>
+
+{% endblock %}
+{% block footer_scripts %}
+<script type='text/javascript' src="{{ MEDIA_URL }}javascript/jquery.autocomplete.js"></script>
+<script type='text/javascript'>
+$('#id_to').autocomplete({
+    serviceUrl: '{% url character:character_lookup %}',
+    delimiter: RegExp(',[ ]?'),
+    tabDisabled: true,
+    autoSelectFirst: true,
+    onSelect: function(suggestion) {
+        this.value=this.value + ', ';
+    },
+});
+</script>
+{% endblock %}

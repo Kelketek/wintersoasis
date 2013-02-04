@@ -9,6 +9,7 @@
 # (also, the master config file may change with server updates).
 #
 from src.settings_default import *
+import os, sys
 ######################################################################
 # Evennia base server config
 ######################################################################
@@ -19,7 +20,7 @@ SSL_ENABLED = True
 # Ports to use for SSL
 SSL_PORTS = [8802]
 TELNET_PORTS = [8888, 4322]
-ALLOW_MULTISESSION = False
+ALLOW_MULTISESSION = True
 
 CHARACTER_DEFAULT_HOME = "#153"
 ######################################################################
@@ -43,6 +44,7 @@ CMDSET_OOC = "game.gamesrc.oasis.commands.standard.OOCCmdSet"
 # Typeclasses
 ######################################################################
 BASE_CHARACTER_TYPECLASS = "game.gamesrc.oasis.objects.character.WOCharacter"
+BASE_PLAYER_TYPECLASS = "game.gamesrc.oasis.objects.player.WOPlayer"
 ######################################################################
 # Batch processors
 ######################################################################
@@ -54,7 +56,7 @@ BASE_CHARACTER_TYPECLASS = "game.gamesrc.oasis.objects.character.WOCharacter"
 ######################################################################
 # In-game access
 ######################################################################
-
+LOCK_FUNC_MODULES = LOCK_FUNC_MODULES + ("game.gamesrc.oasis.conf.lockfuncs",)
 ######################################################################
 # In-game Channels created from server start
 ######################################################################
@@ -86,7 +88,7 @@ ADMINS = ('kelketek@gmail.com',)
 
 SERVER_EMAIL = 'messages@wintersoasis.com'
 
-ROOT_URLCONF = "game.gamesrc.oasis.web.urls"
+ROOT_URLCONF = "web.urls"
 
 ACTIVE_TEMPLATE = 'wonews'
 
@@ -107,7 +109,7 @@ TEMPLATE_CONTEXT_PROCESSORS = tuple(set( TEMPLATE_CONTEXT_PROCESSORS + (
 MEDIA_ROOT = os.path.join(GAME_DIR, "gamesrc", "oasis", "web", "media")
 STATIC_ROOT = os.path.join(GAME_DIR, "gamesrc", "oasis", "web", "static") 
 
-SERVE_MEDIA = True
+SERVE_MEDIA = False
 
 MEDIA_URL = '/media/'
 
@@ -133,7 +135,6 @@ INSTALLED_APPS = tuple(set((
     'django.contrib.admindocs',
     'django.contrib.humanize',
     'django.contrib.markup',
-    'registration',
     'pagination',
     'django_authopenid',
     'djangobb_forum',
@@ -157,6 +158,7 @@ INSTALLED_APPS = tuple(set((
     'src.scripts',
     'dajaxice',
     'dajax',
+    'selectable',
 )))
 
 STATICFILES_FINDERS = (

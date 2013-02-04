@@ -7,7 +7,8 @@ from ev import default_cmds
 from src.commands.default import comms
 from contrib.extended_room import CmdExtendedLook 
 from game.gamesrc.oasis.commands import quote, character_commands, rp_say, \
-    page, warps, mail, ignore, lineeditor, senses, who, follow, hide_from, unloggedin
+    page, warps, mail, ignore, lineeditor, senses, who, follow, hide_from, unloggedin, \
+    quit
 
 from contrib import menusystem
 #from contrib import misc_commands
@@ -48,6 +49,7 @@ class DefaultCmdSet(default_cmds.DefaultCmdSet):
         self.add(quote.Quote())
         self.add(character_commands.WhoSpec())
         self.add(character_commands.Sheet())
+        self.add(quit.Quit())
         #self.add(CmdExtendedLook())
 
         self.add(rp_say.Say())
@@ -56,6 +58,7 @@ class DefaultCmdSet(default_cmds.DefaultCmdSet):
         self.add(page.Page())
         self.add(page.Whisper())
         self.add(warps.Nexus())
+        self.add(warps.IC())
         self.add(mail.Mail())
         self.add(ignore.Ignore())
         self.add(ignore.Unignore())

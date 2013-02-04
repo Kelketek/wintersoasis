@@ -167,6 +167,7 @@ In a freeform post, your name is always appended to the end.
                 self.say_sets[choice] = True
             self.caller.msg("Option '" + choice + "' toggled to '" \
                 + str(self.say_sets[choice]) + "'.")
+            self.caller.db.say = self.say_sets
             return True
 
     def ooc_preprocess(self):
@@ -399,6 +400,7 @@ In a freeform post, your name is always appended to the end.
             else:
                 message = self.pose_format(self.args)
 
+        print message
         # calling the speech hook on the location
         caller.location.at_say(caller, message)
 

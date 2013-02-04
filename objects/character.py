@@ -23,6 +23,8 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from game.gamesrc.oasis.lib.oasis import action_followers, object_stamp, current_object, check_ignores, check_sleepers, check_hiding, ignored_notifications, distill_list, CHARACTER, TIMESTAMP
 from game.gamesrc.oasis.lib.constants import ALERT
+
+from lib.oasis import object_stamp
 from web.character.models import TagCategory, TagDef, Tag
 from settings import SERVERNAME
 
@@ -159,8 +161,9 @@ class WOCharacter(Character):
         # save location again to be sure
         self.db.prelogout_location = self.location
 
-        self.location.msg_contents("{c%s has connected." % self.name, exclude=[self])
-        self.location.at_object_receive(self, self.location)
+        if self.location:
+            self.location.msg_contents("{c%s has connected." % self.name, exclude=[self])
+            self.location.at_object_receive(self, self.location)
         # Save login time.
         if len(self.sessions) <= 1:
             self.db.laston = time.time()
@@ -174,6 +177,11 @@ class WOCharacter(Character):
         self.execute_cmd('look')
         self.execute_cmd('mail/check quiet')
         self.execute_cmd('follow')
+
+    def at_after_move(self, source_location):
+        if self.location and self.location.db.ic:
+            self.db.ic_location = object_stamp(self.location)
+        super(WOCharacter, self).at_after_move(source_location)
 
     def at_disconnect(self):
         """

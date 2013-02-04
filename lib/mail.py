@@ -31,22 +31,51 @@ class Mail:
     def __init__(self, message):
        message, timestamp, read = message
        self.message = message
+       self.id = message.id
        self.subject = message.header
        self.senders = [ character.typeclass for character in message.senders if int(character.dbobj.date_created.strftime('%s')) <= int(timestamp.strftime('%s')) ]
        self.recipients = [ character.typeclass for character in message.receivers if int(character.dbobj.date_created.strftime('%s')) <= int(timestamp.strftime('%s')) ]
        self.sent_at = timestamp
+       self.body = message.message
        self.sender_names = ', '.join([ sender.name for sender in self.senders ])
        self.recipient_names =  ', '.join([ recipient.name for recipient in self.recipients ])
-       # Bogus temporary values
-       self.read_at = time.time()
-       self.replied_at = time.time()
-       self.sender_deleted_at = time.time()
-       self.recipient_deleted_at = time.time()
-       self.get_absolute_url = reverse('messages_detail', args=[self.message.id])
+       self.get_absolute_url = reverse('character:view_message', kwargs={ 'msg_id' : self.message.id })
        if read:
            self.new = False
        else:
            self.new = True
+       self.reply_text = ("""
+
+***
+On %s, %s wrote:
+
+""" % (self.sent_at.strftime("%Y-%m-%d %H:%M:%S"), self.sender_names) + self.body)[:2500]
+
+    def has_message(self, character):
+        """
+            Checks to see if a user has this message.
+        """
+        messages = get_messages(character)
+        messages = [ message[MESSAGE].id for message in messages ]
+        if self.message.id in messages:
+            return True
+        else:
+            return False
+    def delete(self, character):
+        """
+           Deletes a message from a character's inbox.
+        If that character was the last one to have a copy, deletes the
+        message itself.
+        """
+        messages = [ message for message in get_messages(character) if message[MESSAGE].id != self.message.id ]
+        character.db.mail = messages
+        found = False
+        for target in self.recipients:
+            if self.has_message(target):
+                found = True
+                break
+        if not found:
+            self.message.delete()
 
 def get_messages(character):
     """

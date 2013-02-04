@@ -6,6 +6,9 @@ from settings import SERVERNAME
 # DBREF of the OOC meeting place used for the nexus command.
 NEXUS = "#2"
 
+# DBREF of the first IC room people warp into.
+IC_START = "#2"
+
 # Format of alert messages for use with %.
 ALERT = "{g[{y!{g] {c%s{n"
 

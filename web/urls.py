@@ -87,6 +87,7 @@ urlpatterns = patterns('',
 
     # AJAX stuff
     url(dajaxice_config.dajaxice_url, include('dajaxice.urls')),
+    url(r'^selectable/', include('selectable.urls')),
 
     url(r'^$', 'views.page_index'),
 )

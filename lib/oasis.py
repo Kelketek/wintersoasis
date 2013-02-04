@@ -7,6 +7,7 @@ import time
 from constants import *
 from ev import utils
 from src.server.sessionhandler import SESSIONS
+from twisted.internet import reactor
 
 if "notification" in settings.INSTALLED_APPS:
     from notification import models as notification

@@ -1,3 +1,4 @@
+import json
 from dajax.core import Dajax
 from dajaxice.decorators import dajaxice_register
 from character.models import TagDef, Tag
@@ -86,6 +87,6 @@ def tags_save(request, character, tag_list):
                 tag.delete()
     for tag in tags:
         if tag not in character_tags:
-            Tag(character=character, tag=tag).save()
+            Tag(player=character.player, tag=tag).save()
     dajax.assign('#tag_error', 'innerHTML', "Saved.")
     return dajax.json()

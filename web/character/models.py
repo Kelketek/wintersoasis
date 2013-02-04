@@ -89,6 +89,17 @@ class Applaud(models.Model):
     player = models.ForeignKey(PlayerDB, db_index=True, related_name='+')
     applauder = models.ForeignKey(PlayerDB, db_index=True, null=True, related_name='+')
     category = models.ForeignKey(ApplaudCategory, null=True, db_index=True, related_name='+')
-    time = models.DateField(auto_now_add=True)
+    time = models.DateField(auto_now_add=True, db_index=True)
     scene_desc = models.TextField(max_length=2048)
     action_desc = models.TextField(max_length=2048)
+
+class StatList(models.Model):
+    """
+    Character Stats. We use these here for better consistency and manipulation control.
+    """
+    player = models.ForeignKey(PlayerDB, db_index=True, related_name='+', unique=True)
+    body = models.IntegerField()
+    expression = models.IntegerField()
+    focus = models.IntegerField()
+    mind = models.IntegerField()
+    soul = models.IntegerField()

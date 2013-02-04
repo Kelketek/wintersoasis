@@ -9,38 +9,26 @@ from ev import default_cmds
 from ev import utils
 from src.server.sessionhandler import SESSIONS
 from settings import *
+from lib.oasis import current_object
 
-"""
-This sets up the basis for a Evennia's 'MUX-like' command
-    style. The idea is that most other Mux-related commands should
-    just inherit from this and don't have to implement parsing of
-    their own unless they do something particularly advanced.
+MAIN = 0
 
-A MUXCommand command understands the following possible syntax:
+def pre_warp(caller):
+    """
+    Thing to do before warping someone.
+    """
+    message = "{y>> {C%s is loaded into a giant steam cannon and PUM!ed away.{n" % caller
+    caller.location.at_say(caller, message)
+    caller.location.msg_contents(message)
 
-    name[ with several words][/switch[/switch..]] arg1[,arg2,...] [[=|,] arg[,..]]
+def post_warp(caller):
+    """
+    Thing to do after warping someone.
+    """
+    message = "{y>> {C%s crash-lands into the ground with a considerable THUD!{n" % caller
+    caller.location.at_say(caller, message)
+    caller.location.msg_contents(message)
 
-The 'name[ with several words]' part is already dealt with by the
-    cmdhandler at this point, and stored in self.cmdname. The rest is stored
-    in self.args.
-
-The MuxCommand parser breaks self.args into its constituents and stores them in the
-    following variables:
-
-self.switches = optional list of /switches (without the /)
-self.raw = This is the raw argument input, including switches
-self.args = This is re-defined to be everything *except* the switches
-self.lhs = Everything to the left of = (lhs:'left-hand side'). If
-    no = is found, this is identical to self.args.
-self.rhs: Everything to the right of = (rhs:'right-hand side').
-    If no '=' is found, this is None.
-self.lhslist - self.lhs split into a list by comma
-self.rhslist - list of self.rhs split into a list by comma
-self.arglist = list of space-separated args (including '=' if it exists)
-
-All args and list members are stripped of excess whitespace around the
-strings, but case is preserved.
-"""
 
 class Nexus(default_cmds.MuxCommand):
     """
@@ -53,19 +41,43 @@ class Nexus(default_cmds.MuxCommand):
     help_category = "General"
 
     def func(self):
-        """
-        This is the hook function that actually does all the work. It is called
-         by the cmdhandler right after self.parser() finishes, and so has access
-         to all the variables defined therein.
-        """
-        MAIN = 0
-        try:
-            self.caller.location.msg(self.caller.name + " returns to the OOC nexus.")
-        except AttributeError:
-            pass
         nexus = ev.search_object(NEXUS)[MAIN]
         if self.caller.location == nexus:
             self.caller.msg("{rYou are already in the Nexus.{n")
             return
-        self.caller.move_to(nexus,quiet=False)
-        self.caller.location.msg("%s arrives from the IC realm." % self.caller.name)
+        if self.caller.location and self.caller.location.db.ic:
+            self.caller.msg("\n{gYour location has been saved.{n\n")
+        pre_warp(self.caller)
+        self.caller.move_to(nexus,quiet=True)
+        post_warp(self.caller)
+
+class IC(default_cmds.MuxCommand):
+    """
+         Warp back to the IC realm.
+    """
+    key = "ic"
+    locks = "cmd:semi_approved()"
+
+    def func(self):
+        default_location = ev.search_object(IC_START)[MAIN]
+        last_location = self.caller.db.ic_location
+        if last_location:
+            last_location = current_object(last_location)
+        else:
+            last_location = default_location
+        self.switches = [switch.lower() for switch in self.switches]
+        if self.caller.location and self.caller.location.db.ic and 'reset' not in self.switches:
+            self.caller.msg("{rYou are already in an IC area!{n")
+            return
+        if 'reset' in self.switches:
+            del self.caller.db.ic_location
+            if self.caller.location and self.caller.location.db.ic:     
+                self.caller.msg("\n{yYour IC location has been reset the starting point.{n\n")
+            last_location = default_location
+        pre_warp(self.caller)
+        self.caller.move_to(last_location)
+        post_warp(self.caller)
+        if not last_location == default_location:
+            self.caller.msg("{y>> {CYou have been returned to your last saved IC location. If there is an error with this warp, or if you are lost, type {gIC/reset{n")
+        else:
+            self.caller.msg("{y>> {CYou are at the IC realm starting point. To return to the OOC realm, type {gnexus{C.{n")

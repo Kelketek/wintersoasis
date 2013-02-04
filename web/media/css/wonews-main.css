@@ -385,3 +385,47 @@ div.spacer {
     margin-top: 2em;
     margin-bottom: 2em;
 }
+
+div.player_listing {
+    background: #ffc526; /* Old browsers */
+    background: -moz-linear-gradient(-45deg, #ffc526 0%, #997000 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, right bottom, color-stop(0%,#ffc526), color-stop(100%,#997000)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(-45deg, #ffc526 0%,#997000 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(-45deg, #ffc526 0%,#997000 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(-45deg, #ffc526 0%,#997000 100%); /* IE10+ */
+    background: linear-gradient(135deg, #ffc526 0%,#997000 100%); /* W3C */
+    min-height: 4.25em;
+    min-width: 15em;
+    border: 1px;
+    border-style:outset;
+    border-width:5px;
+    display: inline-block;
+    padding-right: 0.25em;
+    border-color: #997000;
+    margin-right: 2em;
+    margin-bottom: 1em;
+}
+
+div.player_listing img {
+    background-image: none !important;
+    float: left !important;
+    padding-left: 0.25em !important;
+    padding-right: 0.25em !important;
+    padding-top: 0.25em !important;
+    padding-bottom: 0.25em !important;
+}
+
+div.player_listing span.name {
+    font-weight: bold;
+    font-size: 2em;
+}
+
+div.status {
+    background-color: #cccccc;
+    padding: 1em;
+}
+
+.autocomplete-suggestions { border: 1px solid #999; background: #FFF; overflow: auto; }
+.autocomplete-suggestion { padding: 2px 5px; white-space: nowrap; overflow: hidden; }
+.autocomplete-selected { background: #F0F0F0; }
+.autocomplete-suggestions strong { font-weight: normal; color: #3399FF; }

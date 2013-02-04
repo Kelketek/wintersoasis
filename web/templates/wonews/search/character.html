@@ -1,0 +1,9 @@
+      <div class="player_listing">
+          {% if user.forum_profile.avatar %}
+            <a href="{% url character:profile user.username %}"><img class ="avatar" alt="{{user.username}}" src="{{ user.forum_profile.avatar.url }}" />
+          {% else %}
+            <a href="{% url character:profile user.username %}"><img class='avatar' alt="{{user.username}}" src='/media/images/unlogged.png' />
+          {% endif %}
+          <span class="name">{{user.username}}</span></a><br />
+          <span class="subtitle">The {{character.db.sex}} {{character.db.species}}</span>
+      </div>

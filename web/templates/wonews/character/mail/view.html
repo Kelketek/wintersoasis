@@ -1,0 +1,25 @@
+{% extends "character/mail/base.html" %} 
+{% load i18n %}
+{% load markup %} 
+{% block content %}
+<h1>{% trans "View Message" %}</h1>
+<p>
+    {% trans "Date:" %} {{ message.sent_at|date:_("DATETIME_FORMAT")}}<br />
+    {% trans "Subject:" %} <strong>{{ message.subject }}</strong><br />
+    {% trans "From:" %} {{ message.sender_names }}<br />
+    {% trans "To:" %} {{ message.recipient_names }}<br />
+</p>
+{{ message.body|markdown:"safe" }}<br /><br />
+<form action="{% url character:trash %}" method="POST" style="display:inline">
+    {% csrf_token %}
+    <input type="hidden" name="msg_id" value="{{ message.id }}" />
+    <input type="submit" value="Delete Message" />
+</form>
+<form action="{% url character:compose %}" method="POST" style="display:inline">
+    {% csrf_token %}
+    <input type="hidden" name="message" value="{{message.reply_text|escape}}" />
+    <input type="hidden" name="to" value="{{message.sender_names}}" />
+    <input type="hidden" name="subject" value="Re: {{ message.subject }}" />
+    <input type="submit" value="Reply" />
+</form>
+{% endblock %}
