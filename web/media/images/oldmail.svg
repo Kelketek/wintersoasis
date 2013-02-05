@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1"
+	 id="svg7106" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://web.resource.org/cc/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" sodipodi:modified="true" inkscape:export-ydpi="31.395624" sodipodi:version="0.32" inkscape:export-filename="D:\Down\kuba_Envelope.png" sodipodi:docbase="D:\Down" inkscape:output_extension="org.inkscape.output.svg.inkscape" inkscape:export-xdpi="31.395624" sodipodi:docname="closed_envelope.svg" inkscape:version="0.45"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="122.25px" height="79px"
+	 viewBox="4.45 2.85 122.25 79" enable-background="new 4.45 2.85 122.25 79" xml:space="preserve">
+<sodipodi:namedview  inkscape:cy="44.886273" inkscape:cx="65.875" inkscape:zoom="4.4222874" guidetolerance="10.0" gridtolerance="10.0" objecttolerance="10.0" borderopacity="1.0" bordercolor="#666666" pagecolor="#ffffff" id="base" inkscape:current-layer="svg7106" inkscape:window-y="22" inkscape:window-x="0" inkscape:window-height="968" inkscape:window-width="1280" inkscape:pageshadow="2" inkscape:pageopacity="0.0">
+	</sodipodi:namedview>
+<radialGradient id="rect7145_1_" cx="736.9167" cy="-331.3472" r="91.4684" gradientTransform="matrix(1.2839 0 0 -0.8121 -877.9155 -226.7225)" gradientUnits="userSpaceOnUse">
+	<stop  offset="0" style="stop-color:#FFFFFF"/>
+	<stop  offset="1" style="stop-color:#585858"/>
+</radialGradient>
+<rect id="rect7145" x="6.596" y="5.039" fill="url(#rect7145_1_)" stroke="#616B6D" stroke-width="4.1216" stroke-linejoin="round" width="117.983" height="74.625"/>
+<linearGradient id="path7153_1_" gradientUnits="userSpaceOnUse" x1="1105.3269" y1="-87.5396" x2="1105.3269" y2="-141.0439" gradientTransform="matrix(0.912 0 0 -1.1432 -971.9358 -84.1219)">
+	<stop  offset="0" style="stop-color:#DCE7EC"/>
+	<stop  offset="1" style="stop-color:#839297"/>
+</linearGradient>
+<path id="path7153" fill="url(#path7153_1_)" stroke="#000000" stroke-width="4.1216" stroke-linejoin="round" d="M6.596,5.113
+	v68.86l0.031,5.617l58.966-37.238L6.66,5.113H6.596z"/>
+<linearGradient id="path7155_1_" gradientUnits="userSpaceOnUse" x1="1170.0066" y1="-84.4253" x2="1170.0066" y2="-147.7555" gradientTransform="matrix(0.912 0 0 -1.1432 -971.9358 -83.9969)">
+	<stop  offset="0" style="stop-color:#DCE7EC"/>
+	<stop  offset="1" style="stop-color:#839297"/>
+</linearGradient>
+<path id="path7155" fill="url(#path7155_1_)" stroke="#000000" stroke-width="4.1216" stroke-linejoin="round" d="M124.58,5.237
+	v68.86l-0.032,5.616L65.582,42.475l58.935-37.238H124.58z"/>
+<linearGradient id="path7157_1_" gradientUnits="userSpaceOnUse" x1="547.7468" y1="-508.6118" x2="547.7468" y2="-583.2163" gradientTransform="matrix(1.584 0 0 -0.6582 -802.0422 -292.8524)">
+	<stop  offset="0" style="stop-color:#DCE7EC"/>
+	<stop  offset="1" style="stop-color:#839297"/>
+</linearGradient>
+<path id="path7157" fill="url(#path7157_1_)" stroke="#000000" stroke-width="4.1216" stroke-linejoin="round" d="M48.88,39.635
+	L6.634,79.649l-0.032,0.128h117.996l-0.063-0.128L82.288,39.635C71.603,29.515,59.858,29.237,48.88,39.635z"/>
+<path id="path7143" fill="#C6D2D7" stroke="#000000" stroke-width="4.1216" stroke-linejoin="round" d="M48.852,41.145L6.654,5.261
+	L6.622,5.146h117.864l-0.064,0.114L82.223,41.145C71.551,50.221,59.818,50.471,48.852,41.145z"/>
+</svg>

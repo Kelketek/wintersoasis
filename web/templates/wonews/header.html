@@ -4,6 +4,15 @@
                     <li><span class='bar'><a href='/wiki/'>Read up on the game</a></span></li>
                     <li><span class='bar'><a href='/forum/'>Play on the forums</a></span></li>
                     <li><span class='bar'><a href='/webclient/'>Play in real time!</a></span></li>
+                    <li>
+                        <a href="{% url mail:inbox %}">
+                            {% if user.is_authenticated and user.get_profile.character.unread_messages %}
+                            <img src="{{MEDIA_URL}}images/newmail.svg" height="23" />
+                            {% else %}
+                            <img src="{{MEDIA_URL}}images/oldmail.svg" height="23" />
+                            {% endif %}
+                        </a>
+                    </li>
                 </ul>
                 <form class="search-header" method="get" action="{% url search:haystack_search %}">
                     <input type="text" name="q" class="search-header-query" placeholder="Search..." />

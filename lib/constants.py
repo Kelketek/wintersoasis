@@ -11,3 +11,5 @@ IC_START = "#492"
 EMAIL = False
 
 MAIL_FROM = 'messages@wintersoasis.com'
+
+MAX_MESSAGES = 10

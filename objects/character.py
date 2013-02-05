@@ -24,6 +24,7 @@ from django.contrib.auth.models import User
 from game.gamesrc.oasis.lib.oasis import action_followers, object_stamp, current_object, check_ignores, check_sleepers, check_hiding, ignored_notifications, distill_list, CHARACTER, TIMESTAMP
 from game.gamesrc.oasis.lib.constants import ALERT
 
+from lib.mail import get_messages
 from lib.oasis import object_stamp
 from web.character.models import TagCategory, TagDef, Tag
 from settings import SERVERNAME
@@ -182,6 +183,11 @@ class WOCharacter(Character):
         if self.location and self.location.db.ic:
             self.db.ic_location = object_stamp(self.location)
         super(WOCharacter, self).at_after_move(source_location)
+
+    def unread_messages(character):
+        READ = 2
+        mail = get_messages(character)
+        return [message for message in mail if not message[READ]]
 
     def at_disconnect(self):
         """

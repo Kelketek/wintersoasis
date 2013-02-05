@@ -84,7 +84,6 @@ def get_messages(character):
     Get the raw messages for a user.
     """
     mail = character.db.mail
-    print mail
     try:
         messages = [item for item in mail if item[TIMESTAMP] <= item[MESSAGE].date_sent]
         # Let's clean up mail storage for this user while we're at it.
@@ -101,19 +100,21 @@ def get_inbox(character):
     return [ Mail(message) for message in messages ]
 
 
-def send_message(senders, subject, body, receivers, priority=False, silent_send=False, silent_receive=False, send_email=False):
+def send_message(senders, subject, body, receivers, priority=False, silent_receive=False, send_email=False):
     """
-    Send a mail message to specified recipients. (Deprecated. Will be removed soon)
+    Send a mail message to specified recipients.
     """
     message = create.create_message(senderobj=senders, message=body,
            receivers=receivers, header=subject)
     successful = []
+    status = []
+    print "starting"
     for target in receivers:
         try:
+            print "Iterated"
             if len(target.db.mail) >= MAX_MESSAGES and not priority:
-                if not silent_send:
-                    for sender in senders:
-                        sender.msg(ALERT % "Mailbox of %s is full. Could not send message!" % target.name)
+                print "Max mail!"
+                status.append("Mailbox of %s is full. Could not send message to this player!" % target.name)
                 continue
             target.db.mail.append([message, message.date_sent, False])
         except (TypeError, AttributeError):
@@ -123,7 +124,7 @@ def send_message(senders, subject, body, receivers, priority=False, silent_send=
         successful.append(target)
     if EMAIL and send_email:
         send_email_copy(message)
-    return successful
+    return successful, status
 
 def send_email_copy(message):
     """
@@ -156,7 +157,6 @@ def send_email_copy(message):
     msg.attach(text_part)
     msg.attach(html_part)
 
-    print "Starting send..."
     for receiver in receivers:
         msg['To'] = receiver.db.email
         sendmail(SMTP_HOST, MAIL_FROM, receiver.player.user.email, msg.as_string())

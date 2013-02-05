@@ -22,8 +22,7 @@ def inbox(request):
        Display character's private messages.
    """
    requester = request.user.get_profile().character
-   messages = [ Mail(message, requester) for message in requester.db.mail ]
-   print request.session.items()
+   messages = [ Mail(message, requester) for message in get_messages(requester) ]
    status = request.session.get('mail_status', '')
    try:
         del request.session['mail_status']
@@ -50,9 +49,14 @@ def compose_message(request):
             # Process the data in form.cleaned_data
             # ...
             data = form.cleaned_data
-            send_message(request.user.get_profile().character, data['subject'], data['message'], data['to'],
-                priority=False, silent_send=True, silent_receive=False, send_email=True)
-            request.session['mail_status'] = 'Message sent.'
+            recipients, status = send_message(request.user.get_profile().character, data['subject'], data['message'], data['to'],
+                priority=False, send_email=True)
+            if recipients:
+                prefix = "Message Sent."
+            else:
+                prefix = "Message sending failed!"
+            print status
+            request.session['mail_status'] = prefix + '\r\r' + '\r\r'.join(status)
             return HttpResponseRedirect(reverse('mail:inbox'))
     else:
         form = ComposeMail(request.user) # An unbound form

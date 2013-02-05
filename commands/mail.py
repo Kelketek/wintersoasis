@@ -124,9 +124,7 @@ To delete all of your messages, type:
                 target.typeclass, settings.BASE_CHARACTER_TYPECLASS) ]),
             message.header))
 
-        self.caller.mail[choice][MESSAGE].delete()
-        del self.caller.db.mail[choice]
-        self.caller.save()
+        Mail(self.caller.mail[choice]).delete()
 
     def send_buffer(self, senders, subject, receivers, editor_result):
         """
@@ -134,7 +132,7 @@ To delete all of your messages, type:
         """
         # If we're not quitting, we're not doing anything.
         if not editor_result['quitting']:
-            self.caller.msg('Saving a draft is not yet supported. Use :wq to send the message.')
+            self.caller.msg('Saving a draft is not yet supported. Use :wq to send the message, or :q! to abort.')
             return False
         # If you're typing out a really long mail, you may have annoyed someone in the interim.
         body = editor_result['buffer']
@@ -142,12 +140,17 @@ To delete all of your messages, type:
         if not receivers:
             caller.msg('No valid recipients found!')
             return False
-        if send_message(senders, subject, body, receivers, send_email=True):
+        sent, status = send_message(senders, subject, body, receivers, send_email=True)
+        return self.benediction(sent, status)
+
+    def benediction(self, sent, status):
+        if sent:
+            self.caller.msg(sent)
             self.caller.msg('Mail sent.')
-            return True
         else:
             self.caller.msg("No messages sent.")
-            return False
+        self.caller.msg("\r%s".join(status))
+        return sent
 
     def long_handler(self):
         """
@@ -222,10 +225,8 @@ To delete all of your messages, type:
         senders = [self.caller]
         subject = '( Quickmail )'
         body = self.rhs
-        if send_message(senders, subject, body, receivers, send_email=True):
-            self.caller.msg('Mail sent.')
-        else:
-            self.caller.msg("No messages sent.")
+        sent, status = send_message(senders, subject, body, receivers, send_email=True)
+        self.benediction(sent, status)
 
     def func(self):
         """

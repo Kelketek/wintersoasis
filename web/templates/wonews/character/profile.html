@@ -12,10 +12,17 @@
 {% if target.forum_profile.avatar %}
     <img class ="left" alt="" src="{{ target.forum_profile.avatar.url }}" />
 {% else %}
-    <img class='left' alt="{{character.name}}" src='/media/images/unlogged.png' />
+    <img class='left' alt="{{character.name}}" src='{{ MEDIA_URL }}images/unlogged.png' />
 {% endif %}
 Dossier: {{ character.name }}</h1>
 {% if user.is_authenticated and not perms.same_player %}
+<form method="POST" action="{% url mail:compose %}" >
+{% csrf_token %}
+<input type="image" src="{{ MEDIA_URL }}images/oldmail.svg" height="23"/>
+<input type="hidden" name="to" value="{{ character.name }}, "/>
+<input type="hidden" name="subject" value="Subject goes here"/>
+<input type="hidden" name="message" value="Type your message here..."/>
+</form>
 <button id="following_button" onclick="call_button('following', '#following_button', true);"></button>
 <button id="hiding_from_button" onclick="call_button('hiding_from', '#hiding_from_button', true);"></button>
 <button id="ignoring_button" onclick="call_button('ignoring', '#ignoring_button', true);"></button>

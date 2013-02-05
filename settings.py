@@ -158,7 +158,7 @@ INSTALLED_APPS = tuple(set((
     'src.scripts',
     'dajaxice',
     'dajax',
-    'selectable',
+    'helpdesk',
 )))
 
 STATICFILES_FINDERS = (

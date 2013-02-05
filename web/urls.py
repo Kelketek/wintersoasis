@@ -92,6 +92,9 @@ urlpatterns = patterns('',
     url(dajaxice_config.dajaxice_url, include('dajaxice.urls')),
     url(r'^selectable/', include('selectable.urls')),
 
+    # Ticket system
+    url(r'^tickets/', include('helpdesk.urls')),
+
     url(r'^$', 'views.page_index'),
 )
 
