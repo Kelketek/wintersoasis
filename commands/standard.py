@@ -100,6 +100,7 @@ class UnloggedinCmdSet(default_cmds.UnloggedinCmdSet):
         # any commands you add below will overload the default ones.
         #
         self.add(unloggedin.Connect())
+        self.add(unloggedin.Magic())
 
 class OOCCmdSet(default_cmds.OOCCmdSet):
     """

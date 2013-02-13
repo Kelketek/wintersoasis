@@ -7,9 +7,9 @@
                     <li>
                         <a href="{% url mail:inbox %}">
                             {% if user.is_authenticated and user.get_profile.character.unread_messages %}
-                            <img src="{{MEDIA_URL}}images/newmail.svg" height="23" />
+                            <img class="mail" src="{{MEDIA_URL}}images/newmail.svg"/>
                             {% else %}
-                            <img src="{{MEDIA_URL}}images/oldmail.svg" height="23" />
+                            <img class="mail" src="{{MEDIA_URL}}images/oldmail.svg"/>
                             {% endif %}
                         </a>
                     </li>

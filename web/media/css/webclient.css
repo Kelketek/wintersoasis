@@ -27,10 +27,9 @@ a:hover, a:active { color: #ccc }
 strong {font-weight:normal;}
 
 /* Base style for new messages in the main message area */
-.msg {
-  white-space: pre-wrap;
-  padding: .5em .9em;}
-  /*border-bottom: 1px dotted #222 } /*optional line between messages */
+.msg { white-space: pre-wrap; }
+
+/*border-bottom: 1px dotted #222 } /* optional line between messages */
 
 /* Utility messages (green) */
 .sys { color: #0f0 }
@@ -132,12 +131,6 @@ strong {font-weight:normal;}
 /*Example player count display */
 #playercount { margin-left: .8em }
 
-/* Testing */
-/*#inputform {
-  outline: 1px dotted blue }
-
-#messagewindow {
-  outline: 1px dotted red }
-
-#wrapper {
-  outline: 1px dotted green }*/
+img.avatar {
+    float: left;
+}

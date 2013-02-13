@@ -5,9 +5,9 @@ var resizer = function () {
     var FOOTER_HEIGHT = 70;
     var elem = $('body');
     if ( $(window).height() >= $(document).height() )  {
-        elem.css({'height' : $(window).height()});
+        elem.css({'height' : $(window).height() - FOOTER_HEIGHT});
     } else {
-        elem.css({'height' : $(document).height()});
+        elem.css({'height' : $(document).height() - FOOTER_HEIGHT});
     }
 }
 //$(document).resize(resizer);

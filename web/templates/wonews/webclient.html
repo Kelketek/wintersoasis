@@ -12,6 +12,10 @@
     <script src="{{MEDIA_URL}}javascript/jquery.js" type="text/javascript" charset="utf-8"></script>
 
     <!-- Importing the Evennia ajax webclient component (requires jQuery)  -->
+    <script type="text/javascript">
+        var magic_cookie="{{user.get_profile.db.magic_cookie}}";
+        var current_user="{{user.get_profile.name}}";
+    </script>
     <script src="{{MEDIA_URL}}javascript/evennia_webclient.js" type="text/javascript" charset="utf-8"></script>
 
   </head>
@@ -32,12 +36,15 @@
           (it's just one file) and then edit webclient.html to point
           to the local copy.</p>
         </div>
-      </div>
+      </div> 
       <form id="inputform" action="javascript:void(0);">
-        <div id="playercount">Logged in Players: {{num_players_connected}}</div>
-        <div id="inputcontrol"><input type="text" id="inputfield" autocomplete="off"><input id="inputsend" type="button" value="send" onClick="webclient_input()" /></div>
+          {% if user.is_authenticated and user.forum_profile.avatar.url %}
+            <a href="{% url character:profile user.username %}"><img class="avatar" alt="{{user.username}}" src="{{ user.forum_profile.avatar.url }}" /></a>
+          {% elif user.is_authenticated %}
+            <a href="{% url character:profile user.username %}"><img class='avatar' alt="{{user.username}}" src='/media/images/unlogged.png' /></a>
+          {% endif %}
+        <div id="inputcontrol"><input type="text" id="inputfield" autocomplete="off" /><input id="inputsend" type="button" value="send" onClick="webclient_input()" /></div>
       </form>
     </div>
-
   </body>
 </html>

@@ -43,7 +43,7 @@ dajaxice_autodiscover()
 
 urlpatterns = patterns('',
     # User Authentication
-    url(r'^login/', 'django.contrib.auth.views.login'),
+    url(r'^login/', 'web.views.login'),
     url(r'^logout/', 'django.contrib.auth.views.logout'),
 
     url(r'^accounts/login', 'views.login_gateway'),

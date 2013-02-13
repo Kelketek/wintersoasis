@@ -76,11 +76,6 @@ body {
     padding-left: 0px;
 }
 
-/* Deals with images placed directly in the header. */
-#header img {
-    position: absolute;
-}
-
 /* Gives headers a nice little 'paper' background with a drop shadow. */
 h1.main span {
     font-family: 'Belgrano', serif;
@@ -107,8 +102,12 @@ h2.main span {
     background-image:url('../images/heading_backdrop.png');
 }
 
+#header form.client_link {
+    display: inline;
+}
+
 /* Used for the search bar. */
-#header form {
+#header form.search-header {
     position:fixed;
     top: 9px !important;
     right: 10px;
@@ -126,6 +125,7 @@ h2.main span {
     font-family: 'Belgrano', serif;
     font-size: 12pt;
     margin: 0px;
+    padding: 0px;
 }
 
 #header input {
@@ -139,6 +139,7 @@ h2.main span {
     border-radius: 0px;
     vertical-align: default;
     width: 10em;
+    float: right;
 }
 
 #footer input {
@@ -154,6 +155,9 @@ h2.main span {
     margin-bottom: 0px;
 }
 
+img.mail {
+    height: 23px;
+}
 
 form.login {
     position: relative;
@@ -164,11 +168,15 @@ form.login {
 ul.wonav {
     margin:0;
     padding:0;
-    position: absolute;
+    position: fixed;
     display: inline;
     float: left;
     top: 7px;
     left: 10px;
+}
+
+ul.wonav img {
+    float: right;
 }
 
 ul.wonav li {
@@ -283,18 +291,18 @@ span.bar a:visited {
     width:100%;
     margin-left:auto;
     margin-right:auto;
+    padding-bottom: 70px;
     position: relative;
     background-position:left, right;
     background-repeat: repeat-y;
     z-index:0;
     height: 100%;
-    padding-bottom: 70px;
 }
 
 div.branding {
     font-size: 8pt;
     text-align: center;
-    padding-top: 50px;
+    display: block;
 }
 
 /* Special classes for forms */

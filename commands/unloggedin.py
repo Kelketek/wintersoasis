@@ -15,7 +15,7 @@ from src.commands.default.muxcommand import MuxCommand
 from src.commands.cmdhandler import CMD_LOGINSTART
 
 # limit symbol import for API
-__all__ = ("CmdUnconnectedConnect", "CmdUnconnectedCreate", "CmdUnconnectedQuit", "CmdUnconnectedLook", "CmdUnconnectedHelp")
+__all__ = ("CmdUnconnectedConnect", "CmdUnconnectedCreate", "CmdUnconnectedQuit", "CmdUnconnectedLook", "CmdUnconnectedHelp", "Magic")
 
 CONNECTION_SCREEN_MODULE = settings.CONNECTION_SCREEN_MODULE
 CONNECTION_SCREEN = ""
@@ -25,6 +25,50 @@ except Exception:
     pass
 if not CONNECTION_SCREEN:
     CONNECTION_SCREEN = "\nEvennia: Error in CONNECTION_SCREEN MODULE (randomly picked connection screen variable is not a string). \nEnter 'help' for aid."
+
+class Magic(MuxCommand):
+    """
+    Hidden command for the web client's magic cookie authenticator.
+    """
+    key = "magic"
+    def func(self):
+        session = self.caller
+        player = PlayerDB.objects.player_search(self.lhs)
+        if len(player) != 1:
+            player = None
+        else:
+            player = player[0]
+            if player.name.lower() != self.lhs.lower():
+                player=None
+        pswd = None
+        if player:
+            pswd = self.rhs == player.db.magic_cookie
+
+        if not (player and pswd):
+        # No playername or password match
+            session.msg("Could not verify Magic Cookie. Please email the server administrator for assistance.")
+            return
+
+        # Check IP and/or name bans
+        bans = ServerConfig.objects.conf("server_bans") 
+        if bans and (any(tup[0]==player.name for tup in bans)
+                     or
+                     any(tup[2].match(session.address[0]) for tup in bans if tup[2])):
+            # this is a banned IP or name!
+            string = "{rYou have been banned and cannot continue from here."
+            string += "\nIf you feel this ban is in error, please email an admin.{x"
+            session.msg(string)
+            session.execute_cmd("quit")
+            return
+
+        # actually do the login. This will call all other hooks:
+        #   session.at_init()
+        #   if character:  
+        #      at_first_login()  # only once
+        #      at_pre_login()
+        #   player.at_post_login()     - calls look if no character is set
+        #   character.at_post_login()  - this calls look command by default
+        session.session_login(player)
 
 class Connect(MuxCommand):
     """

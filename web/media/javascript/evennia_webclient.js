@@ -163,6 +163,9 @@ function webclient_init(){
 
             // Wait for input
             webclient_receive();
+
+            // This defined on the page.
+            webclient_input("magic " + current_user + "=" + magic_cookie);
         },
         error: function(XMLHttpRequest, textStatus, errorThrown){
             msg_display("err", "Connection error ..." + " (" + errorThrown + ")");
