@@ -84,9 +84,9 @@ CHANNEL_CONNECTINFO = ("MUDconnections", '', 'Connection log',
 
 DEBUG = False
 
-ADMINS = ('kelketek@gmail.com',)
+ADMINS = ('admin@example.com',)
 
-SERVER_EMAIL = 'messages@wintersoasis.com'
+SERVER_EMAIL = 'messages@example.com'
 
 ROOT_URLCONF = "web.urls"
 
@@ -141,15 +141,7 @@ INSTALLED_APPS = tuple(set((
     'haystack',
     'character',
     'roster',
-    'raven.contrib.django',
     'captcha',
-    'django.contrib.auth',
-    'django.contrib.sites',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.admin',
-    'django.contrib.admindocs',
-    'django.contrib.flatpages',
     'src.server',
     'src.players',
     'src.objects',
@@ -171,15 +163,6 @@ MIDDLEWARE_CLASSES = (
     #'sslify.middleware.SSLifyMiddleware',
     'pagination.middleware.PaginationMiddleware',
 ) + MIDDLEWARE_CLASSES
-
-"""
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': '127.0.0.1:11211',
-    }
-}
-"""
 
 SESSION_COOKIE_SECURE = True
 SESSION_COOKIE_HTTPONLY = False
