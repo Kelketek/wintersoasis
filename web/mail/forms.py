@@ -33,7 +33,7 @@ class ComposeMail(forms.Form):
                 if not recipient:
                     continue
                 try:
-                    recipient = ev.search_player(recipient)[MAIN].character
+                    recipient = ev.search_player(recipient)[MAIN].db.avatar
                 except IndexError:
                     raise ValidationError('Player %s does not exist' % recipient)
                 if recipient.check_list(self._user, 'ignoring', ignores=False):

@@ -23,14 +23,13 @@ Dossier: {{ character.name }}</h1>
 <input type="hidden" name="subject" value="Subject goes here"/>
 <input type="hidden" name="message" value="Type your message here..."/>
 </form>
-<button id="following_button" onclick="call_button('following', '#following_button', true);"></button>
+<button id="watching_button" onclick="call_button('watching', '#watching_button', true);"></button>
 <button id="hiding_from_button" onclick="call_button('hiding_from', '#hiding_from_button', true);"></button>
 <button id="ignoring_button" onclick="call_button('ignoring', '#ignoring_button', true);"></button>
 {% endif %}
 {% if perms.same_player %}
 <br /><a href="{% url djangobb:forum_profile_upload_avatar character.name %}">Change Avatar</a>
 {% endif %}
-</a>
 <div class="character_sex_and_species">
 <table>
     <tr>
@@ -148,7 +147,7 @@ for (var i=0;i<rp_tags.length;i++) {
     var call_button = function (listname, elementid, toggle) {
         Dajaxice.character.list_toggle(Dajax.process,{'character': '{{character.name}}', 'toggle': toggle, 'listname': listname, 'elementid': elementid});
     }
-    call_button('following', '#following_button', false);
+    call_button('watching', '#watching_button', false);
     call_button('hiding_from', '#hiding_from_button', false);
     call_button('ignoring', '#ignoring_button', false);
     {% endif %}

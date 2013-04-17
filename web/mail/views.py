@@ -21,7 +21,7 @@ def inbox(request):
    """
        Display character's private messages.
    """
-   requester = request.user.get_profile().character
+   requester = request.user.get_profile().db.avatar
    messages = [ Mail(message, requester) for message in get_messages(requester) ]
    status = request.session.get('mail_status', '')
    try:
@@ -49,7 +49,7 @@ def compose_message(request):
             # Process the data in form.cleaned_data
             # ...
             data = form.cleaned_data
-            recipients, status = send_message(request.user.get_profile().character, data['subject'], data['message'], data['to'],
+            recipients, status = send_message(request.user.get_profile().db.avatar, data['subject'], data['message'], data['to'],
                 priority=False, send_email=True)
             if recipients:
                 prefix = "Message Sent."
@@ -68,7 +68,7 @@ def compose_message(request):
 @login_required
 def view_message(request, msg_id):
     READ = 2
-    requester = request.user.get_profile().character
+    requester = request.user.get_profile().db.avatar
     try:
         msg_id = int(msg_id)
         messages = get_messages(requester)
@@ -93,7 +93,7 @@ def delete_message(request):
     """
         Delete a mail message.
     """
-    requester = request.user.get_profile().character
+    requester = request.user.get_profile().db.avatar
     post = dict(request.POST)
     if not 'msg_id' in post:
         return HttpResponseBadRequest()

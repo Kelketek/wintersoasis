@@ -37,12 +37,13 @@ AT_SERVER_STARTSTOP_MODULE = "game.gamesrc.oasis.scripts.startstop"
 ######################################################################
 # Default command sets
 ######################################################################
-CMDSET_DEFAULT = "game.gamesrc.oasis.commands.standard.DefaultCmdSet"
+CMDSET_CHARACTER = "game.gamesrc.oasis.commands.standard.DefaultCmdSet"
 CMDSET_UNLOGGEDIN = "game.gamesrc.oasis.commands.standard.UnloggedinCmdSet"
-CMDSET_OOC = "game.gamesrc.oasis.commands.standard.OOCCmdSet"
+CMDSET_PLAYER = "game.gamesrc.oasis.commands.standard.OOCCmdSet"
 ######################################################################
 # Typeclasses
 ######################################################################
+BASE_OBJECT_TYPECLASS = "game.gamesrc.oasis.objects.object.WOObject"
 BASE_CHARACTER_TYPECLASS = "game.gamesrc.oasis.objects.character.WOCharacter"
 BASE_PLAYER_TYPECLASS = "game.gamesrc.oasis.objects.player.WOPlayer"
 ######################################################################

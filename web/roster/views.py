@@ -15,7 +15,7 @@ def new(request):
             # We'll process the data here, now that it's been deemed sane.
             data = form.cleaned_data
             new_player(name=data['name'], email=data['email'],
-                password=data['password'], context=request)
+                password=data['password'], request=request)
             return render_to_response(
                 'roster/new.html',
                 {

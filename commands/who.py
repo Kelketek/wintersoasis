@@ -26,6 +26,7 @@ class Who(default_cmds.MuxCommand):
     key = "who"
     aliases = ["findall", "fa", "wa", "whereare"]
     locks = "cmd:all()"
+    priority = 5
     help_category = "General"
 
     # Each of these takes a list of lists. The first element in each list

@@ -6,7 +6,7 @@ list.
 import time
 from ev import Command as BaseCommand
 from ev import default_cmds
-from game.gamesrc.oasis.lib.oasis import partial_pmatch, check_ignores, validate_targets, distill_list, ferment_list
+from game.gamesrc.oasis.lib.oasis import partial_pmatch, check_ignores, validate_targets
 
 class Ignore(default_cmds.MuxCommand):
     """
@@ -33,7 +33,7 @@ class Ignore(default_cmds.MuxCommand):
         if not targets:
             self.caller.msg("No valid targets found.")
             return
-        ignore = distill_list(self.caller.db.ignore)
+        ignore = self.caller.db.ignore
         if switch:
             for target in targets:
                 if target not in ignore:
@@ -50,7 +50,7 @@ class Ignore(default_cmds.MuxCommand):
                 else:
                     ignore = [ person for person in ignore if person != target ]
                     self.caller.msg("No longer ignoring %s." % target.name)
-        self.caller.db.ignore = ferment_list(ignore)
+        self.caller.db.ignore = ignore
 
     def func(self):
         """

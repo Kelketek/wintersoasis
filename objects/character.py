@@ -21,13 +21,17 @@ from ev import Character
 from collections import OrderedDict
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
-from game.gamesrc.oasis.lib.oasis import action_followers, object_stamp, current_object, check_ignores, check_sleepers, check_hiding, ignored_notifications, distill_list, CHARACTER, TIMESTAMP
+from game.gamesrc.oasis.lib.oasis import action_watchers, check_ignores, check_sleepers, check_hiding, ignored_notifications
 from game.gamesrc.oasis.lib.constants import ALERT
 
 from lib.mail import get_messages
-from lib.oasis import object_stamp
 from web.character.models import TagCategory, TagDef, Tag
 from settings import SERVERNAME
+
+# these are called so many times it's worth setting them to avoid lookup calls
+_GA = object.__getattribute__
+_SA = object.__setattr__
+_DA = object.__delattr__
 
 class WOCharacter(Character):
     """
@@ -52,6 +56,12 @@ class WOCharacter(Character):
     def __str__(self):
         return self.name
     __repr__ = __str__
+
+    def new_character(self):
+        """
+        Things to do when first setting up a character, even before connection.
+        """
+        self.db.stats = { 'Body': 0, 'Soul': 0, 'Mind': 0, 'Expression': 0, 'Focus': 0 }
 
     def announce_message(self, user, target, message, message_key, must_be_online=False):
         """
@@ -94,11 +104,11 @@ class WOCharacter(Character):
             If raw is false and the user is not active, always returns an empty
         list.
         """
-        user = self.player.user
+        user = self.db.spirit.user
         if not raw and not user.is_active:
             return []
         try:
-            alts = [ alt.get_profile().character for alt in User.objects.filter(email__iexact=user.email) if alt.is_active or raw ]
+            alts = [ alt.get_profile().db.avatar for alt in User.objects.filter(email__iexact=user.email) if alt.is_active or raw ]
             return alts
         except AttributeError:
             return []
@@ -110,7 +120,6 @@ class WOCharacter(Character):
         list_to_check = getattr(self.db, listname)
         if not list_to_check:
             return False
-        list_to_check = distill_list(list_to_check)
         if target in list_to_check:
             if ignores:
                 if not check_ignores(target, [self], silent=True):
@@ -124,12 +133,16 @@ class WOCharacter(Character):
         """
         CHARACTER = 0
         if toggle:
-             character_list = distill_list(getattr(self.db, listname), preserve_format=True)
-             character_list.append(object_stamp(target))
+             character_list = getattr(self.db, listname)
+             if not character_list:
+                 character_list = []
+             character_list.append(target)
              setattr(self.db, listname, character_list)
         else:
-             old_list = distill_list(getattr(self.db, listname), preserve_format=True)
-             new_list = [ stamp for stamp in old_list if stamp[CHARACTER] != target ]
+             old_list = getattr(self.db, listname)
+             if not old_list:
+                 old_list = []
+             new_list = [ obj for obj in old_list if obj != target ]
              setattr(self.db, listname, new_list)
 
 
@@ -141,7 +154,7 @@ class WOCharacter(Character):
 
     def delete(self):
         """
-            Delete the object with all standard checks, and any extras we've defined for it.
+        Delete the object with all standard checks, and any extras we've defined for it.
         """
         result = super(WOCharacter, self).delete()
         if result:
@@ -149,7 +162,7 @@ class WOCharacter(Character):
                 tag.delete()
         return result
 
-    def at_post_login(self):
+    def at_post_puppet(self):
         """
         This recovers the character again after having been "stowed away" at disconnect.
         """
@@ -168,20 +181,20 @@ class WOCharacter(Character):
         # Save login time.
         if len(self.sessions) <= 1:
             self.db.laston = time.time()
-        # Announce connection to followers
+        # Announce connection to watchers
         if len(self.sessions) == 1:
             message = ALERT % "Somewhere on %s, %s has connected." % ( SERVERNAME, self.name )
         else:
             message = ALERT % "Somewhere on %s, %s has reconnected." % ( SERVERNAME, self.name )
-        action_followers(self, self.announce_message, delay=WOCharacter.DELAY, kwargs={ 'message' : message, 'message_key' : 'connection', 'must_be_online' : True })
-        # Call look.
+        action_watchers(self, self.announce_message, delay=WOCharacter.DELAY, kwargs={ 'message' : message, 'message_key' : 'connection', 'must_be_online' : True })
+        print "I ran!"
         self.execute_cmd('look')
         self.execute_cmd('mail/check quiet')
-        self.execute_cmd('follow')
+        self.execute_cmd('watch')
 
     def at_after_move(self, source_location):
         if self.location and self.location.db.ic:
-            self.db.ic_location = object_stamp(self.location)
+            self.db.ic_location = self.location
         super(WOCharacter, self).at_after_move(source_location)
 
     def unread_messages(character):
@@ -189,7 +202,7 @@ class WOCharacter(Character):
         mail = get_messages(character)
         return [message for message in mail if not message[READ]]
 
-    def at_disconnect(self):
+    def at_pre_unpuppet(self):
         """
         We stow away the character when logging off, otherwise the character object will
         remain in the room also after the player logged off ("headless", so to speak).
@@ -202,6 +215,8 @@ class WOCharacter(Character):
                 self.db.prelogout_location = self.location
                 self.location = None
                 self.db.lastoff = time.time()
+                if not self.db.laston:
+                    self.db.laston = 0
                 if self.db.lastoff - self.db.laston >= WOCharacter.DELAY:
                     message = ALERT % "Somewhere on %s, %s has disconnected." % ( SERVERNAME, self.name )
-                    action_followers(self, self.announce_message, kwargs={ 'message' : message, 'message_key' : 'connection' })
+                    action_watchers(self, self.announce_message, kwargs={ 'message' : message, 'message_key' : 'connection' })

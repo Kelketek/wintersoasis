@@ -2,7 +2,7 @@
 Backend functions for the character application.
 """
 import string
-from src.utils.create import create_player
+from src.utils.create import create_player, create_object
 from django.conf import settings
 from django.contrib.auth import login
 from django.contrib.auth.models import User
@@ -47,37 +47,44 @@ def activate_player(uid, activation_key, request):
         print "NonExistant."
         return False
 
-def send_activation_email(character, request):
+def send_activation_email(player, request):
     """
         Generate an activation key, set it on a player, then have the user
     emailed with the relevant info.
     """
     lst = [random.choice(string.ascii_letters + string.digits) for n in xrange(30)]
     key = "".join(lst)
-    character.player.db.activation_key = key
+    player.db.activation_key = key
     send_mail(
         "Welcome to %s!" % settings.SERVERNAME,
         get_template('roster/email.txt').render(
             RequestContext(request, {
                 'current_server' : request.META['HTTP_HOST'],
                 'key' : key,
-                'uid' : character.player.dbobj.id
+                'uid' : player.dbobj.id
                 }
             )
         ),
         settings.SERVER_EMAIL,
-        [character.player.user.email]
+        [player.user.email]
     )
     
 
-def new_player(name, email, password, context):
+def new_player(name, email, password, request):
     """
     Easier front-end for creating a new player. Also sends reg email.
     """
-    character = create_player(name=name, email=email, password=password,
+    player = create_player(name=name, email=email, password=password,
         permissions=settings.PERMISSION_PLAYER_DEFAULT,
-        typeclass=settings.BASE_PLAYER_TYPECLASS,
-        character_home=settings.CHARACTER_DEFAULT_HOME)
-    character.player.user.is_active = False
-    character.player.user.save()
-    send_activation_email(character, context)
+        typeclass=settings.BASE_PLAYER_TYPECLASS)
+    player.user.is_active = False
+    player.user.save()
+    character = create_object(typeclass=settings.BASE_CHARACTER_TYPECLASS, key=name,
+        permissions=settings.PERMISSION_PLAYER_DEFAULT, home=settings.CHARACTER_DEFAULT_HOME)
+    character.db.spirit = player
+    player.db.avatar = character
+    player.db._last_puppet = character
+    player.db._playable_characters = [ character ]
+    character.locks.add("puppet:id(%i) or pid(%i) or perm(Immortals) or pperm(Immortals)" % (character.id, player.id))
+    character.new_character()
+    send_activation_email(player, request)

@@ -7,7 +7,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, Http404, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
-from character.forms import ComposeMail
+from mail.forms import ComposeMail
 from django.conf import settings
 from django.db import transaction
 from django.shortcuts import render
@@ -29,7 +29,7 @@ def is_alt(request, target):
     Determines if a user is another user's alt.
     """
     try:
-        return request.user.get_profile().character in target.get_profile().character.get_alts()
+        return request.user.get_profile().db.avatar in target.get_profile().db.avatar.get_alts()
     except:
         return False
 
@@ -84,7 +84,7 @@ def switch(request):
     if is_alt(request, user) and do_login:
         user.backend = 'django.contrib.auth.backends.ModelBackend' 
         login(request, user)
-    next_page = user.get_profile().character.get_absolute_url()
+    next_page = user.get_profile().db.avatar.get_absolute_url()
     return HttpResponseRedirect(next_page)
 
 def profile(request, username):
@@ -93,7 +93,7 @@ def profile(request, username):
     """
     try:
         user = User.objects.get(username__iexact=username)
-        character = user.get_profile().character
+        character = user.get_profile().db.avatar
         tags = character.get_tags()
     except User.DoesNotExist:
         character = None

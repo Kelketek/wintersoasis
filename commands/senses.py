@@ -6,7 +6,7 @@ from ev import Command as BaseCommand
 from ev import default_cmds
 from ev import utils
 from game.gamesrc.oasis.lib.constants import ALERT
-from game.gamesrc.oasis.lib.oasis import validate_targets, check_ignores, check_owner
+from game.gamesrc.oasis.lib.oasis import validate_targets, check_ignores
 
 class Sense(default_cmds.MuxCommand):
     """
@@ -32,7 +32,7 @@ class Sense(default_cmds.MuxCommand):
         target.msg(ALERT % '%s just %s you.' % (self.caller.name, self.verbed))
 
     def set_sense(self, target, message):
-        if not (check_owner(self.caller, target) or target.access(self.caller, 'control')):
+        if not (target.check_owner(self.caller) or target.access(self.caller, 'control')):
             self.caller.msg("{rPermission denied.{n")
             return
         try:

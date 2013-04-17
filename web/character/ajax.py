@@ -9,12 +9,12 @@ def get_settings(request, character):
     Get settings needed for toggles.
     """
     player = ev.search_player(character)[0]
-    character = player.character
-    my_character = request.user.get_profile().character
+    character = player.db.avatar
+    my_character = request.user.get_profile().db.avatar
     return player, character, my_character
 
 def permissions_check(my_character, target):
-    if my_character.player.user.is_staff:
+    if my_character.db.spirit.user.is_staff:
         return True
     if my_character in target.get_alts() or target == my_character:
         return True
@@ -28,7 +28,7 @@ def list_toggle(request, character, listname, elementid, toggle=True):
     result = ""
     dajax = Dajax()
     permitted_lists = {
-                        'following': ('Unfollow this character.', 'Follow this character.'),
+                        'watching': ('Watch this character.', 'Unwatch this character.'),
                         'hiding_from': ('Stop hiding from this character.', 'Hide from this character.'),
                         'ignoring': ('Stop ignoring this character.', 'Ignore this character.')
                       }
@@ -87,6 +87,6 @@ def tags_save(request, character, tag_list):
                 tag.delete()
     for tag in tags:
         if tag not in character_tags:
-            Tag(player=character.player, tag=tag).save()
+            Tag(player=character.db.spirit, tag=tag).save()
     dajax.assign('#tag_error', 'innerHTML', "Saved.")
     return dajax.json()

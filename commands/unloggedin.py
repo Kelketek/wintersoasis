@@ -61,14 +61,7 @@ class Magic(MuxCommand):
             session.execute_cmd("quit")
             return
 
-        # actually do the login. This will call all other hooks:
-        #   session.at_init()
-        #   if character:  
-        #      at_first_login()  # only once
-        #      at_pre_login()
-        #   player.at_post_login()     - calls look if no character is set
-        #   character.at_post_login()  - this calls look command by default
-        session.session_login(player)
+        session.sessionhandler.login(session, player)
 
 class Connect(MuxCommand):
     """
@@ -147,7 +140,7 @@ class Connect(MuxCommand):
         #      at_pre_login()
         #   player.at_post_login()     - calls look if no character is set
         #   character.at_post_login()  - this calls look command by default
-        session.session_login(player)
+        session.sessionhandler.login(session, player)
 
 class Create(MuxCommand):
     """

@@ -47,76 +47,26 @@ def partial_pmatch(me, name, local_only=False):
                 global_name = '*' + name
         except IndexError:
             pass
-        target = me.search(global_name, global_search=True, ignore_errors=True)
+        target = me.search(global_name, global_search=True, ignore_errors=False, use_nicks=True)
     if target:
         if type(target) == list:
             return target
         else:
             return [ target ]
     matches = []
-    if local_only:
-        return matches
     for session in SESSIONS.sessions.values():
         character = session.get_character()
         if character and character.name.lower().startswith(name.lower()):
             matches.append(character)
     return matches
 
-def object_stamp(thing):
+def action_watchers(user, function, kwargs, delay=0, respect_hide=True):
     """
-        Create an 'object stamp'-- this is a tuple for storage of an object
-    refrence and the current time. Useful for seeing if the object ref has been
-    recycled since the item was stored.
-    """
-    return (thing, time.time())
-
-def in_object_list(thing, object_list):
-    """
-    Take an object stamp and determine whether or not it exists in a specified list.
-    """
-    target = current_object(thing)
-    if target in distill_list(object_list):
-        return target
-
-def ferment_list(ref_list):
-    """
-    Converts a list of dbrefs into a list of object_stamps
-    """
-    return [ object_stamp(dbref) for dbref in ref_list if dbref ]
-
-def distill_list(object_list, preserve_format=False):
-    """
-        Take a list of object stamps and return the objects that are legit.
-    The preserve_format flag is for retaining the character stamp format instead
-    of just returning a list of characters.
-    """
-    if not object_list:
-        object_list = []
-    if preserve_format:
-        return [ thing for thing in object_list if current_object(thing) ]
-    else:
-        return [ current_object(thing) for thing in object_list if current_object(thing) ]
-
-def current_object(thing):
-    """
-        Takes an object stamp and returns the object if that
-    object was made before or on its time stamp.
-    """
-    thing, timestamp = thing
-    if not thing:
-        return
-    if timestamp >= int(thing.dbobj.date_created.strftime('%s')):
-        return thing
-    else:
-        return
-
-def action_followers(user, function, kwargs, delay=0, respect_hide=True):
-    """
-        Perform an action for all followers. Delay is ignored for Wizards.
+    Perform an action for all followers. Delay is ignored for Wizards.
     """
     online_users = [ session.get_character() for session in SESSIONS.sessions.values() if session.get_character() ]
     for target in online_users:
-        if user.check_list(target, "following"):
+        if user.check_list(target, "watching"):
             kwargs['target'] = target
             kwargs['user'] = user
             if target.locks.check_lockstring(target, 'admin:perm(Wizards)'):
@@ -169,7 +119,9 @@ def check_ignores(person, ref_list, silent=False):
         return ref_list
     targets = []
     for target in ref_list:
-        ignore = distill_list(target.db.ignore)
+        ignore = target.db.ignore
+        if not ignore:
+            ignore = []
         if person in ignore:
             if not silent:
                 person.msg("%s is ignoring you." % target.name)
@@ -182,16 +134,7 @@ def check_hiding(person, ref_list):
     """
     Remove players from a reflist who are hiding from a person or in general.
     """
-    return [ item for item in ref_list if (not item.db.hiding) and (not person in distill_list(item.db.hiding_from)) ]
-
-def check_owner(person, target):
-    """
-    Checks to see if a user owns an object.
-    """
-    owner = target.db.owner
-    if not owner:
-        return False
-    return person == current_object(owner)
+    return [ item for item in ref_list if (not item.db.hiding) and (not person in item.db.hiding_from) ]
 
 def validate_targets(person, name_list, ignores=True, local_only=True, silent=False):
     """

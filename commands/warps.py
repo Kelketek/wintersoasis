@@ -9,7 +9,6 @@ from ev import default_cmds
 from ev import utils
 from src.server.sessionhandler import SESSIONS
 from settings import *
-from lib.oasis import current_object
 
 MAIN = 0
 
@@ -61,9 +60,7 @@ class IC(default_cmds.MuxCommand):
     def func(self):
         default_location = ev.search_object(IC_START)[MAIN]
         last_location = self.caller.db.ic_location
-        if last_location:
-            last_location = current_object(last_location)
-        else:
+        if not last_location:
             last_location = default_location
         self.switches = [switch.lower() for switch in self.switches]
         if self.caller.location and self.caller.location.db.ic and 'reset' not in self.switches:

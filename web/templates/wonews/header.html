@@ -6,7 +6,7 @@
                     <li><span class='bar'><a href='/webclient/'>Play in real time!</a></span></li>
                     <li>
                         <a href="{% url mail:inbox %}">
-                            {% if user.is_authenticated and user.get_profile.character.unread_messages %}
+                            {% if user.is_authenticated and user.get_profile.db.avatar.unread_messages %}
                             <img class="mail" src="{{MEDIA_URL}}images/newmail.svg"/>
                             {% else %}
                             <img class="mail" src="{{MEDIA_URL}}images/oldmail.svg"/>

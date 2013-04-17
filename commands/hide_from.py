@@ -6,7 +6,7 @@ list, or allows a character to hide from everyone.
 import time
 from ev import Command as BaseCommand
 from ev import default_cmds
-from game.gamesrc.oasis.lib.oasis import partial_pmatch, check_ignores, validate_targets, distill_list, ferment_list
+from game.gamesrc.oasis.lib.oasis import partial_pmatch, check_ignores, validate_targets
 
 class HideFrom(default_cmds.MuxCommand):
     """
@@ -36,7 +36,7 @@ class HideFrom(default_cmds.MuxCommand):
         if not targets:
             self.caller.msg("No valid targets found.")
             return
-        hiding_from = distill_list(self.caller.db.hiding_from)
+        hiding_from = self.caller.db.hiding_from
         if switch:
             for target in targets:
                 if target not in hiding_from:
@@ -53,7 +53,7 @@ class HideFrom(default_cmds.MuxCommand):
                 else:
                     hiding_from = [ person for person in hiding_from if person != target ]
                     self.caller.msg("No longer hiding from %s." % target.name)
-        self.caller.db.hiding_from = ferment_list(hiding_from)
+        self.caller.db.hiding_from = hiding_from
 
     def func(self):
         """
