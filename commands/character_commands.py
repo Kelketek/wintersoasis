@@ -76,7 +76,7 @@ and get their info.
        self.caller.msg("")
 
        if char.db.qualities:
-           for key, value in char.qualities.items():
+           for key, value in char.db.qualities.items():
                 line = "{c%-20s{b: {g%s{n" % (key, value)
                 self.caller.msg(line)
 
@@ -86,10 +86,11 @@ and get their info.
 	"""
 	self.caller.msg("The legend of " + char.name + ":")
 	self.caller.msg("")
-	try:
-	    self.caller.msg(char.background)
-	except:
+	background = char.db.background
+	if not background:
 	    self.caller.msg("    This tale is not written.")
+            return
+        self.caller.msg(background)
 
     def func(self):
         """

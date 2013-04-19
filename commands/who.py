@@ -14,6 +14,9 @@ from ev import utils
 from game.gamesrc.oasis.lib.oasis import check_ignores
 from src.server.sessionhandler import SESSIONS
 
+SESSION = 0
+STRING = 1
+
 class Who(default_cmds.MuxCommand):
     """
     List all players, their locations, online times, idle times, and more.
@@ -29,15 +32,18 @@ class Who(default_cmds.MuxCommand):
     priority = 5
     help_category = "General"
 
+    SESSION = 0
+    STRING = 1
+
     # Each of these takes a list of lists. The first element in each list
     # should be the session object. After that should be the string in
     # progress. Each section adds to the string.
 
-    SESSION = 0
-    STRING = 1
-
     def get_status(self, session):
-        status = session.get_character().db.status
+        character = session.get_character()
+        if not character:
+            return 'NULL'
+        status = character.db.status
         if not status:
             return ''
         return status
@@ -46,7 +52,10 @@ class Who(default_cmds.MuxCommand):
     get_status.color = '{r'
 
     def get_location(self, session):
-        location = session.get_character().location
+        character = session.get_character()
+        if not character:
+            return 'None'
+        location = character.location
         if location and self.admin:
             return '%s(#%s)' % ( location, location.dbobj.id )
         return location
@@ -70,14 +79,18 @@ class Who(default_cmds.MuxCommand):
     get_idle_time.spacing = 10
     get_idle_time.color = '{y'
 
-    def get_ip(self, session):
+    def get_host(self, session):
+        print dir(session)
         return session.address[0]
-    get_ip.title = "IP"
-    get_ip.spacing = 13
-    get_ip.color = '{B'
+    get_host.title = "Host"
+    get_host.spacing = 13
+    get_host.color = '{B'
 
     def get_doing(self, session):
-        doing = session.get_character().db.doing
+        character = session.get_character()
+        if not character:
+            return ''
+        doing = character.db.doing
         if not doing:
             return ''
         return doing
@@ -87,12 +100,14 @@ class Who(default_cmds.MuxCommand):
 
     def get_name(self, session):
         character = session.get_character()
+        if not character:
+            return "(Player) %s" % session.player
         name = character.name
         if self.admin:
-            name += '(#%s)' % character.dbobj.id
+            name += '(#%s) (%s:#%s)' % (character.dbobj.id, character.player, character.player.dbobj.id)
         return name
     get_name.title = "Name"
-    get_name.spacing = 20
+    get_name.spacing = 40
     get_name.color = '{G'
 
     def func(self):
@@ -101,20 +116,27 @@ class Who(default_cmds.MuxCommand):
         """
         construction = [ self.get_name, self.get_online_time, self.get_idle_time, self.get_status, self.get_location ]
         self.switches = [ switch.lower() for switch in self.switches ]
-        if 'wiz' in self.switches and self.caller.locks.check_lockstring(self.caller, 'admin:perm(Immortals)'):
-            construction.append(self.get_ip)
-            self.admin = True
-        else:
+        if not getattr(self.caller, 'locks', None) or not \
+            ('wiz' in self.switches and self.caller.locks.check_lockstring(self.caller, 'admin:perm(Immortals)')):
+            self.admin = False # This is a session, not a player.
             construction.append(self.get_doing)
-            self.admin = False
+        else:
+            construction.append(self.get_host)
+            self.admin = True
         header = ''
         separator = ' '
         for function in construction:
              header += '%s%s{n' % (function.color, function.title)
              padding = function.spacing - len(function.title)
              header += separator * padding
+
         self.caller.msg(header)
+
         users = [ [session, ''] for session in SESSIONS.get_sessions() if check_ignores(self.caller, [session.get_character()], silent=True) ]
+
+        if not self.admin:
+            users = [ user for user in users if user[Who.SESSION].get_character() ]
+
         for user in users:
              for function in construction:
                  user[Who.STRING] += function.color + "%%-%ss" % function.spacing % function(user[Who.SESSION]) + '{n'

@@ -66,10 +66,10 @@ def action_watchers(user, function, kwargs, delay=0, respect_hide=True):
     """
     online_users = [ session.get_character() for session in SESSIONS.sessions.values() if session.get_character() ]
     for target in online_users:
-        if user.check_list(target, "watching"):
+        if target.check_list(user, "watching"):
             kwargs['target'] = target
             kwargs['user'] = user
-            if target.locks.check_lockstring(target, 'admin:perm(Wizards)'):
+            if user.locks.check_lockstring(target, 'admin:perm(Wizards)'):
                 function(**kwargs)
             elif respect_hide and check_hiding(target, [user]):
                 reactor.callLater(delay, function, **kwargs)
@@ -102,7 +102,7 @@ def ignored_notifications(user):
 def check_sleepers(person, ref_list, silent=False):
     targets = []
     for ref in ref_list:
-        if ref.sessions:
+        if ref and ref.player:
             targets.append(ref)
         else:
             if not silent:
