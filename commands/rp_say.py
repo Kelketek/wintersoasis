@@ -15,82 +15,49 @@ class Say(default_cmds.MuxCommand):
 
     Talk to those in your current location.
 
-    Use say/help to get extended configuration options.
+    Say has several options for configuration. For instance, you can change the verbs of your say statements with:
+        say/say verb
+        say/ask verb
+        say/exclaim verb
+    So, if you typed:
+        say/say rumbles
+    Your statements would look something like:
+        Tom rumbles, "This or that."
+    If you don't supply a verb, any setting you have will be cleared and it will use the default. You can also use an alternative quote mark.
+        say/quote ~
+    Will make your statements like:
+        Tom rumbles, ~This or that.~
+
+    You can set colors for your quote marks, your text in quote marks, and your text outside of quote marks with:
+        say/quotecolor color
+        say/saycolor color
+        say/posecolor color
+    The following colors are supported:
+        {RRed{n, {GGreen{n, {YYellow{n, {BBlue{n, {MMagenta{n,
+        {CCyan{n, {WWhite{n, and {nNormal, which uses 'uncolored' text.
+    You can also specify that the color is to be bold. So:
+        say/saycolor blue
+    ...will make the color {Bblue{n, but
+        say/saycolor bold blue
+    ...will make the color a {bstrong blue{n.
+
+    This program will automatically balance your quote marks by default. You can escape a quote mark with a backslash. You can toggle quote balancing with:
+        say/balance
+    ...as a result, poses will never have a quote mark appended automatically, and all 'say's will always have a quote appended.
+    This program allows you to split statements with double commas. For example:
+        say This is a strange place,,I'm not sure we belong here.
+    would yield:
+        "This is a strange place," says Tom, "I'm not sure we belong here."
+    You can also inject your name arbitrarily into your statement, or not have it at all. The spoof command allows you to do a free-form pose, and you can inject your own name with /self. Why use /self? Because it will use your namecolor. So, if Tom has his namecolor as blue, this:
+        spoof He looked over at his watch, and checked the time. /self wondered how long it would take his friend to get here.
+    Would produce:
+        He looked over at his watch, and checked the time. {BTom{n wondered how long it would take his friend to get here. {C[{BTom{C]{n
+    In a freeform post, your name is always appended to the end.
     """
     key = "say"
     aliases = ['"', "'"]
     locks = "cmd:all()"
     help_category = "General"
-
-    def do_extended_help(self):
-        help_docs = ["""
-{c=={gSay extended options{c=={n
-
-Say/pose etc has several options for configuration. For instance, you can change the verbs of your say statements with:
-    say/say verb
-    say/ask verb
-    say/exclaim verb
-So, if you typed:
-    say/say rumbles
-Your statements would look something like:
-    Tom rumbles, "This or that."
-If you don't supply a verb, any setting you have will be cleared and it will use the default. You can also use an alternative quote mark.
-    say/quote ~
-Will make your statements like:
-    Tom rumbles, ~This or that.~
-
-For more options, type say/help 2
-
-{c======================={n
-""",
-
-"""
-{c=={gSay extended options{c=={n
-
-You can set colors for your quote marks, your text in quote marks, and your text outside of quote marks with:
-    say/quotecolor color
-    say/saycolor color
-    say/posecolor color
-The following colors are supported:
-    {RRed{n, {GGreen{n, {YYellow{n, {BBlue{n, {MMagenta{n,
-    {CCyan{n, {WWhite{n, and {nNormal, which uses 'uncolored' text.
-You can also specify that the color is to be bold. So:
-say/saycolor blue
-...will make the color {Bblue{n, but
-say/saycolor bold blue
-...will make the color a {bstrong blue{n.
-
-For more options, type say/help 3
-
-{c======================={n
-""",
-
-"""
-{c=={gSay extended options{c=={n
-
-This program will automatically balance your quote marks by default. You can escape a quote mark with a backslash. You can toggle quote balancing with:
-    say/balance
-...as a result, poses will never have a quote mark appended automatically, and all 'say's will always have a quote appended.
-This program allows you to split statements with double commas. For example:
-    say This is a strange place,,I'm not sure we belong here.
-would yield:
-    "This is a strange place," says Tom, "I'm not sure we belong here."
-You can also inject your name arbitrarily into your statement, or not have it at all. The spoof command allows you to do a free-form pose, and you can inject your own name with /self. Why use /self? Because it will use your namecolor. So, if Tom has his namecolor as blue, this:
-    spoof He looked over at his watch, and checked the time. /self wondered how long it would take his friend to get here.
-Would produce:
-    He looked over at his watch, and checked the time. {BTom{n wondered how long it would take his friend to get here. {C[{BTom{C]{n
-In a freeform post, your name is always appended to the end.
-
-{c======================={n
-"""]
-        try:
-            doc = int(self.args) - 1
-        except:
-            doc = 0
-        try:
-            self.caller.msg(help_docs[doc])
-        except:
-            self.caller.msg("Sorry, no such help page exists for this program!")
 
     # To get these typles, lowercase a string, split it, and arrange
     # alphabetically before converting.
@@ -132,9 +99,6 @@ In a freeform post, your name is always appended to the end.
             return
 
         choice = self.switches[0].lower()
-        if choice == "help":
-            self.do_extended_help()
-            return True
 
         if choice in [
             "say", "ask", "exclaim", "quote",
@@ -153,7 +117,7 @@ In a freeform post, your name is always appended to the end.
                         self.caller.msg("Color set for " + color + choice + "{n.")
                     else:
                         self.caller.msg("Couldn't recognize color: " + self.args)
-                    return True
+                        return True
                 else:
                     self.say_sets[choice] = self.args
                     self.caller.msg("Set '" + choice + "' to '" + self.args + "'.")

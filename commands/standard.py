@@ -5,6 +5,7 @@ Winter's Oasis standard command sets.
 from ev import CmdSet, Command
 from ev import default_cmds
 from src.commands.default import comms
+from src.commands.default import unloggedin
 from contrib.extended_room import CmdExtendedLook 
 from game.gamesrc.oasis.commands import quote, character_commands, rp_say, \
     page, warps, mail, ignore, lineeditor, senses, who, watch, hide_from, unloggedin, \
@@ -63,7 +64,6 @@ class DefaultCmdSet(default_cmds.CharacterCmdSet):
         self.add(senses.Taste())
         self.add(senses.Feel())
         self.add(senses.Smell())
-        self.add(who.Who())
         self.add(watch.Watch())
         self.add(watch.Unwatch())
         self.add(hide_from.HideFrom())
@@ -99,6 +99,7 @@ class UnloggedinCmdSet(default_cmds.UnloggedinCmdSet):
         #
         self.add(unloggedin.Connect())
         self.add(unloggedin.Magic())
+        self.add(who.Who())
 
 class OOCCmdSet(default_cmds.PlayerCmdSet):
     """
@@ -115,6 +116,7 @@ class OOCCmdSet(default_cmds.PlayerCmdSet):
         super(OOCCmdSet, self).at_cmdset_creation()
         self.remove(comms.CmdPage())
         self.add(quit.Quit())
+        self.add(who.Who())
         #
         # any commands you add below will overload the default ones.
         #
