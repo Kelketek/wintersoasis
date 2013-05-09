@@ -46,6 +46,7 @@ CMDSET_PLAYER = "game.gamesrc.oasis.commands.standard.OOCCmdSet"
 BASE_OBJECT_TYPECLASS = "game.gamesrc.oasis.objects.object.WOObject"
 BASE_CHARACTER_TYPECLASS = "game.gamesrc.oasis.objects.character.WOCharacter"
 BASE_PLAYER_TYPECLASS = "game.gamesrc.oasis.objects.player.WOPlayer"
+BASE_ROOM_TYPECLASS = "game.gamesrc.oasis.objects.room.WORoom"
 ######################################################################
 # Batch processors
 ######################################################################

@@ -23,6 +23,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from game.gamesrc.oasis.lib.oasis import action_watchers, check_ignores, check_sleepers, check_hiding, ignored_notifications
 from game.gamesrc.oasis.lib.constants import ALERT
+from object import WOObject
 
 from lib.mail import get_messages
 from web.character.models import TagCategory, TagDef, Tag
@@ -33,7 +34,7 @@ _GA = object.__getattribute__
 _SA = object.__setattr__
 _DA = object.__delattr__
 
-class WOCharacter(Character):
+class WOCharacter(Character, WOObject):
     """
     The Character is like any normal Object (see example/object.py for
     a list of properties and methods), except it actually implements
