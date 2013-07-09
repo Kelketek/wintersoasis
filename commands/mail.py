@@ -8,7 +8,8 @@ import settings
 from ev import Command as BaseCommand
 from ev import default_cmds
 from src.utils import create, utils
-from game.gamesrc.oasis.lib.mail import send_message
+from game.gamesrc.oasis.lib.mail import send_message, get_messages
+from game.gamesrc.oasis.lib.mail import Mail as MailObject
 from game.gamesrc.oasis.lib.oasis import partial_pmatch, validate_targets, check_ignores
 from game.gamesrc.oasis.lib.constants import *
 from game.gamesrc.oasis.commands.lineeditor import LineEditor
@@ -64,18 +65,10 @@ To delete all of your messages, type:
         self.caller.msg('-'*len(header))
 
     def mail_check(self):
-        messages = self.caller.db.mail
+        messages = self.caller.unread_messages()
         if not messages:
             if not self.args.lower() == 'quiet':
                 self.caller.msg(ALERT % "You have no new messages.")
-            return
-        count = 0
-        READ = 2
-        for message in messages:
-            if not message[READ]:
-                count += 1
-        if not count and not self.args.lower() == 'quiet':
-            self.caller.msg(ALERT % "You have no new messages.")
         else:
             self.caller.msg(ALERT % "You have %s new message(s). Check them with: mail" % count)
 
@@ -113,7 +106,7 @@ To delete all of your messages, type:
             self.caller.msg("'%s' is not a valid message number." % self.args)
             return
         try:
-            message = self.caller.mail[choice][MESSAGE]
+            message = get_messages(self.caller)[choice][MESSAGE]
         except (TypeError, IndexError):
             self.caller.msg("The message number %s does not exist." % self.args)
             return
@@ -124,7 +117,7 @@ To delete all of your messages, type:
                 target.typeclass, settings.BASE_CHARACTER_TYPECLASS) ]),
             message.header))
 
-        Mail(self.caller.mail[choice]).delete()
+        MailObject(get_messages(self.caller)[choice], self.caller).delete(self.caller)
 
     def send_buffer(self, senders, subject, receivers, editor_result):
         """

@@ -6,10 +6,10 @@
 # http://diveintopython.org/regular_expressions/street_addresses.html#re.matching.2.3
 #
 
-from django.conf.urls.defaults import *
 from django.conf import settings
+from django.conf.urls.defaults import *
 from django.contrib import admin
-from django.views.generic.simple import direct_to_template
+from django.views.generic import RedirectView
 
 # Wiki imports
 from wiki.urls import get_pattern as get_wiki_pattern
@@ -20,10 +20,6 @@ from django_notify.urls import get_pattern as get_notify_pattern
 #from django.db.models.loading import cache as model_cache
 #if not model_cache.loaded:
 #    model_cache.get_models()
-
-# Forum imports
-from django_authopenid.urls import urlpatterns as authopenid_urlpatterns
-from registration.forms import RegistrationFormUniqueEmail
 
 from djangobb_forum import settings as forum_settings
 #from sitemap import SitemapForum, SitemapTopic
@@ -59,7 +55,7 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     
     # favicon
-    url(r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url':'/media/images/favicon.ico'}),
+    url(r'^favicon\.ico$', RedirectView.as_view(url='/media/images/favicon.ico')),
 
     # ajax stuff
     url(r'^webclient/',include('game.gamesrc.oasis.web.webclient.urls')),
@@ -71,10 +67,9 @@ urlpatterns = patterns('',
     #(r'^mail/', include('game.gamesrc.oasis.web.mail_urls')),
 
     # Forum
-    (r'^forum/account/', include('django_authopenid.urls')),
     (r'^forum/', include('bb_urls', namespace='djangobb')),
     # Favicon
-    (r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/media/images/favicon.ico'}),
+    (r'^favicon\.ico$', RedirectView.as_view(url='/media/images/favicon.ico')),
 
     # Registration stuff
     url(r'^roster/', include('roster.urls', namespace='roster')),
@@ -93,9 +88,9 @@ urlpatterns = patterns('',
     url(r'^selectable/', include('selectable.urls')),
 
     # Ticket system
-    url(r'^tickets/', include('helpdesk.urls')),
+    url(r'^tickets/', include('helpdesk.urls', namespace='helpdesk')),
 
-    url(r'^$', 'views.page_index'),
+    url(r'^$', 'views.page_index', name='index'),
 )
 
 # 500 Errors:

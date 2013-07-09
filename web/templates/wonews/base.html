@@ -1,25 +1,38 @@
-{% load forum_extras %}
+{% load forum_extras bootstrap_toolkit %}
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
-        <title>{{game_name}} - {% if flatpage %}{{flatpage.title}}{% else %}{% block titleblock %}{{page_title}}{% endblock %}{% endif %}</title>
-{% include 'wonews/styles.html' %}
-{% block extra_styles %}{% endblock extra_styles %}
-    </head>
-    <body>
-{% include 'wonews/header.html' %}
-        <div id='sidebar'>
-        {% block sidebar %}
-        {% endblock %}
-        </div>
-        <div id='container'>
-            <div id='main'>
-                {% block content %}
-                {% endblock %}
-            </div>
-        </div>
-{% include 'wonews/footer.html' %}
+  <head>
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+    <title>{{game_name}} - {% if flatpage %}{{flatpage.title}}{% else %}{% block titleblock %}{{page_title}}{% endblock %}{% endif %}</title>
+    {% bootstrap_stylesheet_tag %}
+    {% bootstrap_stylesheet_tag "responsive" %}
+    <style type="text/css">
+        body {
+            padding-top: 60px;
+        }
+    </style>
+    {% block extra_styles %}{% endblock extra_styles %}
+    <script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
+    {% bootstrap_javascript_tag %}
+    <script>
+      $(function() {
+          // Setup drop down menu
+          $('.dropdown-toggle').dropdown();
+ 
+          // Fix input element click problem
+          $('.dropdown input, .dropdown label').click(function(e) {
+              e.stopPropagation();
+          });
+      });
+    </script>
+  </head>
+  <body>
+{% include 'header.html' %}
+<div class="container">
+    {% bootstrap_messages %}
+     {% block content %}{% endblock %}
+
 {% block footer_scripts %}{% endblock footer_scripts %}
-    </body>
+</div>
+  </body>
 </html>

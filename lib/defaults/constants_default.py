@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import ev
-import src.objects.models as models
-from settings import SERVERNAME
+from src.objects import models
+from settings import SERVERNAME, BASE_OBJECT_TYPECLASS
 
 # DBREF of the OOC meeting place used for the nexus command.
 NEXUS = "#2"
@@ -50,3 +50,6 @@ ${message}
 To check and manage your in-game messages, log in to %s.
 """ % SERVERNAME
 
+OBJECT_TYPES = {
+    'default' : BASE_OBJECT_TYPECLASS,
+}

@@ -21,6 +21,7 @@ SSL_ENABLED = True
 SSL_PORTS = [8802]
 TELNET_PORTS = [8888, 4322]
 ALLOW_MULTISESSION = True
+AMP_PORT = 5000
 
 CHARACTER_DEFAULT_HOME = "#153"
 ######################################################################
@@ -103,9 +104,10 @@ TEMPLATE_CONTEXT_PROCESSORS = tuple(set( TEMPLATE_CONTEXT_PROCESSORS + (
     'django.core.context_processors.media',
     'django.core.context_processors.static',
     'django.core.context_processors.request',
-    'django_authopenid.context_processors.authopenid',
+    #'django_authopenid.context_processors.authopenid',
     'djangobb_forum.context_processors.forum_settings',
     'django.contrib.messages.context_processors.messages',
+    'game.gamesrc.oasis.web.context_processors.include_login_form',
 )))
 
 MEDIA_ROOT = os.path.join(GAME_DIR, "gamesrc", "oasis", "web", "media")
@@ -153,6 +155,7 @@ INSTALLED_APPS = tuple(set((
     'dajaxice',
     'dajax',
     'helpdesk',
+    'bootstrap_toolkit',
 )))
 
 STATICFILES_FINDERS = (
@@ -177,8 +180,17 @@ TIME_ZONE = "America/Chicago"
 DJANGOBB_DEFAULT_MARKUP = 'markdown'
 
 # Haystack settings
-HAYSTACK_SITECONF = os.path.join('game.gamesrc.oasis.web.search_sites')
-HAYSTACK_SEARCH_ENGINE = 'whoosh'
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',
+        'PATH': os.path.join(GAME_DIR, 'gamesrc', 'oasis', 'web', 'djangobb_index'),
+        'STORAGE': 'file',
+        'POST_LIMIT': 128 * 1024 * 1024,
+        'INCLUDE_SPELLING': True,
+        'BATCH_SIZE': 100,
+        'EXCLUDED_INDEXES': ['thirdpartyapp.search_indexes.BarIndex'],
+    },
+}
 HAYSTACK_WHOOSH_PATH = os.path.join(GAME_DIR, 'gamesrc', 'oasis', 'web', 'djangobb_index')
 
 TEMPLATE_CONTEXT_PROCESSORS = tuple(set(TEMPLATE_CONTEXT_PROCESSORS + (

@@ -87,6 +87,6 @@ def tags_save(request, character, tag_list):
                 tag.delete()
     for tag in tags:
         if tag not in character_tags:
-            Tag(player=character.db.spirit, tag=tag).save()
+            Tag(player=character.db.spirit.dbobj, tag=tag).save()
     dajax.assign('#tag_error', 'innerHTML', "Saved.")
     return dajax.json()
