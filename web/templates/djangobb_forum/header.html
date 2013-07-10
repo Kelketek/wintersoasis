@@ -1,20 +1,11 @@
 {% load forum_extras %}
 {% load i18n %}
 
-<div id="djangobbwrap">
-<div id="djangobbindex" class="djangobb">
-<div id="brdheader" class="block">
-	<div id="brdmenu" class="inbox">
-		<ul class="nav nav-pills">
-			{% block menu %}
-				<li id="navindex"><a href="{% url 'djangobb:index' %}">{% trans "Index" %}</a></li>
-				<li id="navsearch"><a href="{% url 'djangobb:search' %}">{% trans "Search" %}</a></li>
-				{% if user.is_superuser %}
-					<li id="navadmin"><a href="{% url 'admin:index' %}">{% trans "Administration" %}</a></li>
-				{% endif %}
-			{% endblock %}
-		</ul>
-	</div>
+<div id="brdmenu" class="inbox">
+	<ul class="nav nav-pills">
+		{% block menu %}
+		{% endblock %}
+	</ul>
 </div>
 
 {% if forum_settings.NOTICE %}

@@ -156,6 +156,7 @@ INSTALLED_APPS = tuple(set((
     'dajax',
     'helpdesk',
     'bootstrap_toolkit',
+    'widget_tweaks',
 )))
 
 STATICFILES_FINDERS = (
