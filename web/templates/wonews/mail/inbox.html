@@ -30,7 +30,7 @@
 {% else %}
 <p>{% trans "No messages." %}</p>
 {% endif %}  
-<form method="link" action="{% url mail:compose %}">
+<form method="link" action="{% url 'mail:compose' %}">
 <input type="submit" value="Compose message" />
 </form>
 {% endblock %}

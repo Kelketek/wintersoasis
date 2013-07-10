@@ -2,6 +2,6 @@ Hello there!
 
     You recently registered an account with Winter's Oasis. In order to use this account, you will need to activate it. You can activate the account by visiting the following URL:
 
-    https://{{ current_server }}{% url roster:activate uid=uid activation_key=key %}
+    https://{{ current_server }}{% url 'roster:activate' uid=uid activation_key=key %}
 
     If you didn't register with Winter's Oasis, you can ignore this email. The account will be deleted within a few days if it is not activated.

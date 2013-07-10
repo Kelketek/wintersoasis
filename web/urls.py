@@ -39,8 +39,8 @@ dajaxice_autodiscover()
 
 urlpatterns = patterns('',
     # User Authentication
-    url(r'^login/', 'web.views.login'),
-    url(r'^logout/', 'django.contrib.auth.views.logout'),
+    url(r'^login/', 'web.views.login', name="login"),
+    url(r'^logout/', 'django.contrib.auth.views.logout', name="logout"),
 
     url(r'^accounts/login', 'views.login_gateway'),
 
@@ -58,7 +58,7 @@ urlpatterns = patterns('',
     url(r'^favicon\.ico$', RedirectView.as_view(url='/media/images/favicon.ico')),
 
     # ajax stuff
-    url(r'^webclient/',include('game.gamesrc.oasis.web.webclient.urls')),
+    url(r'^webclient/',include('game.gamesrc.oasis.web.webclient.urls', namespace="webclient")),
 
     # Wiki
     url(r'^notify/', get_notify_pattern()),

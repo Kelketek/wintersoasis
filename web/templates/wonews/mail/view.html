@@ -10,26 +10,26 @@
     {% trans "To:" %} {{ message.recipient_names }}<br />
 </p>
 {{ message.body|markdown:"safe" }}<br /><br />
-<form action="{% url mail:trash %}" method="POST" style="display:inline">
+<form action="{% url 'mail:trash' %}" method="POST" style="display:inline">
     {% csrf_token %}
     <input type="hidden" name="msg_id" value="{{ message.id }}" />
     <input type="submit" value="Delete Message" />
 </form>
-<form action="{% url mail:compose %}" method="POST" style="display:inline">
+<form action="{% url 'mail:compose' %}" method="POST" style="display:inline">
     {% csrf_token %}
     <input type="hidden" name="message" value="{{message.reply_text|escape}}" />
     <input type="hidden" name="to" value="{{message.reply_all}}" />
     <input type="hidden" name="subject" value="Re: {{ message.subject }}" />
     <input type="submit" value="Reply to all" />
 </form>
-<form action="{% url mail:compose %}" method="POST" style="display:inline">
+<form action="{% url 'mail:compose' %}" method="POST" style="display:inline">
     {% csrf_token %}
     <input type="hidden" name="message" value="{{message.reply_text|escape}}" />
     <input type="hidden" name="to" value="{{message.sender_names}}" />
     <input type="hidden" name="subject" value="Re: {{ message.subject }}" />
     <input type="submit" value="Reply" />
 </form>
-<form method="link" action="{% url mail:inbox %}">
+<form method="link" action="{% url 'mail:inbox' %}">
 <input type="submit" value="Return to Inbox" />
 </form>
 {% endblock %}

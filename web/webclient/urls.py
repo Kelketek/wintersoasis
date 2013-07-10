@@ -5,4 +5,4 @@ webpage 'application'.
 from django.conf.urls.defaults import *
 
 urlpatterns = patterns('',
-   url(r'^$', 'web.webclient.views.webclient'),)
+   url(r'^$', 'web.webclient.views.webclient', name="client"),)

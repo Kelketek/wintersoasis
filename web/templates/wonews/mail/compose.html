@@ -42,7 +42,7 @@
 <script type='text/javascript' src="{{ MEDIA_URL }}javascript/jquery.autocomplete.js"></script>
 <script type='text/javascript'>
 $('#id_to').autocomplete({
-    serviceUrl: '{% url character:character_lookup %}',
+    serviceUrl: '{% url 'character:character_lookup' %}',
     delimiter: RegExp(',[ ]?'),
     tabDisabled: true,
     autoSelectFirst: true,

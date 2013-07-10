@@ -16,7 +16,7 @@
 {% endif %}
 Dossier: {{ character.name }}</h1>
 {% if user.is_authenticated and not perms.same_player %}
-<form method="POST" action="{% url mail:compose %}" >
+<form method="POST" action="{% url 'mail:compose' %}" >
 {% csrf_token %}
 <input type="image" src="{{ MEDIA_URL }}images/oldmail.svg" height="23"/>
 <input type="hidden" name="to" value="{{ character.name }}, "/>
@@ -28,7 +28,7 @@ Dossier: {{ character.name }}</h1>
 <button id="ignoring_button" onclick="call_button('ignoring', '#ignoring_button', true);"></button>
 {% endif %}
 {% if perms.same_player %}
-<br /><a href="{% url djangobb:forum_profile_upload_avatar character.name %}">Change Avatar</a>
+<br /><a href="{% url 'djangobb:forum_profile_upload_avatar' character.name %}">Change Avatar</a>
 {% endif %}
 <div class="character_sex_and_species">
 <table>
@@ -42,7 +42,7 @@ Dossier: {{ character.name }}</h1>
     </tr>
 </table>
 {% if perms.me and character.get_alts %}
-    <form method="POST" action="{% url character:switch %}" />
+    <form method="POST" action="{% url 'character:switch' %}" />
     {% csrf_token %}
     <select name="target">
         {% for alt in character.get_alts %}
