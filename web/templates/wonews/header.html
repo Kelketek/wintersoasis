@@ -8,12 +8,23 @@
                 <li><a href='{% url "wiki:root" %}'>Read up on the game</a></li>
                 <li><a href='{% url "djangobb:index" %}'>Play on the forums</a></li>
                 <li><a href='{% url "webclient:client" %}'>Play in real time!</a></li>
-                <li><a href='{% url "roster:new" %}'>Register</a></li>
             </ul>
             <ul class="nav pull-right">
+              {% if request.user.is_authenticated %}
+              <li><a class="wo-avatar-link" href="{% url 'character:profile' user.username %}">
+              {% if user.forum_profile.avatar %}
+                <img class="wo-avatar" src="{{ user.forum_profile.avatar.url }}" />
+              {% else %}
+                <img class="wo-avatar" src="{{ MEDIA_URL }}images/unlogged.png" />
+              {% endif %}
+              <li class="divider-vertical"></li>
+              <li><a href="{% url 'logout' %}">Sign out</a></li>
+              {% else %}
+              <li><a href='{% url "roster:new" %}'>Register</a></li>
+              <li class="divider-vertical"></li>
               <li class="dropdown">
                 <a class="dropdown-toggle" href="#" data-toggle="dropdown">Sign In <strong class="caret"></strong></a>
-                <div class="dropdown-menu" style="padding: 15px; padding-bottom: 0px;">
+                <div class="dropdown-menu" class="popout" style="padding: 15px; padding-bottom: 0px;">
                   <form class="form-inline" action="{% url "login" %}" method="POST">
                     {% csrf_token %}
                     {{ login_form|as_bootstrap }}
@@ -22,6 +33,7 @@
                   </form>
                 </div>
               </li>
+             {% endif %}
             </ul>
         </div>
     </div>

@@ -1,0 +1,41 @@
+body {
+    background-image:url('../images/paper/eggshell.jpg');
+    background-repeat:repeat;
+}
+hr {
+    height: 3px;
+    background-color: #aaaaaa;
+}
+.navbar-inner {
+    background-image: linear-gradient(to bottom, #FaE6D4, #baA684);
+}
+.navbar .nav > li > a {
+    color: #dcdcdc;
+    font-weight: bold;
+    text-shadow: 0px 2px 5px #1a1a1a;
+}
+.navbar .brand {
+    color: #dcdcdc;
+    font-weight: bold;
+    text-shadow: 0px -1px 5px #000000;
+}
+.vtlogo {
+   height: 75px; 
+}
+
+.footer-text {
+    font-size: 10pt;
+}
+
+.wo-avatar-link {
+    padding: 0px !important;
+}
+
+.wo-avatar {
+    margin: 0px;
+    max-height: 39px;
+    max-width: 39px;
+    border-top: 1px;
+    outline: 1px solid #111;
+    background: #333;
+}

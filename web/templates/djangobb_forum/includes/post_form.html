@@ -56,7 +56,7 @@
             </div>
             {% endif %}
             <hr />
-            <p><input class="btn btn-primary" type="submit" name="{{ form.FORM_NAME }}" value="{% trans "Submit" %}" /><a href="{{ back_url|default_if_none:"javascript:history.go(-1)" }}">{% trans "Go back" %}</a></p>
+            <div class="btn-group"><input class="btn btn-primary" type="submit" name="{{ form.FORM_NAME }}" value="{% trans "Submit" %}" /><a class="btn" href="{{ back_url|default_if_none:"javascript:history.go(-1)" }}">{% trans "Go back" %}</a></div>
         </form>
     </div>
 </div>

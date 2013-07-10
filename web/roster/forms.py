@@ -14,8 +14,8 @@ class Username(CharField):
     """
     Used for validating usernames.
     """
-    def __init__(self):
-        super(Username, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(Username, self).__init__(*args, **kwargs)
         MAX_USERNAME_LENGTH = 16
         self.validators = [validators.MaxLengthValidator(MAX_USERNAME_LENGTH), self.check_no_spaces, self.check_existing]
 
@@ -48,13 +48,29 @@ class Username(CharField):
             pass
 
 class NewUser(forms.Form):
-    name = Username()
-    password = forms.CharField(widget=forms.PasswordInput(render_value=False), max_length=80)
-    password2 = forms.CharField(widget=forms.PasswordInput(render_value=False), max_length=80)
-    email = forms.EmailField()
-    email2 = forms.EmailField()
-    captcha = ReCaptchaField(attrs={'theme' : 'white'})
-    aup = forms.BooleanField()
+    name = Username(help_text="You will only want to put the first name of your character here, as this is also the name you will use to sign in. Spaces are not allowed, but underscores and hyphens are fine.")
+    password = forms.CharField(
+        widget=forms.PasswordInput(render_value=False), max_length=80,
+        help_text="A good password is best made by creating a nonsense phrase "
+            "you can remember. For instance, 'JulesVerneKickedInTheJewels'.")
+    password2 = forms.CharField(widget=forms.PasswordInput(
+        render_value=False), max_length=80,
+        help_text="Type your password one more time to double-check that "
+            "you've entered it correctly. If you haven't typed it the same "
+            "twice, you may have made a typo in the original!")
+    email = forms.EmailField(help_text="Specify your contact email address. "
+        "If you have multiple characters, be sure to use the same email "
+        "address for all of them. This allows alternate character aware "
+        "features to work.")
+    email2 = forms.EmailField(help_text="Type your email one more time to "
+        "double-check that you've entered it correctly. If you haven't typed "
+        "it the same twice, you may have made a typo in the original!")
+    captcha = ReCaptchaField(
+        attrs={'theme' : 'white'},
+        help_text="This last part's just a formality. We want to make sure "
+            "you are a human, whether or not your character is. :)")
+    aup = forms.BooleanField(
+        help_text="I have read and agree to the Acceptable Use Policy.")
 
     def clean_password2(self):
         password = self.cleaned_data.get('password')

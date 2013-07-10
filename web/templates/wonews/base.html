@@ -11,6 +11,8 @@
             padding-top: 60px;
         }
     </style>
+    <link href='http://fonts.googleapis.com/css?family=IM+Fell+Great+Primer' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="{{ MEDIA_URL }}css/wonews.css">
     {% block extra_styles %}{% endblock extra_styles %}
     <script type="text/javascript" src="{{ MEDIA_URL }}javascript/jquery.js"></script>
     {% bootstrap_javascript_tag %}
@@ -33,6 +35,12 @@
      {% block oasis_content %}{% endblock %}
 
 {% block footer_scripts %}{% endblock footer_scripts %}
+<footer class="span12">
+<hr />
+<img src="{{ MEDIA_URL }}images/foxlogo.svg" class="pull-right vtlogo" />
+<p class="footer-text">Winter's Oasis is a <a href="http://www.vulpinetheory.net">Vulpine Theory</a> project.<br />
+Vulpine Theory is a Division of Kelketek Enterprises, LLC.</p>
+</footer>
 </div>
   </body>
 </html>

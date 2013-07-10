@@ -2,8 +2,12 @@
 {% include forum_extras %}
 {% load dajaxice_templatetags %}
 {% load markup %}
+{% block extra_styles %}
+{% dajaxice_js_import %}
+{% endblock %}
 {% block titleblock %}{% if character %}{{ character.name }}{% else %}Profiles{% endif %}{% endblock %}
-{% block content %}
+{% block oasis_content %}
+<div class="container">
 {% if not character %}
 <h1>Not Found</h1>
 <p>The character you're seaching for does not exist, or you have not specified one.</p>
@@ -30,8 +34,9 @@ Dossier: {{ character.name }}</h1>
 {% if perms.same_player %}
 <br /><a href="{% url 'djangobb:forum_profile_upload_avatar' character.name %}">Change Avatar</a>
 {% endif %}
-<div class="character_sex_and_species">
-<table>
+<div class="row">
+<div class="span3">
+<table class="table">
     <tr>
         <td class="profile_key">Sex:</td>
         <td class="profile_value">{{ character.db.sex }}</td>
@@ -49,13 +54,22 @@ Dossier: {{ character.name }}</h1>
             <option>{{ alt.name }}</option>
         {% endfor %}
     </select>
-    <input type="Submit" value="Switch Characters" />
-    <input type="checkbox" name="login" />Log in
+    <input class="btn" type="Submit" value="Switch Characters" />
+    <label class="checkbox">
+        <input type="checkbox" name="login" />
+           Log in
+    </label>
     </form>
 {% endif %}
+</div>
+</div>
 {% if perms.me or perms.staff %}
-    <div class="character_stats">
-        <table>
+<div class="row">
+        <table class="table span3">
+          <tr>
+            <th>Stat</th>
+            <th>Value</th>
+          <tr>
             {% for key, value in character.db.stats.items %}
             <tr>
                 <td class="profile_key"><img class="character_stat_icon" src="{{ MEDIA_URL }}/images/{{ key }}.png" alt="">{{ key }}:</td>
@@ -63,9 +77,12 @@ Dossier: {{ character.name }}</h1>
             </tr>
             {% endfor %}
         </table>
-    </div>
-    <div class="character_qualities">
-        <table class="character_quality_table">
+    <div class="span8">
+        <table class="table">
+          <tr>
+            <th>Quality</th>
+            <th>Description</th>
+          </tr>
             {% for key, value in character.db.qualities.items %}
             <tr>
                 <td class="quality_key"><span class="quality_key">{{ key }}</span></td>
@@ -74,12 +91,13 @@ Dossier: {{ character.name }}</h1>
             {% endfor %}
         </table>
     </div>
-    <h2>History</h2>
+</div>
+    <h2>History</h2><hr />
         {{ character.db.background|markdown:"safe" }}
 {% endif %}
-<h2>Appearance</h2>
+<h2>Appearance</h2><hr />
 {{ character.db.desc|markdown:"safe" }}
-<h2>Role-Play Tags</h2>{% if perms.me or perms.staff %}<button class="show_tag_form" onclick="show_tag_form(true);">Edit</button>{% endif %}
+<h2>Role-Play Tags</h2><hr />{% if perms.me or perms.staff %}<button class="show_tag_form" onclick="show_tag_form(true);">Edit</button>{% endif %}
 <div class="character_tag_listing">
 {% for category, tag_dict in tags.items %}
     <div class="tags_{{category.name}}">
@@ -94,7 +112,7 @@ Dossier: {{ character.name }}</h1>
             <input class="tag_toggle" type="checkbox" name="tag_check" value="{{tag.id}}" {% if tag_set %}checked{% endif %} style="display: none;" />
         {% endif %}
         {% if tag_set or perms.me or perms.staff %}
-        <span class="tag_name">{{ tag.name }}</span><div class="tag_description" style="display: none;">{{ tag.description }}</div></span>
+        <span class="label">{{ tag.name }}</span><div class="tag_description" style="display: none;">{{ tag.description }}</div></span>
         {% endif %}
     {% endfor %}
     </div>
@@ -107,7 +125,8 @@ Dossier: {{ character.name }}</h1>
 {% endif %}
 </div>
 {% endif %}
-{% endblock content %}
+</div>
+{% endblock oasis_content %}
 {% block footer_scripts %}
         <script src="{{ MEDIA_URL }}javascript/qtip.js"></script>
         <script src="{{ MEDIA_URL }}javascript/Markdown.Converter.js"></script>
