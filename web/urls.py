@@ -115,8 +115,3 @@ if (settings.DEBUG):
         (r'^%s(?P<path>.*)$' % settings.MEDIA_URL.lstrip('/'),
             'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
     )
-
-# Django-article
-urlpatterns += patterns('',
-    url(r'^news/', include('articles.urls')),
-)

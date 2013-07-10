@@ -47,7 +47,7 @@ def partial_pmatch(me, name, local_only=False):
                 global_name = '*' + name
         except IndexError:
             pass
-        target = me.search(global_name, global_search=True, ignore_errors=False, use_nicks=True)
+        target = me.search(global_name, global_search=True, quiet=True, use_nicks=True)
     if target:
         if type(target) == list:
             return target

@@ -213,8 +213,6 @@ TEMPLATE_LOADER_PRIORITIES = [
 
 FILE_UPLOAD_PERMISSIONS = 0644
 
-AUTHENTICATION_BACKENDS = ('game.gamesrc.oasis.web.models.CaseInsensitiveModelBackend',)
-
 # Character App Settings
 
 AUP = """

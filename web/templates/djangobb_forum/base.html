@@ -1,15 +1,8 @@
+{% extends 'wonews/base.html' %}
 {% load forum_extras %}
 {% load i18n %}
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-<head>
-	<title>{{ forum_settings.FORUM_BASE_TITLE }} {% block title %}{% endblock %}</title>
-	<meta name="description" content="{{ forum_settings.FORUM_META_DESCRIPTION }} " />
-	<meta name="keywords" content="{{ forum_settings.FORUM_META_KEYWORDS }}" />
-	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-	
-	{% set_theme_style request.user %}
+{% comment %}
 
 	<link rel="alternate" type="application/atom+xml" href="{% url 'djangobb:forum_posts_feed' %}" title="{% trans "Latest posts on forum" %}" />
 	<link rel="alternate" type="application/atom+xml" href="{% url 'djangobb:forum_topics_feed' %}" title="{% trans "Latest topics on forum" %}" />
@@ -24,6 +17,9 @@
 	{% else %}
     	<script type="text/javascript" src="{{ STATIC_URL }}admin/js/jquery.min.js" onerror="JavaScript:alert('Error loading file [' + this.src + '] !');" ></script>
 	{% endif %}
+
+{% endcomment %}
+    {% block extra_styles %}
 	{% if user.is_authenticated %}
     	{% if post %}
             {% with markup=post.markup %}
@@ -34,12 +30,14 @@
                 {% include "djangobb_forum/includes/markup_editor.html" %}
             {% endwith %}
         {% endif %}
+
     	<script type="text/javascript">
     	   $(document).ready(function() {
     		$(".markup").markItUp(mySettings);
     	   });
     	</script>
 	{% endif %}
+
 
     <!-- Highlightjs goodies -->
 	<link type="text/css" rel="stylesheet" href="{{ STATIC_URL }}djangobb_forum/css/pygments.css" />
@@ -52,51 +50,22 @@
 		</script>
 	{% endif %}
 	{% block extra_meta %}{% endblock %}
-</head>
-<body>
-    {% include 'djangobb_forum/header.html' %}
+   {% endblock %}
 
-    {% block messages %}
-        {% if messages %}
-        <div id="messages" class="block">
-            <h2><span>{% trans "Notice" %}</span></h2>
-            <div class="box">
-                <div class="inbox">
-                    <ul class="messagelist">
-                        {% for message in messages %}
-                            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            </div>
-        </div>
-        {% endif %}
-    {% endblock messages %}
-
+{% block oasis_content %}
+        {% include 'djangobb_forum/header.html' %}
 	{% block content %}{% endblock %}
-	<div id="brdfooter" class="block">
-	<h2><span>{% trans "Board footer" %}</span></h2>
-        <div class="box">
-            <div class="inbox">
-                {% block controls %}
-                    <dl id="searchlinks" class="conl">
-                        <dt><strong>{% trans "Search links" %}</strong></dt>
-                        <dd><a href="{% url 'djangobb:search' %}?action=show_24h">{% trans "Show recent posts" %}</a></dd>
-                        <dd><a href="{% url 'djangobb:search' %}?action=show_unanswered">{% trans "Show unanswered posts" %}</a></dd>
-                        {% if user.is_authenticated %}
-                        <dd><a href="{% url 'djangobb:search' %}?action=show_subscriptions">{% trans "Show your subscribed topics" %}</a></dd>
-                        <dd>{% trans "Show your" %} <a href="{% url 'djangobb:search' %}?action=show_user&show_as=topics">{% trans "topics" %}</a>/<a href="{% url 'djangobb:search' %}?action=show_user&show_as=posts">{% trans "posts" %}</a></dd>
-                        {% endif %}
-                    </dl>
-                {% endblock controls %}
-                <p class="conr">Powered by <a href="http://djangobb.org/">DjangoBB</a></p>
-                <div class="clearer"></div>
-                {% block lofi %}
-                {% endblock lofi%}
-            </div>
-        </div>
+    <div class="well well-small">
+        {% block controls %}
+            <ul class="nav nav-pills">
+                <li><a href="{% url 'djangobb:search' %}?action=show_24h">{% trans "Show recent posts" %}</a></li>
+                <li><a href="{% url 'djangobb:search' %}?action=show_unanswered">{% trans "Show unanswered posts" %}</a></li>
+                {% if user.is_authenticated %}
+                <li><a href="{% url 'djangobb:search' %}?action=show_subscriptions">{% trans "Show your subscribed topics" %}</a></li>
+                <li><a href="{% url 'djangobb:search' %}?action=show_user&show_as=topics">{% trans "Show your topics" %}</a></li>
+                <li><a href="{% url 'djangobb:search' %}?action=show_user&show_as=posts">{% trans "Show your posts" %}</a></li>
+                {% endif %}
+            </ul>
+        {% endblock controls %}
     </div>
-</div>
-</div>
-</body>
-</html>
+{% endblock %}

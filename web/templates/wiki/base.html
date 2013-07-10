@@ -1,4 +1,5 @@
 {% extends "wonews/base.html" %}
+{% block oasis_content %}
 {% block content %}
     {% block wiki_body %}
     
@@ -28,4 +29,5 @@
 
 {% block footer_scripts %}
     <script src="{{ STATIC_URL }}wiki/js/core.js"></script>
+{% endblock %}
 {% endblock %}

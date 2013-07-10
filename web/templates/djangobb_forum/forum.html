@@ -10,20 +10,21 @@
 	<div class="inbox">
 		<div class="pagelink conl">{% paginate %}</div>
 		{% if user.is_authenticated %}
-			<p class="postlink conr"><a href="{% url 'djangobb:add_topic' forum.id %}">{% trans "New topic" %}</a></p>
-		{% endif %}
-		<ul><li><a href="{% url 'djangobb:index' %}">{% trans "Root" %}</a> </li><li>&raquo; {{ forum.name }}</li></ul>
+			<p><a class="btn btn-primary" href="{% url 'djangobb:add_topic' forum.id %}">{% trans "New topic" %}</a>
+        {% if moderator %}<a class="btn" href="{% url 'djangobb:moderate' forum.id %}">{% trans "Moderate forum" %}</a>{% endif %}
+		{% endif %}</p>
+		<ul class="breadcrumb"><li><a href="{% url 'djangobb:index' %}">{% trans "Root" %}</a><span class="divider">/</span></li><li>{{ forum.name }}</li></ul>
 		<div class="clearer"></div>
 	</div>
 </div>
 <div id="vf" class="blocktable">
 	<h2>
+        <strong><span>{{ forum.name }}</span></strong>
 		<a href="{% url 'djangobb:forum_forum_feed' forum.id %}"><img src="{{ STATIC_URL }}djangobb_forum/img/feed-icon-small.png"  alt="[RSS Feed]" title="[RSS Feed]" class="rss" /></a>
-		<b><span>{{ forum.name }}</span></b>
 	</h2>
 	<div class="box">
 		<div class="inbox">
-			<table cellspacing="0">
+			<table class="table" cellspacing="0">
 			<thead>
 				<tr>
 					<th class="tcl" scope="col">{% trans "Topic" %}</th>
@@ -65,43 +66,27 @@
 	</div>
 </div>
 <div class="linkst">
-	<div class="inbox">
 		<div class="pagelink conl">{% paginate %}</div>
 		{% if user.is_authenticated %}
-			<p class="postlink conr"><a href="{% url 'djangobb:add_topic' forum.id %}">{% trans "New topic" %}</a></p>
+            <p></p><a class="btn btn-primary" href="{% url 'djangobb:add_topic' forum.id %}">{% trans "New topic" %}</a>
+        {% if moderator %}<a class="btn" href="{% url 'djangobb:moderate' forum.id %}">{% trans "Moderate forum" %}</a>{% endif %}</p>
 		{% endif %}
-		<ul><li><a href="{% url 'djangobb:index' %}">{% trans "Root" %}</a> </li><li>&raquo; {{ forum.name }}</li></ul>
-		<div class="clearer"></div>
-	</div>
+		<ul class="breadcrumb"><li><a href="{% url 'djangobb:index' %}">{% trans "Root" %}</a><span class="divider">/</span></li><li>{{ forum.name }}</li></ul>
 </div>
 {% endblock %}
 {% block controls %}
-<div class="conl">
-	<form id="qjump" method="get" action="forum">
-		<div><label>{% trans "Jump to" %}
-		<br />
-		<select name="id" id="forum_id" onchange="window.location=('{% url 'djangobb:index' %}'+this.options[this.selectedIndex].value)">
-			{% for category in categories %}
-				<optgroup label="{{ category }}">
-					{% for forum in category.forums.all %}
-						<option value="{{ forum.id }}">{{ forum.name }}</option>
-					{% endfor %}
-				</optgroup>
-			{% endfor %}
-		</select>
-		<input type="button" onclick="window.location=('{% url 'djangobb:index' %}'+getElementById('forum_id').value)" value=" {% trans "Go" %} " accesskey="g" />
-		</label></div>
-	</form>
-	{% if moderator %}
-		<p id="modcontrols"><a href="{% url 'djangobb:moderate' forum.id %}">{% trans "Moderate forum" %}</a></p>
-	{% endif %}
-</div>
-{% endblock %}
-
-{% block lofi %}
-{% if forum_settings.LOFI_SUPPORT %}
-    <p class="lofi">
-        <a href="{{ forum.get_absolute_url }}lofi/">Lo-Fi Version</a>
-    </p>
-{% endif %}
+    <div class="input-append">
+    <form method="get" action="forum">
+    <select name="id" id="forum_id" onchange="window.location=('{% url 'djangobb:index' %}'+this.options[this.selectedIndex].value)">
+        {% for category in categories %}
+            <optgroup label="{{ category }}">
+                {% for forum in category.forums.all %}
+                    <option value="{{ forum.id }}">{{ forum.name }}</option>
+                {% endfor %}
+            </optgroup>
+        {% endfor %}
+    </select>
+    <input type="button" class="btn" onclick="window.location=('{% url 'djangobb:index' %}'+getElementById('forum_id').value)" value=" {% trans "Go" %} " accesskey="g" />
+    </form>
+    </div>
 {% endblock %}
