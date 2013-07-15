@@ -216,29 +216,11 @@ FILE_UPLOAD_PERMISSIONS = 0644
 
 # Character App Settings
 
-AUP = """
-
-Lorem Ipsum
-===========
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque tortor nunc, porta luctus fringilla a, ullamcorper sit amet neque. Aenean elementum viverra congue. Sed quis justo lectus. Suspendisse potenti. Fusce mollis sagittis ullamcorper. Mauris volutpat augue metus. Nunc tristique augue eu sem auctor malesuada.
-
-Vestibulum at imperdiet ipsum. Phasellus neque neque, fringilla quis dapibus vel, ultricies quis metus. Fusce dictum mi et lacus dapibus bibendum rhoncus metus rhoncus. Nullam tellus libero, pulvinar id consequat venenatis, rutrum eu tellus. Proin cursus lorem vitae libero tristique ac hendrerit mauris interdum. Nulla mollis venenatis rhoncus. Sed tincidunt, augue vitae congue laoreet, neque tortor tristique risus, id blandit turpis dui a nisi. Morbi vitae velit vel leo eleifend vulputate. In tellus dui, condimentum vel pellentesque vulputate, lacinia in justo. Praesent id lorem ornare ipsum vulputate lobortis.
-
-Moar Lorem Ipsum crap
----------------------
-Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Maecenas eu enim sed dui malesuada varius. Curabitur a sollicitudin mauris. Morbi nisi tellus, dapibus ac interdum sit amet, pellentesque vel tellus. Vivamus purus orci, placerat vel hendrerit ac, iaculis quis massa. Donec ultrices mi sit amet turpis blandit faucibus. Etiam libero mauris, adipiscing sit amet porttitor in, viverra venenatis leo.
-
-Aliquam sed nulla elit. Morbi volutpat eleifend quam. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean vitae quam eros. Duis quis orci vel sapien cursus pellentesque. Etiam odio felis, venenatis a elementum eget, tincidunt quis enim. Sed consectetur auctor dictum.
-
-* Stuff
-* Things
-
-Fusce rutrum ullamcorper lorem vitae lacinia. Integer vel dui augue. Aenean a erat eget arcu volutpat tempor quis nec urna. Phasellus ultrices, eros ac tincidunt porttitor, magna nunc dapibus nunc, nec rutrum ligula nisi eget mi. Cras blandit vehicula sollicitudin. Nam scelerisque urna nec dui condimentum venenatis. Etiam tincidunt tortor quis velit vehicula vitae blandit turpis consequat. Sed vitae risus dui. Vestibulum eros lectus, volutpat ut porttitor vel, vehicula in nisl. Vivamus faucibus nibh nec elit rhoncus et mollis quam tempor. Nullam a tortor sit amet mauris hendrerit faucibus sit amet non magna. Donec elementum adipiscing dui eu varius. Curabitur dignissim pellentesque sollicitudin. Donec posuere leo in dolor lacinia pharetra. Mauris nunc justo, consequat eget blandit eu, pulvinar vitae nisl. In hac habitasse platea dictumst.
-"""
-
 # Wiki settings
 WIKI_ACCOUNT_HANDLING = False
 
-#DAJAX
+# DAJAX
 DAJAXICE_MEDIA_PREFIX="dajaxice"
+
+# Django REST Framework
+

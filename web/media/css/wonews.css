@@ -1,24 +1,54 @@
 body {
     background-image:url('../images/paper/eggshell.jpg');
-    background-repeat:repeat;
 }
 hr {
     height: 3px;
     background-color: #aaaaaa;
 }
-.navbar-inner {
-    background-image: linear-gradient(to bottom, #FaE6D4, #baA684);
+
+code {
+    color: rgb(68, 17, 68);
+    background-image: url('../images/paper/sand.jpg');
+}
+
+pre {
+    background-image: url('../images/paper/sand.jpg');
+    border: none;
+}
+
+blockquote {
+    border-left: 5px solid rgb(150, 150, 150);
+}
+
+.navbar-fixed-top .navbar-inner {
+    background-image: none;
+    background-color: rgb(160, 100, 26);
+    box-shadow: 0px 1px 1px #000000;
+    border: none;
+    font-size: 12pt;
 }
 .navbar .nav > li > a {
-    color: #dcdcdc;
+    color: rgb(250, 250, 250);
     font-weight: bold;
-    text-shadow: 0px 2px 5px #1a1a1a;
+    text-shadow: none;
 }
 .navbar .brand {
-    color: #dcdcdc;
+    color: rgb(250, 250, 250);
     font-weight: bold;
-    text-shadow: 0px -1px 5px #000000;
+    font-size: 15pt;
+    text-shadow: none;
 }
+
+.navbar .divider-vertical {
+    border-color: rgb(0, 0, 0);
+}
+
+.navbar .nav > li > a:focus, .navbar .nav > li > a:hover {
+    color: rgb(221, 221, 221);
+    text-decoration: none;
+    background-color: transparent;
+}
+
 .vtlogo {
    height: 75px; 
 }
@@ -38,4 +68,128 @@ hr {
     border-top: 1px;
     outline: 1px solid #111;
     background: #333;
+}
+
+.nav-pills > .active > a, .nav-pills > .active > a:hover, .nav-pills > .active
+> a:focus {
+    background-color: rgb(133, 100, 123);
+}
+
+.navbar .nav li.dropdown.open > .dropdown-toggle, .navbar .nav
+li.dropdown.active > .dropdown-toggle, .navbar .nav li.dropdown.open.active >
+.dropdown-toggle {
+    color: rgb(221, 221, 221);
+    background-color: rgb(160, 100, 26);
+}
+
+.btn {
+    box-shadow: 0px 1px 1px #000000;
+    background-image: none;
+    background-color: rgb(190, 190, 190);
+}
+
+.btn:hover, .btn:focus, .btn:active, .btn.active, .btn.disabled,
+.btn[disabled] {
+    background-color: rgb(150, 150, 150);
+}
+
+.btn:hover, .btn:focus {
+    transition: background-color 0.3s linear 0s;
+}
+
+.btn-primary {
+    background-color: rgb(133, 100, 123);
+    background-image: none;
+}
+
+.btn-warning {
+    background-image: none;
+    background-color: rgb(250, 167, 50);
+}
+
+.btn-danger {
+    background-image: none;
+    background-color: rgb(218, 79, 73);
+}
+
+.btn-inverse {
+    background-image: none;
+    background-color: rgb(54, 54, 54);
+}
+
+.btn-info {
+    background-image: none;
+    background-color: rgb(133, 100, 123);
+}
+
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active,
+.btn-primary.active, .btn-primary.disabled, .btn-primary[disabled] {
+    background-color: rgb(103, 70, 93);
+}
+
+.btn-warning:hover, .btn-warning:focus, .btn-warning:active,
+.btn-warning.active, .btn-warning.disabled, .btn-warning[disabled] {
+    background-color: rgb(248, 148, 6);
+}
+
+.btn-danger:hover, .btn-danger:focus, .btn-danger:active, .btn-danger.active,
+.btn-danger.disabled, .btn-danger[disabled] {
+    background-color: rgb(189, 54, 47);
+}
+
+.btn-inverse:hover, .btn-inverse:focus, .btn-inverse:active,
+.btn-inverse.active, .btn-inverse.disabled, .btn-inverse[disabled] {
+    background-color: rgb(34, 34, 34);
+}
+
+.btn-info:hover, .btn-info:focus, .btn-info:active, .btn-info.active,
+.btn-info.disabled, .btn-info[disabled] {
+    background-color: rgb(113, 80, 103);
+}
+
+a {
+    color: rgb(100, 100, 204);
+    text-decoration: none;
+}
+
+a:hover, a:focus {
+    color: rgb(70, 70, 184);
+}
+
+.well {
+    background-image: url('../images/paper/sand.jpg');
+    border-radius: 5px;
+}
+
+.breadcrumb {
+    background-image: url('../images/paper/sand.jpg');
+}
+
+.breadcrumb > li > .divider {
+    padding: 0px 5px;
+    color: rgb(60, 60, 60);
+}
+
+.dropdown-menu {
+    background-image:url('../images/paper/eggshell.jpg'); 
+}
+
+.dropdown-menu > li > a:hover, .dropdown-menu > li > a:focus,
+.dropdown-submenu:hover > a, .dropdown-submenu:focus > a {
+    color: rgb(255, 255, 255);
+    background-image: none;
+    background-color: rgb(133, 100, 123);
+}
+
+.form-actions {
+     background-image: url('../images/paper/sand.jpg');
+     border-radius: 5px;
+}
+
+.alert {
+    box-shadow: 0px 1px 1px #000000;
+}
+
+.accordion-group {
+    border: 1px solid rgb(100, 100, 100);
 }

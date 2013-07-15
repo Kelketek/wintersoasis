@@ -112,7 +112,7 @@
 						{% endif %}
 				</ul>
 			</div>
-			<div class="postright">
+			<div>
 				<h3>{{ post.topic.name }}</h3>
 				<div class="span7">
 					<p class="post_body_html">{{ post.body_html|safe }}</p>
@@ -136,7 +136,7 @@
 					{% endwith %}
 				</div>
 			</div>
-			<div class="postfootright">
+			<div class="span2">
 				<div class="btn-group btn-group-vertical">
 					<a class="btn btn-warning" href="{% url 'djangobb:misc' %}?action=report&amp;post_id={{ post.id }}">{% trans "Report" %}</a>
 					{% if moderator or post|forum_equal_to:last_post %}
