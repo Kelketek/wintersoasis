@@ -152,9 +152,9 @@ INSTALLED_APPS = tuple(set((
     'src.comms',
     'src.help',
     'src.scripts',
+    'src.typeclasses',
     'dajaxice',
     'dajax',
-    'helpdesk',
     'bootstrap_toolkit',
     'widget_tweaks',
 )))

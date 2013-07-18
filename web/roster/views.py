@@ -1,4 +1,3 @@
-from django.contrib.auth.models import User
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 from roster.forms import NewUser
@@ -10,7 +9,7 @@ def new(request):
     Basic Registration
     """
     if request.method == 'POST':
-        form  = NewUser(request.POST) # A character generation request was submitted.
+        form = NewUser(request.POST) # A character generation request was submitted.
         if form.is_valid(): # Everything's good to go!
             # We'll process the data here, now that it's been deemed sane.
             data = form.cleaned_data

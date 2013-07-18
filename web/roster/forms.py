@@ -4,11 +4,13 @@ Forms used for Character manipulation
 import regex
 from django import forms
 from captcha.fields import ReCaptchaField
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.core import validators
 from django.core.exceptions import ValidationError
 from django.forms.fields import CharField
 from django.utils.encoding import smart_unicode
+
+User = get_user_model()
 
 class Username(CharField):
     """

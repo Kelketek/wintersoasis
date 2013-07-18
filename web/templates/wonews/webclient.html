@@ -13,8 +13,8 @@
 
     <!-- Importing the Evennia ajax webclient component (requires jQuery)  -->
     <script type="text/javascript">
-        var magic_cookie="{{user.get_profile.db.magic_cookie}}";
-        var current_user="{{user.get_profile.name}}";
+        var magic_cookie="{{user.db.magic_cookie}}";
+        var current_user="{{user.username}}";
     </script>
     <script src="{{MEDIA_URL}}javascript/evennia_webclient.js" type="text/javascript" charset="utf-8"></script>
 
