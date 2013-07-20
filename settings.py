@@ -119,16 +119,19 @@ MEDIA_URL = '/media/'
 
 STATIC_URL = '/static/'
 
-INSTALLED_APPS = tuple(set((
+INSTALLED_APPS = (
     'south',
+    'src.server',
+    'src.typeclasses',
+    'src.players',
+    'src.objects',
+    'src.comms',
+    'src.help',
+    'src.scripts',
     'django_notify',
     'mptt',
     'sekizai',
     'sorl.thumbnail',
-    'wiki.plugins.notifications',
-    'wiki',
-    'wiki.plugins.attachments',
-    'wiki.plugins.images',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -143,21 +146,18 @@ INSTALLED_APPS = tuple(set((
     'django_authopenid',
     'djangobb_forum',
     'haystack',
+    'wiki',
+    'wiki.plugins.attachments',
+    'wiki.plugins.notifications',
+    'wiki.plugins.images',
+    'wiki.plugins.macros',
     'character',
     'roster',
     'captcha',
-    'src.server',
-    'src.players',
-    'src.objects',
-    'src.comms',
-    'src.help',
-    'src.scripts',
-    'src.typeclasses',
     'dajaxice',
     'dajax',
     'bootstrap_toolkit',
-    'widget_tweaks',
-)))
+    'widget_tweaks',)
 
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',

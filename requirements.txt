@@ -16,7 +16,7 @@ django-pagination
 django-recaptcha
 django-sekizai
 django-bootstrap-toolkit
-https://bitbucket.org/slav0nic/djangobb/get/stable.tar.gz
+#https://bitbucket.org/slav0nic/djangobb/get/stable.tar.gz
 mercurial
 postmarkup
 python-openid
