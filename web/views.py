@@ -25,12 +25,12 @@ def login(request, *args, **kwargs):
     if request.user.is_authenticated():
         lst = [random.choice(string.ascii_letters + string.digits) for n in xrange(30)]
         key = "".join(lst)
-        request.user.get_profile().db.magic_cookie = key
+        request.user.db.magic_cookie = key
     return response
 
 def logout(request, *args, **kwargs):
     if request.user.is_authenticated():
-        del request.user.get_profile().db.magic_cookie
+        del request.user.db.magic_cookie
     return authlogout(request, *args, **kwargs)
 
 def login_gateway(request):
