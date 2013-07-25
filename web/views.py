@@ -46,7 +46,6 @@ def page_index(request):
     """
     Main root page.
     """
-    raise Http500
     context_instance = RequestContext(request)
     context_instance['rip'] = request.META['REMOTE_ADDR']
     return render_to_response('index.html', context_instance)
