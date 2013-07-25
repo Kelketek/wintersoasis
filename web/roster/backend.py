@@ -57,7 +57,7 @@ def send_activation_email(player, request):
     player.db.activation_key = key
     send_mail(
         "Welcome to %s!" % settings.SERVERNAME,
-        get_template('roster/email.txt').render(
+        get_template('activation_email.txt').render(
             RequestContext(request, {
                 'current_server' : request.META['HTTP_HOST'],
                 'key' : key,

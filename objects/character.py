@@ -20,7 +20,7 @@ import time
 from ev import Character
 from collections import OrderedDict
 from django.core.urlresolvers import reverse
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from game.gamesrc.oasis.lib.oasis import action_watchers, check_ignores, check_sleepers, check_hiding, ignored_notifications
 from game.gamesrc.oasis.lib.constants import ALERT
 from object import WOObject
@@ -33,6 +33,8 @@ from settings import SERVERNAME
 _GA = object.__getattribute__
 _SA = object.__setattr__
 _DA = object.__delattr__
+
+User = get_user_model()
 
 class WOCharacter(Character, WOObject):
     """
@@ -105,11 +107,11 @@ class WOCharacter(Character, WOObject):
             If raw is false and the user is not active, always returns an empty
         list.
         """
-        user = self.db.spirit.user
+        user = self.db.spirit
         if not raw and not user.is_active:
             return []
         try:
-            alts = [ alt.get_profile().db.avatar for alt in User.objects.filter(email__iexact=user.email) if alt.is_active or raw ]
+            alts = [alt.db.avatar for alt in User.objects.filter(email__iexact=user.email) if alt.is_active or raw]
             return alts
         except AttributeError:
             return []

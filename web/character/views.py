@@ -1,22 +1,16 @@
 import ujson as json
 from django.contrib.auth import login
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.core.cache import get_cache
-from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, Http404, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from mail.forms import ComposeMail
-from django.conf import settings
-from django.db import transaction
-from django.shortcuts import render
-from urllib2 import unquote
 
 from character.models import TagCategory, Tag
-from src.comms.models import Msg
-from src.objects.models import ObjectDB
 from lib.mail import get_messages, send_message, Mail, MESSAGE
+
+User = get_user_model()
 
 cache = get_cache('default')
 
@@ -29,7 +23,7 @@ def is_alt(request, target):
     Determines if a user is another user's alt.
     """
     try:
-        return request.user.get_profile().db.avatar in target.get_profile().db.avatar.get_alts()
+        return request.user.db.avatar in target.db.avatar.get_alts()
     except:
         return False
 
@@ -84,7 +78,7 @@ def switch(request):
     if is_alt(request, user) and do_login:
         user.backend = 'django.contrib.auth.backends.ModelBackend' 
         login(request, user)
-    next_page = user.get_profile().db.avatar.get_absolute_url()
+    next_page = user.db.avatar.get_absolute_url()
     return HttpResponseRedirect(next_page)
 
 def profile(request, username):
@@ -93,7 +87,7 @@ def profile(request, username):
     """
     try:
         user = User.objects.get(username__iexact=username)
-        character = user.get_profile().db.avatar
+        character = user.db.avatar
         tags = character.get_tags()
     except User.DoesNotExist:
         character = None
@@ -101,7 +95,7 @@ def profile(request, username):
         tags = {}
     perms = permissions_bundle(request, user)
     return render_to_response(
-        'character/profile.html',
+        'profile.html',
         {
             'character' : character,
             'perms'     : perms,

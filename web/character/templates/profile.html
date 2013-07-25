@@ -1,4 +1,4 @@
-{% extends 'wonews/character/default.html' %}
+{% extends 'default.html' %}
 {% include forum_extras %}
 {% load dajaxice_templatetags %}
 {% load markup %}
@@ -10,7 +10,7 @@
 <div class="container">
 {% if not character %}
 <h1>Not Found</h1>
-<p>The character you're seaching for does not exist, or you have not specified one.</p>
+<p>The character you're searching for does not exist, or you have not specified one.</p>
 {% else %}
 <h1>
 {% if target.forum_profile.avatar %}
