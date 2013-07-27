@@ -1,4 +1,4 @@
-{% extends 'wonews/roster/default.html' %}
+{% extends 'default.html' %}
 {% load markup bootstrap_toolkit %}
 {% block titleblock %}Create a New Character{% endblock %}
 {% block oasis_content %}
@@ -10,7 +10,7 @@
 <form action="{% url 'roster:new' %}" method="post">
     {% csrf_token %}
     {{ new_character|as_bootstrap }}
-    <input type="submit", value="Sign up!" />
+    <input type="submit" value="Sign up!" />
 </form>
 {% else %}
 <h1>You already have a character!</h1>

@@ -35,7 +35,7 @@ def activate_player(uid, activation_key, request):
         if user.is_active:
             # User is already activated.
             return False
-        if user.get_profile().db.activation_key == activation_key:
+        if user.db.activation_key == activation_key:
             user.is_active = True
             user.save()
             switch_to(request, user)

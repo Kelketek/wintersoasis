@@ -5,10 +5,8 @@ Winter's Oasis standard command sets.
 from ev import CmdSet, Command
 from ev import default_cmds
 from src.commands.default import comms
-from src.commands.default import unloggedin
-from contrib.extended_room import CmdExtendedLook 
 from game.gamesrc.oasis.commands import quote, character_commands, say, \
-    page, warps, mail, ignore, lineeditor, senses, who, watch, hide_from, unloggedin, \
+    unloggedin, page, warps, mail, ignore, lineeditor, senses, who, watch, hide_from,\
     quit
 
 from contrib import menusystem

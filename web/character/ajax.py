@@ -10,7 +10,7 @@ def get_settings(request, character):
     """
     player = ev.search_player(character)[0]
     character = player.db.avatar
-    my_character = request.user.get_profile().db.avatar
+    my_character = request.user.db.avatar
     return player, character, my_character
 
 def permissions_check(my_character, target):
