@@ -14,7 +14,7 @@ def get_settings(request, character):
     return player, character, my_character
 
 def permissions_check(my_character, target):
-    if my_character.db.spirit.user.is_staff:
+    if my_character.db.spirit.is_staff:
         return True
     if my_character in target.get_alts() or target == my_character:
         return True

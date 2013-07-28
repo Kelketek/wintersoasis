@@ -2,9 +2,6 @@
 {% include forum_extras %}
 {% load dajaxice_templatetags %}
 {% load markup %}
-{% block extra_styles %}
-{% dajaxice_js_import %}
-{% endblock %}
 {% block titleblock %}{% if character %}{{ character.name }}{% else %}Profiles{% endif %}{% endblock %}
 {% block oasis_content %}
 <div class="container">
@@ -159,8 +156,6 @@ for (var i=0;i<rp_tags.length;i++) {
     });
 }
 </script>
-{% dajaxice_js_import %}
-<script src="{{ STATIC_URL }}dajax/jquery.dajax.core.js"></script>
     <script>
     {% if user.is_authenticated %}
     var call_button = function (listname, elementid, toggle) {
