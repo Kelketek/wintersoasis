@@ -77,8 +77,8 @@ def new_player(name, email, password, request):
     player = create_player(key=name, email=email, password=password,
         permissions=settings.PERMISSION_PLAYER_DEFAULT,
         typeclass=settings.BASE_PLAYER_TYPECLASS)
-    player.user.is_active = False
-    player.user.save()
+    player.is_active = False
+    player.save()
     character = create_object(typeclass=settings.BASE_CHARACTER_TYPECLASS, key=name,
         permissions=settings.PERMISSION_PLAYER_DEFAULT, home=settings.CHARACTER_DEFAULT_HOME)
     character.db.spirit = player
