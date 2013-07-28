@@ -74,7 +74,7 @@ def new_player(name, email, password, request):
     """
     Easier front-end for creating a new player. Also sends reg email.
     """
-    player = create_player(name=name, email=email, password=password,
+    player = create_player(key=name, email=email, password=password,
         permissions=settings.PERMISSION_PLAYER_DEFAULT,
         typeclass=settings.BASE_PLAYER_TYPECLASS)
     player.user.is_active = False
