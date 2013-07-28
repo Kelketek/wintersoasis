@@ -52,7 +52,7 @@ def send_activation_email(player, request):
         Generate an activation key, set it on a player, then have the user
     emailed with the relevant info.
     """
-    lst = [random.choice(string.ascii_letters + string.digits) for n in xrange(30)]
+    lst = [random.choice(string.ascii_letters + string.digits) for _ in xrange(30)]
     key = "".join(lst)
     player.db.activation_key = key
     send_mail(
@@ -66,7 +66,7 @@ def send_activation_email(player, request):
             )
         ),
         settings.SERVER_EMAIL,
-        [player.user.email]
+        [player.email]
     )
     
 
