@@ -5,11 +5,12 @@ import string
 from src.utils.create import create_player, create_object
 from django.conf import settings
 from django.contrib.auth import login
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
-from django.core.urlresolvers import reverse
 from django.template import RequestContext
 from Crypto.Random import random
+
+User = get_user_model()
 
 # get_template is what we need for loading up the template for parsing.
 from django.template.loader import get_template
