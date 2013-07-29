@@ -111,7 +111,8 @@ class WOCharacter(Character, WOObject):
         if not raw and not user.is_active:
             return []
         try:
-            alts = [alt.db.avatar for alt in User.objects.filter(email__iexact=user.email) if alt.is_active or raw]
+            alts = [alt.db.avatar for alt in User.objects.filter(email__iexact=user.email)
+                        if (alt.is_active or raw) and alt.email]
             return alts
         except AttributeError:
             return []

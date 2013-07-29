@@ -15,20 +15,8 @@ from django.views.generic import RedirectView
 from wiki.urls import get_pattern as get_wiki_pattern
 from django_notify.urls import get_pattern as get_notify_pattern
 
-# fix to resolve lazy-loading bug
-# https://code.djangoproject.com/ticket/10405#comment:11
-#from django.db.models.loading import cache as model_cache
-#if not model_cache.loaded:
-#    model_cache.get_models()
-
 from djangobb_forum import settings as forum_settings
-#from sitemap import SitemapForum, SitemapTopic
 
-#from django.contrib.auth.views import login
-#from django.contrib.auth.views import logout
-# loop over all settings.INSTALLED_APPS and execute code in 
-# files named admin.py in each such app (this will add those
-# models to the admin site)
 admin.autodiscover()
 
 # Setup the root url tree from / 
@@ -63,8 +51,6 @@ urlpatterns = patterns('',
     # Wiki
     url(r'^notify/', get_notify_pattern()),
     url(r'^wiki/', get_wiki_pattern()),
-
-    #(r'^mail/', include('game.gamesrc.oasis.web.mail_urls')),
 
     # Forum
     (r'^forum/', include('bb_urls', namespace='djangobb')),
