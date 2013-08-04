@@ -10,9 +10,8 @@ examples/cmdset.py)
 
 from ev import Command as BaseCommand
 from ev import default_cmds
-from ev import utils
 from ev import syscmdkeys
-from ev import Command, CmdSet, utils
+from ev import CmdSet
 
 CMD_NOMATCH = syscmdkeys.CMD_NOMATCH
 CMD_NOINPUT = syscmdkeys.CMD_NOINPUT

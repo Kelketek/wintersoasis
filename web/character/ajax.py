@@ -1,8 +1,8 @@
-import json
 from dajax.core import Dajax
 from dajaxice.decorators import dajaxice_register
-from character.models import TagDef, Tag
 import ev
+from src.typeclasses.models import Tag
+
 
 def get_settings(request, character):
     """

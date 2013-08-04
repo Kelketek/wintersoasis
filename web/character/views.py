@@ -5,10 +5,6 @@ from django.core.cache import get_cache
 from django.http import HttpResponseRedirect, Http404, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
-from mail.forms import ComposeMail
-
-from character.models import TagCategory, Tag
-from lib.mail import get_messages, send_message, Mail, MESSAGE
 
 User = get_user_model()
 
@@ -22,14 +18,11 @@ def is_alt(request, target):
     """
     Determines if a user is another user's alt.
     """
-    try:
-        return request.user.db.avatar in target.db.avatar.get_alts()
-    except:
-        return False
+    return target.db.avatar.is_alt(request.user)
 
 def permissions_bundle(request, target):
     """
-        Dictionary of permissions values that can be used to determine what a player
+    Dictionary of permissions values that can be used to determine what a player
     can and can't do through the interface, relative to a target user.
     """
     requester = request.user
@@ -42,7 +35,7 @@ def permissions_bundle(request, target):
     perms.same_player = False # If the requesting user and the target are the same
     perms.me = False # If either is_alt or same_player is true.
 
-    if not target or not requester.is_authenticated:
+    if not requester.is_authenticated:
         return perms
     if requester == target:
         perms.same_player = True
@@ -58,11 +51,13 @@ def permissions_bundle(request, target):
     if requester.is_staff:
         perms.staff = True
         perms.helpstaff = True
+    print "Perms: %s" % perms
     return perms
+
 
 def switch(request):
     """
-        Allows one to switch to another user. Optionally logs in, if the user
+    Allows one to switch to another user. Optionally logs in, if the user
     is an alt of the other user.
     """
     if not request.method == 'POST' or not request.user.is_authenticated:
@@ -81,34 +76,28 @@ def switch(request):
     next_page = user.db.avatar.get_absolute_url()
     return HttpResponseRedirect(next_page)
 
+
 def profile(request, username):
     """
     Character profile
     """
-    try:
-        user = User.objects.get(username__iexact=username)
-        character = user.db.avatar
-        tags = character.get_tags()
-    except User.DoesNotExist:
-        character = None
-        user = None
-        tags = {}
+    user = get_object_or_404(User, username__iexact=username)
+    character = user.db.avatar
+    tags = character.get_tags()
     perms = permissions_bundle(request, user)
     return render_to_response(
         'profile.html',
-        {
-            'character' : character,
-            'perms'     : perms,
-            'target'    : user,
-            'tags'      : tags,
-            'request'   : request,
-        },
-        RequestContext(request)
-    )
+        {'character' : character,
+         'perms'     : perms,
+         'target'    : user,
+         'tags'      : tags,
+         'request'   : request},
+        RequestContext(request))
+
 
 def ajax_render(original_function):
     """
-        Decorator for Ajaxy functions.
+    Decorator for Ajaxy functions.
     """
     def ajaxize(request):
         get_dict = request.GET.copy()

@@ -1,14 +1,10 @@
 """
 Warp commands. takes a user to special places on the MUCK, saving state as needed.
 """
-import time
-from game.gamesrc.oasis.lib.constants import *
+
 import ev
-from ev import Command as BaseCommand
 from ev import default_cmds
-from ev import utils
-from src.server.sessionhandler import SESSIONS
-from settings import *
+from game.gamesrc.oasis.lib.constants import NEXUS, IC_START
 
 MAIN = 0
 

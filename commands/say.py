@@ -4,9 +4,7 @@ This module contains commands that are used for player communication.
 """
 
 import re
-from ev import Command as BaseCommand
 from ev import default_cmds
-from ev import utils
 
 class Say(default_cmds.MuxCommand):
     """

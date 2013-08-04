@@ -3,9 +3,7 @@
 post status updates.
 """
 
-from ev import Command as BaseCommand
 from ev import default_cmds
-from ev import utils
 from game.gamesrc.oasis.lib.constants import ALERT
 from game.gamesrc.oasis.lib.oasis import validate_targets, toggle_notifications, check_ignores, check_sleepers, check_hiding
 

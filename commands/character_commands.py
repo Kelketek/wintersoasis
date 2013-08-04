@@ -9,43 +9,9 @@ examples/cmdset.py)
 """
 
 import time
-from ev import Command as BaseCommand
 from ev import default_cmds
 from ev import utils
-from settings import *
 
-
-"""
-This sets up the basis for a Evennia's 'MUX-like' command
-    style. The idea is that most other Mux-related commands should
-    just inherit from this and don't have to implement parsing of
-    their own unless they do something particularly advanced.
-
-A MUXCommand command understands the following possible syntax:
-
-    name[ with several words][/switch[/switch..]] arg1[,arg2,...] [[=|,] arg[,..]]
-
-The 'name[ with several words]' part is already dealt with by the
-    cmdhandler at this point, and stored in self.cmdname. The rest is stored
-    in self.args.
-
-The MuxCommand parser breaks self.args into its constituents and stores them in the
-    following variables:
-
-self.switches = optional list of /switches (without the /)
-self.raw = This is the raw argument input, including switches
-self.args = This is re-defined to be everything *except* the switches
-self.lhs = Everything to the left of = (lhs:'left-hand side'). If
-    no = is found, this is identical to self.args.
-self.rhs: Everything to the right of = (rhs:'right-hand side').
-    If no '=' is found, this is None.
-self.lhslist - self.lhs split into a list by comma
-self.rhslist - list of self.rhs split into a list by comma
-self.arglist = list of space-separated args (including '=' if it exists)
-
-All args and list members are stripped of excess whitespace around the
-strings, but case is preserved.
-"""
 
 class Sheet(default_cmds.MuxCommand):
     """
@@ -82,40 +48,41 @@ and get their info.
 
     def display_background(self, char):
         """
-	Displays a character's background.
-	"""
-	self.caller.msg("The legend of " + char.name + ":")
-	self.caller.msg("")
-	background = char.db.background
-	if not background:
-	    self.caller.msg("    This tale is not written.")
+        Displays a character's background.
+        """
+        self.caller.msg("The legend of " + char.name + ":")
+        self.caller.msg("")
+        background = char.db.background
+        if not background:
+            self.caller.msg("    This tale is not written.")
             return
         self.caller.msg(background)
 
     def func(self):
         """
-	Primary function for +sheet.
-	"""
-	self.caller.msg("")
-	if self.args:
-	    if not (self.caller.check_permstring("Immortals") or self.caller.check_permstring("Wizards")
-	    or self.caller.check_permstring("PlayerHelpers")):
-	        self.caller.msg("Players cannot look at each other's sheets.")
-	        return
-	    char_list = self.caller.search(self.args, global_search=True, ignore_errors=True)
-	    if char_list:
-	        char = char_list[0]
-	    else:
-	        self.caller.msg("No such character: " + self.args)
-		self.caller.msg("")
-	else:
-	    char = self.caller
-	if "bg" in self.switches:
-	    self.display_background(char)
-	    self.caller.msg("")
-	    return
+        Primary function for +sheet.
+        """
+        self.caller.msg("")
+        if self.args:
+            if not (self.caller.check_permstring("Immortals") or self.caller.check_permstring("Wizards")
+                    or self.caller.check_permstring("PlayerHelpers")):
+                self.caller.msg("Players cannot look at each other's sheets.")
+                return
+            char_list = self.caller.search(self.args, global_search=True, ignore_errors=True)
+            if char_list:
+                char = char_list[0]
+            else:
+                self.caller.msg("No such character: " + self.args)
+                self.caller.msg("")
+                return
+        else:
+            char = self.caller
+            if "bg" in self.switches:
+                self.display_background(char)
+                self.caller.msg("")
+                return
         self.display_sheet(char)
-	self.caller.msg("")
+        self.caller.msg("")
 
 class WhoSpec(default_cmds.MuxCommand):
     """
@@ -147,27 +114,26 @@ class WhoSpec(default_cmds.MuxCommand):
         ]
 
         if "far" in self.switches:
-	    characters = [ thing for thing in
-	        self.caller.search(self.args, global_search=True, ignore_errors=True)
-		if thing.player
-	    ]
+            characters = [thing for thing in
+                self.caller.search(self.args, global_search=True,
+                                   ignore_errors=True) if thing.db.spirit]
 
         idle_threshhold = 180 # Three minutes minimum idle.
 
         self.caller.msg("+-Stat---Name----------------------------Sex---------Species-----------------+")
         for character in characters:
-	    if character.sessions:
-	        idle_time = time.time() - character.sessions[0].cmd_last_visible
-		if idle_time > idle_threshhold:
-		    name = name = character.name + "[Idle " + utils.time_format(idle_time,1) + "]"
-		else:
-		    name = character.name
+            if character.sessions:
+                idle_time = time.time() - character.sessions[0].cmd_last_visible
+                if idle_time > idle_threshhold:
+                    name = name = character.name + "[Idle " + utils.time_format(idle_time,1) + "]"
+                else:
+                    name = character.name
             else:
-	        name = character.name + "[Zzz]"
+                name = character.name + "[Zzz]"
 
-	    status = character.db.status
-	    if not status:
-	        status = ""
+            status = character.db.status
+            if not status:
+                status = ""
             line = "| %-5s| %-30s| %-10s| %-24s|" % ( character.db.status, name, character.db.sex, character.db.species )
             self.caller.msg(line)
         self.caller.msg("+----------------------------------------------------------------------------+")

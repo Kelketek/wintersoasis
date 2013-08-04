@@ -21,12 +21,11 @@ from ev import Character
 from collections import OrderedDict
 from django.core.urlresolvers import reverse
 from django.contrib.auth import get_user_model
-from game.gamesrc.oasis.lib.oasis import action_watchers, check_ignores, check_sleepers, check_hiding, ignored_notifications
-from game.gamesrc.oasis.lib.constants import ALERT
+from game.gamesrc.oasis.lib.oasis import action_watchers, check_ignores, check_hiding, ignored_notifications
+from game.gamesrc.oasis.lib.constants import ALERT, TAG_CATEGORIES
 from object import WOObject
 
 from lib.mail import get_messages
-from web.character.models import TagCategory, TagDef, Tag
 from settings import SERVERNAME
 
 # these are called so many times it's worth setting them to avoid lookup calls
@@ -68,12 +67,14 @@ class WOCharacter(Character, WOObject):
 
     def announce_message(self, user, target, message, message_key, must_be_online=False):
         """
-            Sends an announcement to other characters.
+        Sends an announcement to other characters.
         message is a string to send.
+
         message_key is a label for the type of message being sent. An
-            announcement that a user is connection might have this as "connection".
+        announcement that a user is connection might have this as "connection".
+
         must_be_online makes the message cancel if the user disconnects before
-            the targets receive it.
+        the targets receive it.
         """
         if (must_be_online and not self.sessions) or (not check_hiding(user, [target])) or (not check_ignores(target, [self], silent=True) ) \
             or self.db.hiding or message_key in ignored_notifications(target):
@@ -90,16 +91,31 @@ class WOCharacter(Character, WOObject):
         I'd say avoid doing this if you have more than a couple hundred tags.
         """
         tags_dict = {}
-        categories = list(TagCategory.objects.all())
-        tag_defs = list(TagDef.objects.all())
-        character_tags = [tag.tag for tag in Tag.objects.filter(player=self.player) ]
-        if flat:
-            return character_tags
-        for category in categories:
-            tags_dict[category] = OrderedDict(sorted({tagdef : (tagdef in character_tags) for tagdef in TagDef.objects.filter(category=category)}.items(), key=lambda tagkey: tagkey[0].name))
+        for category in TAG_CATEGORIES:
+            search_category = 'object_%s' % category.lower()
+            print category
+            tags_dict[category] = self.db_tags.get_tag(category=search_category)
+        print tags_dict
         return tags_dict
 
-    def get_alts(self, raw=False):
+    def is_alt(self, target, raw=True):
+        """
+        Checks if a User is an alt of this character's user.
+        """
+        spirit = self.db.spirit
+        if not spirit:
+            return False
+        if not (target.is_authenticated() and target.is_active and
+                target.email.lower() == spirit.email.lower()):
+            return False
+        if not raw and target == spirit:
+            return False
+        # Prevent priv escalation.
+        if spirit.is_superuser:
+            return False
+        return True
+
+    def get_alts(self):
         """
             Get all verified alts of a character. If raw is true, gets even
         unverified characters. Don't use raw for security purpose, only for
@@ -108,14 +124,12 @@ class WOCharacter(Character, WOObject):
         list.
         """
         user = self.db.spirit
-        if not raw and not user.is_active:
+        if not user.is_active:
             return []
-        try:
-            alts = [alt.db.avatar for alt in User.objects.filter(email__iexact=user.email)
-                        if (alt.is_active or raw) and alt.email]
-            return alts
-        except AttributeError:
-            return []
+        alts = [alt.db.avatar for alt in User.objects.filter(email__iexact=user.email)
+                if self.is_alt(alt, raw=False)]
+        print alts
+        return alts
 
     def check_list(self, target, listname, ignores=True):
         """
@@ -155,16 +169,6 @@ class WOCharacter(Character, WOObject):
         Get the URL to a user's profile.
         """
         return reverse('character:profile', args=[self.name])
-
-    def delete(self):
-        """
-        Delete the object with all standard checks, and any extras we've defined for it.
-        """
-        result = super(WOCharacter, self).delete()
-        if result:
-            for tag in Tag.objects.filter(character=self.dbobj):
-                tag.delete()
-        return result
 
     def at_post_puppet(self):
         """

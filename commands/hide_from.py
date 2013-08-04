@@ -3,10 +3,8 @@
 list, or allows a character to hide from everyone.
 """
 
-import time
-from ev import Command as BaseCommand
 from ev import default_cmds
-from game.gamesrc.oasis.lib.oasis import partial_pmatch, check_ignores, validate_targets
+from game.gamesrc.oasis.lib.oasis import validate_targets
 
 class HideFrom(default_cmds.MuxCommand):
     """

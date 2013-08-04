@@ -1,0 +1,15 @@
+{% if perms.me and character.get_alts %}
+ <form method="POST" action="{% url 'character:switch' %}" />
+  {% csrf_token %}
+  <select name="target">
+   {% for alt in character.get_alts %}
+    <option>{{ alt.name }}</option>
+   {% endfor %}
+  </select>
+  <input class="btn" type="Submit" value="Switch Characters" />
+  <label class="checkbox">
+   <input type="checkbox" name="login" />
+    Log in
+  </label>
+  </form>
+{% endif %}

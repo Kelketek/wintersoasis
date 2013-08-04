@@ -21,20 +21,6 @@ eventual tracebacks by logging the error and returning False.
 See many more examples of lock functions in src.locks.lockfuncs.
 
 """
-from web.character.models import Approval
-
-def myfalse(accessing_obj, accessed_obj, *args, **kwargs):
-    """
-    called in lockstring with myfalse().
-    A simple logger that always returns false. Prints to stdout
-    for simplicity, should use utils.logger for real operation.
-    """
-    print "%s tried to access %s. Access denied." % (accessing_obj, accessed_obj)
-    return False
 
 def semi_approved(accessing_obj, accessed_obj, *args, **kwargs):
-    try:
-        approve = Approval.objects.get(player=accessing_obj.player.dbobj)
-    except:
-        return False
-    return len(approve.approvers.all())
+    return accessing_obj.approvers

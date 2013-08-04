@@ -1,16 +1,11 @@
 #!/usr/bin/env python
-import datetime
-import re
-
-import ev
 import settings
 
-from ev import Command as BaseCommand
 from ev import default_cmds
-from src.utils import create, utils
+from src.utils import utils
 from game.gamesrc.oasis.lib.mail import send_message, get_messages
 from game.gamesrc.oasis.lib.mail import Mail as MailObject
-from game.gamesrc.oasis.lib.oasis import partial_pmatch, validate_targets, check_ignores
+from game.gamesrc.oasis.lib.oasis import validate_targets, check_ignores
 from game.gamesrc.oasis.lib.constants import *
 from game.gamesrc.oasis.commands.lineeditor import LineEditor
 
@@ -70,7 +65,7 @@ To delete all of your messages, type:
             if not self.args.lower() == 'quiet':
                 self.caller.msg(ALERT % "You have no new messages.")
         else:
-            self.caller.msg(ALERT % "You have %s new message(s). Check them with: mail" % count)
+            self.caller.msg(ALERT % "You have %s new message(s). Check them with: mail" % len(messages))
 
     def display_mail(self, message):
         """
@@ -131,7 +126,7 @@ To delete all of your messages, type:
         body = editor_result['buffer']
         receivers = check_ignores(self.caller, receivers)
         if not receivers:
-            caller.msg('No valid recipients found!')
+            self.caller.msg('No valid recipients found!')
             return False
         sent, status = send_message(senders, subject, body, receivers, send_email=True)
         return self.benediction(sent, status)

@@ -2,12 +2,8 @@
 Page command. Used to contact another player across the MUCK.
 """
 
-import time
-from ev import Command as BaseCommand
 from ev import default_cmds
-from ev import utils
-from src.server.sessionhandler import SESSIONS
-from settings import *
+
 from game.gamesrc.oasis.lib.oasis import partial_pmatch, check_ignores, check_sleepers, validate_targets
 
 

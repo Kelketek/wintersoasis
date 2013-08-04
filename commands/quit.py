@@ -1,7 +1,5 @@
 "Quit command."
-from ev import Command as BaseCommand
 from ev import default_cmds
-from ev import utils
 from lib import fortunes
 from random import choice
 

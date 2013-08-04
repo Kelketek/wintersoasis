@@ -1,0 +1,7 @@
+<h1>
+{% if target.forum_profile.avatar %}
+    <img class ="left" alt="" src="{{ target.forum_profile.avatar.url }}" />
+{% else %}
+    <img class='left' alt="{{character.name}}" src='{{ MEDIA_URL }}images/unlogged.png' />
+{% endif %}
+Dossier: {{ character.name }}</h1>

@@ -36,15 +36,15 @@
     {% bootstrap_messages %}
      {% block oasis_content %}{% endblock %}
 
-{% block footer_scripts %}{% endblock footer_scripts %}
 <div class="row">
-<footer class="span12 center">
-<hr />
-<img src="{{ MEDIA_URL }}images/foxlogo.svg" class="pull-right vtlogo" />
-<p class="footer-text">Winter's Oasis is a <a href="http://www.vulpinetheory.net">Vulpine Theory</a> project.<br />
-Vulpine Theory is a Division of Kelketek Enterprises, LLC.</p>
-</footer>
+ <footer class="span12 center">
+  <hr />
+  <img src="{{ MEDIA_URL }}images/foxlogo.svg" class="pull-right vtlogo" />
+  <p class="footer-text">Winter's Oasis is a <a href="http://www.vulpinetheory.net">Vulpine Theory</a> project.<br />
+  Vulpine Theory is a Division of Kelketek Enterprises, LLC.</p>
+ </footer>
 </div>
 </div>
-  </body>
+{% block footer_scripts %}{% endblock footer_scripts %}
+ </body>
 </html>

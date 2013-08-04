@@ -2,7 +2,7 @@
 <div class="navbar navbar-fixed-top">
     <div class="navbar-inner">
         <div class="container">
-            <a class="brand" href="{% url "index" %}">Winter's Oasis</a>
+            <a class="brand" href="{% url 'index' %}">Winter's Oasis</a>
             <ul class="nav">
                 <li><a href='{% url "wiki:root" %}'>Read up on the game</a></li>
                 <li><a href='{% url "djangobb:index" %}'>Play on the forums</a></li>
@@ -15,7 +15,7 @@
                 <img class="wo-avatar" src="{{ user.forum_profile.avatar.url }}" />
               {% else %}
                 <img class="wo-avatar" src="{{ MEDIA_URL }}images/unlogged.png" />
-              {% endif %}
+              {% endif %}</a>
               <li><a href="{% url 'logout' %}?next={{ request.get_full_path }}">Sign out</a></li>
               {% else %}
               <li><a href='{% url "roster:new" %}'>Register</a></li>
@@ -23,7 +23,7 @@
               <li class="dropdown">
                 <a class="dropdown-toggle" href="#" data-toggle="dropdown">Sign In <strong class="caret"></strong></a>
                 <div class="dropdown-menu" class="popout" style="padding: 15px; padding-bottom: 0px;">
-                  <form class="form-inline" action="{% url "login" %}" method="POST">
+                  <form class="form-inline" action="{% url 'login' %}" method="POST">
                     {% csrf_token %}
                     {{ login_form|as_bootstrap }}
                    <input class="btn btn-primary" style="clear: left; width: 100%; height: 32px; font-size: 13px;" type="submit" name="commit" value="Sign In" />

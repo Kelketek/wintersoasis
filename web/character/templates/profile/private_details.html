@@ -1,0 +1,34 @@
+{% load markup %}
+{% if perms.me or perms.staff %}
+<div class="row">
+ <table class="table span3">
+  <tr>
+   <th>Stat</th>
+   <th>Value</th>
+  </tr>
+  {% for key, value in character.db.stats.items %}
+  <tr>
+   <td class="profile_key"><img class="character_stat_icon" src="{{ MEDIA_URL }}/images/{{ key }}.png" alt="">{{ key }}:</td>
+   <td class="profile_value">{{value}}</td>
+  </tr>
+  {% endfor %}
+ </table>
+ <div class="span8">
+  <table class="table">
+   <tr>
+    <th>Quality</th>
+    <th>Description</th>
+   </tr>
+   {% for key, value in character.db.qualities.items %}
+   <tr>
+    <td class="quality_key"><span class="quality_key">{{ key }}</span></td>
+    <td class="quality_value">{{value}}</td>
+   </tr>
+   {% endfor %}
+  </table>
+ </div>
+</div>
+<h2>History</h2>
+<hr />
+{{ character.db.background|markdown:"safe" }}
+{% endif %}

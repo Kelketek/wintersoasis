@@ -10,8 +10,6 @@ from game.gamesrc.oasis.commands import quote, character_commands, say, \
     quit
 
 from contrib import menusystem
-#from contrib import misc_commands
-#from contrib import chargen
 
 class ExampleCmdSet(CmdSet):
     """

@@ -2,15 +2,13 @@
 Senses commands. For stuff like taste, feel, and smell.
 """
 
-from ev import Command as BaseCommand
 from ev import default_cmds
-from ev import utils
 from game.gamesrc.oasis.lib.constants import ALERT
 from game.gamesrc.oasis.lib.oasis import validate_targets, check_ignores
 
 class Sense(default_cmds.MuxCommand):
     """
-        Base command for Taste, Feel, and Smell.
+    Base command for Taste, Feel, and Smell.
     """
     key = 'sense'
     aliases = []

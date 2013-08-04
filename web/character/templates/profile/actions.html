@@ -1,0 +1,15 @@
+{% if user.is_authenticated and not perms.same_player %}
+ <form method="POST" action="{% url 'mail:compose' %}" >
+  {% csrf_token %}
+  <input type="image" src="{{ MEDIA_URL }}images/oldmail.svg" height="23"/>
+  <input type="hidden" name="to" value="{{ character.name }}, "/>
+  <input type="hidden" name="subject" value="Subject goes here"/>
+  <input type="hidden" name="message" value="Type your message here..."/>
+ </form>
+ <button id="watching_button" onclick="call_button('watching', '#watching_button', true);"></button>
+ <button id="hiding_from_button" onclick="call_button('hiding_from', '#hiding_from_button', true);"></button>
+ <button id="ignoring_button" onclick="call_button('ignoring', '#ignoring_button', true);"></button>
+{% endif %}
+{% if perms.same_player %}
+ <br /><a href="{% url 'djangobb:forum_profile_upload_avatar' character.name %}">Change Avatar</a>
+{% endif %}

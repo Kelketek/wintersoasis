@@ -8,7 +8,6 @@ examples/cmdset.py)
 
 """
 import time
-from ev import Command as BaseCommand
 from ev import default_cmds
 from ev import utils
 from game.gamesrc.oasis.lib.oasis import check_ignores

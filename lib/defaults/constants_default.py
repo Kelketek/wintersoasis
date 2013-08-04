@@ -53,3 +53,5 @@ To check and manage your in-game messages, log in to %s.
 OBJECT_TYPES = {
     'default' : BASE_OBJECT_TYPECLASS,
 }
+
+TAG_CATEGORIES = ("Character Attributes", "Player Preferences", "Organization Membership")

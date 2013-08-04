@@ -1,0 +1,29 @@
+<h2>Role-Play Tags</h2>
+<hr />
+{% if perms.me or perms.staff %}
+ <button class="show_tag_form" onclick="show_tag_form(true);">Edit</button>
+{% endif %}
+<div class="character_tag_listing">
+ {% for category, tag in tags.items %}
+ <div class="tags_{{category.name}}">
+  <h3>{{ category.name }}</h3>
+   {% for category, tag_list in tag_dict.items %}
+    {% if tag_list %}
+     <span class="tag">
+    {% elif perms.me or perms.staff %}
+     <span class="tag" style="display: none;">
+     <input class="tag_toggle" type="checkbox" name="tag_check" value="{{tag.id}}" {% if tag_set %}checked{% endif %} style="display: none;" />
+    {% endif %}
+    {% if perms.me or perms.staff %}
+     <span class="label">{{ tag.db_key }}</span><div class="tag_description" style="display: none;">{{ tag.db_data }}</div></span>
+    {% endif %}
+   {% endfor %}
+ </div>
+ {% endfor %}
+ {% if perms.me or perms.staff %}
+  <br />
+  <span id="tag_error"></span>
+  <button class="save_tags" onclick="show_tag_form(false);save_tags();" style="display:none;">Save</button>
+  <div class="spacer"></div>
+ {% endif %}
+</div>
