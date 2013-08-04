@@ -7,6 +7,7 @@
 {% include "profile/header.html" %}
 {% include "profile/private_details.html" %}
 {% include "profile/public_info.html" %}
+{% include "profile/rp_tags.html" %}
 {% endblock oasis_content %}
 {% block footer_scripts %}
         <script src="{{ MEDIA_URL }}javascript/qtip.js"></script>
@@ -70,7 +71,9 @@ for (var i=0;i<rp_tags.length;i++) {
         var tag_list = [];
         $('.character_tag_listing :checked').each( function() {
             console.log($(this).next().text());
-            tag_list.push($(this).next().text());
+            console.log($(this))
+            console.log($(this).val())
+            tag_list.push($(this).val());
         });
         Dajaxice.character.tags_save(Dajax.process,{ 'tag_list' : tag_list, 'character' : '{{character.name}}' });
     }

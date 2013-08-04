@@ -8,6 +8,7 @@ from constants import *
 from ev import utils
 from src.server.sessionhandler import SESSIONS
 from twisted.internet import reactor
+from src.typeclasses.models import Tag
 
 if "notification" in settings.INSTALLED_APPS:
     from notification import models as notification
@@ -159,3 +160,12 @@ def validate_targets(person, name_list, ignores=True, local_only=True, silent=Fa
     if ignores:
         targets = check_ignores(person, targets, silent=silent)
     return targets
+
+def get_full_taglist():
+    """
+    Gets all possible preference tags.
+    """
+    tag_categories = ['object_%s' % category.strip().lower()
+        for category in TAG_CATEGORIES]
+    tags = Tag.objects.filter(db_category__in=tag_categories)
+    return tags

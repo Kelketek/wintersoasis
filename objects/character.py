@@ -18,7 +18,6 @@ this change, you have to convert them manually e.g. with the
 """
 import time
 from ev import Character
-from collections import OrderedDict
 from django.core.urlresolvers import reverse
 from django.contrib.auth import get_user_model
 from game.gamesrc.oasis.lib.oasis import action_watchers, check_ignores, check_hiding, ignored_notifications
@@ -29,6 +28,8 @@ from lib.mail import get_messages
 from settings import SERVERNAME
 
 # these are called so many times it's worth setting them to avoid lookup calls
+from src.typeclasses.models import Tag
+
 _GA = object.__getattribute__
 _SA = object.__setattr__
 _DA = object.__delattr__
@@ -81,21 +82,40 @@ class WOCharacter(Character, WOObject):
             return
         target.msg(message)
 
+    def get_tag_category_dict(self, category, flat=False):
+        """
+        Returns a dictionary of all tags, where tags set on the user are marked
+        True, and ones not set are marked False. Useful for allowing the user
+        to pick what tags are desired.
+        """
+        search_category = 'object_%s' % category.lower()
+        character_tags = Tag.objects.get_tags_on_obj(self.dbobj,
+            category=search_category)
+        if flat:
+            return character_tags
+        tag_dict = {tag: False for tag in
+            Tag.objects.filter(db_category=search_category)}
+        patch_dict = {tag: True for tag in character_tags}
+        tag_dict.update(patch_dict)
+        return tag_dict
+
     def get_tags(self, flat=False):
         """
-            Get tags on this characted back, organized into an OrderedDict by
+            Get tags on this character back, organized into an OrderedDict by
         category name. The tags in each category will also be a dictionary of
-        true/false values. This method is only really practical if the number
-        of defined tags remains relativly small.
-
-        I'd say avoid doing this if you have more than a couple hundred tags.
+        true/false values.
         """
         tags_dict = {}
+
         for category in TAG_CATEGORIES:
-            search_category = 'object_%s' % category.lower()
-            print category
-            tags_dict[category] = self.db_tags.get_tag(category=search_category)
-        print tags_dict
+            tags_dict[category] = self.get_tag_category_dict(category, flat=flat)
+        if flat:
+            tags = []
+            for value in tags_dict.values():
+                tags.extend(value)
+            print "FLAT TAGS: %s" % tags
+            return tags
+        print "FINAL TAGS DICT: %s" % tags_dict
         return tags_dict
 
     def is_alt(self, target, raw=True):

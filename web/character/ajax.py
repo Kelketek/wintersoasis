@@ -1,6 +1,7 @@
 from dajax.core import Dajax
 from dajaxice.decorators import dajaxice_register
 import ev
+from game.gamesrc.oasis.lib.oasis import get_full_taglist
 from src.typeclasses.models import Tag
 
 
@@ -72,21 +73,24 @@ def tags_save(request, character, tag_list):
         return dajax.json()
     print character
     character_tags = character.get_tags(flat=True)
-    tags = []
-    for tag in tag_list:
-        try:
-            tags.append(TagDef.objects.get(name=tag))
-        except:
-            continue
-    # Sync lists in a manner which calls the DB the least number of times.
+    print "CHARACTER TAGS: %s" % character_tags
+    possible_tags = get_full_taglist()
+    print "POSSIBLE TAGS: %s" % possible_tags
+    print "PREPROCESSED TAG LIST: %s" % tag_list
+    tag_list = Tag.objects.in_bulk(tag_list).values()
+    print "TAG LIST: %s" % tag_list
+    # Make sure someone doesn't hack up our other tags.
+    tags = [tag for tag in tag_list if tag in possible_tags]
+
     for tag in character_tags:
         if tag not in tags:
-            # Possibility of duplicates. Kill them all.
-            doomed_tags = Tag.objects.filter(tag=tag)
-            for tag in doomed_tags:
-                tag.delete()
+            print "Removing %s" % tag
+            category = tag.db_category.replace('object_','')
+            character.tags.remove(tag.db_key, category=category)
     for tag in tags:
         if tag not in character_tags:
-            Tag(player=character.db.spirit.dbobj, tag=tag).save()
+            print "Adding %s" % tag
+            category = tag.db_category.replace('object_','')
+            character.tags.add(tag.db_key, category=category)
     dajax.assign('#tag_error', 'innerHTML', "Saved.")
     return dajax.json()

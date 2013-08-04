@@ -51,7 +51,6 @@ def permissions_bundle(request, target):
     if requester.is_staff:
         perms.staff = True
         perms.helpstaff = True
-    print "Perms: %s" % perms
     return perms
 
 

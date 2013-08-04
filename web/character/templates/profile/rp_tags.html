@@ -4,18 +4,18 @@
  <button class="show_tag_form" onclick="show_tag_form(true);">Edit</button>
 {% endif %}
 <div class="character_tag_listing">
- {% for category, tag in tags.items %}
- <div class="tags_{{category.name}}">
-  <h3>{{ category.name }}</h3>
-   {% for category, tag_list in tag_dict.items %}
-    {% if tag_list %}
+ {% for category, tag_dict in tags.items %}
+ <div class="tags">
+  <h3>{{ category }}</h3>
+   {% for key, value in tag_dict.items %}
+    {% if perms.me or perms.staff %}
+     <span class="tag" {% if not value %}style="display: none;"{% endif %}>
+     <input class="tag_toggle" type="checkbox" name="tag_check" value="{{key.id}}" {% if value %}checked{% endif %} style="display: none;" />
+    {% else %}
      <span class="tag">
-    {% elif perms.me or perms.staff %}
-     <span class="tag" style="display: none;">
-     <input class="tag_toggle" type="checkbox" name="tag_check" value="{{tag.id}}" {% if tag_set %}checked{% endif %} style="display: none;" />
     {% endif %}
     {% if perms.me or perms.staff %}
-     <span class="label">{{ tag.db_key }}</span><div class="tag_description" style="display: none;">{{ tag.db_data }}</div></span>
+     <span class="label">{{ key.db_key }}</span><div class="tag_description" style="display: none;">{{ tag.db_data }}</div></span>
     {% endif %}
    {% endfor %}
  </div>
