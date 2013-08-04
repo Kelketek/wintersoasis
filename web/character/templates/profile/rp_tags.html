@@ -15,7 +15,7 @@
      <span class="tag">
     {% endif %}
     {% if perms.me or perms.staff %}
-     <span class="label">{{ key.db_key }}</span><div class="tag_description" style="display: none;">{{ tag.db_data }}</div></span>
+     <span class="label">{{ key.db_key }}</span><div class="tag_description" style="display: none;">{{ key.db_data }}</div></span>
     {% endif %}
    {% endfor %}
  </div>
