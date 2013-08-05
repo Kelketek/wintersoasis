@@ -44,6 +44,7 @@ def permissions_bundle(request, target):
     perms.is_alt = is_alt(request, target)
     if perms.same_player or perms.is_alt:
         perms.me = True
+        perms.editable = True #TODO: Change this later to account for chargen.
 
     # Other permissions to be put in later.
     if requester.is_superuser:
