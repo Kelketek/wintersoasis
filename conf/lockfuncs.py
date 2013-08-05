@@ -23,4 +23,4 @@ See many more examples of lock functions in src.locks.lockfuncs.
 """
 
 def semi_approved(accessing_obj, accessed_obj, *args, **kwargs):
-    return accessing_obj.approvers
+    return accessing_obj.db.approvers
