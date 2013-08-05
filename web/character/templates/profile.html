@@ -71,12 +71,51 @@ for (var i=0;i<rp_tags.length;i++) {
         var tag_list = [];
         $('.character_tag_listing :checked').each( function() {
             console.log($(this).next().text());
-            console.log($(this))
-            console.log($(this).val())
+            console.log($(this));
+            console.log($(this).val());
             tag_list.push($(this).val());
         });
         Dajaxice.character.tags_save(Dajax.process,{ 'tag_list' : tag_list, 'character' : '{{character.name}}' });
     }
+    {% if perms.editable %}
+    var show_background_form = function () {
+        $('#background_container').hide();
+        $('#edit_background').hide();
+        $('#background_form').show();
+        $('#save_background').show();
+    }
+    var hide_background_form = function () {
+        $('#background_form').hide();
+        $('#save_background').hide();
+        $('#background_container').show();
+        $('#edit_background').show();
+    }
+    var save_background = function () {
+        var background = $('#id_background').val();
+        console.log(background);
+        Dajaxice.character.change_background(
+                Dajax.process, {'character': '{{character.name}}', 'textwall': background});
+        $('#background').html(converter.makeHtml(background));
+    }
+    var show_description_form = function () {
+        $('#description_container').hide();
+        $('#edit_description').hide();
+        $('#description_form').show();
+        $('#save_description').show();
+    }
+    var hide_description_form = function () {
+        $('#description_form').hide();
+        $('#save_description').hide();
+        $('#description_container').show();
+        $('#edit_description').show();
+    }
+    var save_description = function () {
+        var description = $('#id_description').val();
+        Dajaxice.character.change_description(
+                Dajax.process, {'character': '{{character.name}}', 'textwall': description});
+        $('#description').html(converter.makeHtml(description));
+    }
+    {% endif %}
     {% endif %}
 </script>
 {% endblock footer_scripts %}

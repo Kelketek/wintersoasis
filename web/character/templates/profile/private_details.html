@@ -1,15 +1,21 @@
-{% load markup %}
+{% load markup bootstrap_toolkit widget_tweaks %}
 {% if perms.me or perms.staff %}
 <div class="row">
  <table class="table span3">
   <tr>
    <th>Stat</th>
    <th>Value</th>
+   {% if perms.editable %}
+   <th></th>
+   {% endif %}
   </tr>
   {% for key, value in character.db.stats.items %}
   <tr>
    <td class="profile_key"><img class="character_stat_icon" src="{{ MEDIA_URL }}images/{{ key }}.png" alt="">{{ key }}:</td>
    <td class="profile_value">{{value}}</td>
+   {% if perms.editable %}
+   <td class="adjust_stats"><div></div></td>
+   {% endif %}
   </tr>
   {% endfor %}
  </table>
@@ -28,7 +34,26 @@
   </table>
  </div>
 </div>
-<h2>History</h2>
+<h2 class="page-header">History</h2>
 <hr />
-{{ character.db.background|markdown:"safe" }}
+ {% if perms.editable %}
+  <div class="btn-toolbar">
+   <button id="edit_background" class="btn show_background_form" onclick="show_background_form();">Edit</button>
+  </div>
+ {% endif %}
+<div id='background_container' class='row'>
+ <div id='background' class="span12">
+  {{ character.db.background|markdown:"safe" }}
+ </div>
+</div>
+{% if perms.editable %}
+<div id='background_form' class='row' style='display:none;'>
+ <div class="span12">
+  {{ background_form.background|attr:"class:span12" }}
+ </div>
+</div>
+<div class="btn-toolbar pull-right">
+ <button id="save_background" class="btn btn-primary" onclick="hide_background_form();save_background();" style="display:none;">Save</button>
+</div>
+{% endif %}
 {% endif %}

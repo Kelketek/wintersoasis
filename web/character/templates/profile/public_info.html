@@ -1,4 +1,23 @@
-{% load markup %}
+{% load markup widget_tweaks %}
 <h2>Appearance</h2>
 <hr />
-{{ character.db.desc|markdown:"safe" }}
+{% if perms.editable %}
+ <div class="btn-toolbar">
+  <button id="edit_description" class="btn show_description_form" onclick="show_description_form();">Edit</button>
+ </div>
+{% endif %}
+<div id='description_container' class='row'>
+ <div id='description' class="span12">
+  {{ character.db.desc|markdown:"safe" }}
+ </div>
+</div>
+{% if perms.editable %}
+<div id='description_form' class='row' style='display:none;'>
+ <div class="span12">
+  {{ description_form.description|attr:"class:span12" }}
+ </div>
+</div>
+<div class="btn-toolbar pull-right">
+ <button id="save_description" class="btn btn-primary" onclick="hide_description_form();save_description();" style="display:none;">Save</button>
+</div>
+{% endif %}

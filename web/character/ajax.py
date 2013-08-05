@@ -2,6 +2,7 @@ from dajax.core import Dajax
 from dajaxice.decorators import dajaxice_register
 import ev
 from game.gamesrc.oasis.lib.oasis import get_full_taglist
+from game.gamesrc.oasis.web.character.forms import BackgroundForm, DescriptionForm
 from src.typeclasses.models import Tag
 
 
@@ -73,24 +74,60 @@ def tags_save(request, character, tag_list):
         return dajax.json()
     print character
     character_tags = character.get_tags(flat=True)
-    print "CHARACTER TAGS: %s" % character_tags
     possible_tags = get_full_taglist()
-    print "POSSIBLE TAGS: %s" % possible_tags
-    print "PREPROCESSED TAG LIST: %s" % tag_list
     tag_list = Tag.objects.in_bulk(tag_list).values()
-    print "TAG LIST: %s" % tag_list
     # Make sure someone doesn't hack up our other tags.
     tags = [tag for tag in tag_list if tag in possible_tags]
 
     for tag in character_tags:
         if tag not in tags:
-            print "Removing %s" % tag
             category = tag.db_category.replace('object_','')
             character.tags.remove(tag.db_key, category=category)
     for tag in tags:
         if tag not in character_tags:
-            print "Adding %s" % tag
             category = tag.db_category.replace('object_','')
             character.tags.add(tag.db_key, category=category)
     dajax.assign('#tag_error', 'innerHTML', "Saved.")
+    return dajax.json()
+
+@dajaxice_register
+def change_background(request, character, textwall):
+    result = ""
+    dajax = Dajax()
+    try:
+        player, character, my_character = get_settings(request, character)
+        if not permissions_check(my_character, character):
+            result = "Permission Denied."
+    except IndexError:
+        result = "Could not find player internally."
+    if result:
+        dajax.assign('#background_error', 'innerHTML', result)
+        return dajax.json()
+    background = BackgroundForm({'background': textwall})
+    if background.is_valid():
+        character.db.background = background.cleaned_data['background']
+        dajax.assign('#background_error', 'innerHTML', 'Saved.')
+        return dajax.json()
+    dajax.assign('#background_error', 'innerHTML', background.errors)
+    return dajax.json()
+
+@dajaxice_register
+def change_description(request, character, textwall):
+    result = ""
+    dajax = Dajax()
+    try:
+        player, character, my_character = get_settings(request, character)
+        if not permissions_check(my_character, character):
+            result = "Permission Denied."
+    except IndexError:
+        result = "Could not find player internally."
+    if result:
+        dajax.assign('#description_error', 'innerHTML', result)
+        return dajax.json()
+    description = DescriptionForm({'description': textwall})
+    if description.is_valid():
+        character.db.desc = description.cleaned_data['description']
+        dajax.assign('#description_error', 'innerHTML', 'Saved.')
+        return dajax.json()
+    dajax.assign('#description_error', 'innerHTML', description.errors)
     return dajax.json()

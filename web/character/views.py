@@ -3,8 +3,9 @@ from django.contrib.auth import login
 from django.contrib.auth import get_user_model
 from django.core.cache import get_cache
 from django.http import HttpResponseRedirect, Http404, HttpResponse, HttpResponseBadRequest
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import render_to_response, get_object_or_404, render
 from django.template import RequestContext
+from game.gamesrc.oasis.web.character.forms import BackgroundForm, DescriptionForm
 
 User = get_user_model()
 
@@ -34,6 +35,7 @@ def permissions_bundle(request, target):
     perms.is_alt = False # If the users are owned by the same activated email, this will become true.
     perms.same_player = False # If the requesting user and the target are the same
     perms.me = False # If either is_alt or same_player is true.
+    perms.editable = False # If the viewing user can edit the person's profile.
 
     if not requester.is_authenticated:
         return perms
@@ -48,9 +50,11 @@ def permissions_bundle(request, target):
         perms.wizard = True
         perms.staff = True
         perms.helpstaff = True
+        perms.editable = True
     if requester.is_staff:
         perms.staff = True
         perms.helpstaff = True
+        perms.editable = True
     return perms
 
 
@@ -84,14 +88,17 @@ def profile(request, username):
     character = user.db.avatar
     tags = character.get_tags()
     perms = permissions_bundle(request, user)
-    return render_to_response(
-        'profile.html',
-        {'character' : character,
-         'perms'     : perms,
-         'target'    : user,
-         'tags'      : tags,
-         'request'   : request},
-        RequestContext(request))
+    background_form = BackgroundForm(initial={'background':
+        (character.db.background or '')})
+    description_form = DescriptionForm(initial={'description':
+        (character.db.desc or '')})
+    return render(request, 'profile.html',
+        {'character': character,
+         'perms': perms,
+         'target': user,
+         'tags': tags,
+         'background_form': background_form,
+         'description_form': description_form})
 
 
 def ajax_render(original_function):

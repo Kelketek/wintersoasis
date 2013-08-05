@@ -1,7 +1,7 @@
 <h2>Role-Play Tags</h2>
 <hr />
 {% if perms.me or perms.staff %}
- <button class="show_tag_form" onclick="show_tag_form(true);">Edit</button>
+ <button class="show_tag_form btn" onclick="show_tag_form(true);">Edit</button>
 {% endif %}
 <div class="character_tag_listing">
  {% for category, tag_dict in tags.items %}
@@ -23,7 +23,7 @@
  {% if perms.me or perms.staff %}
   <br />
   <span id="tag_error"></span>
-  <button class="save_tags" onclick="show_tag_form(false);save_tags();" style="display:none;">Save</button>
+  <button class="save_tags btn btn-primary" onclick="show_tag_form(false);save_tags();" style="display:none;">Save</button>
   <div class="spacer"></div>
  {% endif %}
 </div>
